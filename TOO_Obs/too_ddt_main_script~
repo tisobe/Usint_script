@@ -1,0 +1,7 @@
+source /home/mta/.ascrc 
+
+cd /proj/web-icxc/cgi-bin/obs_ss/Usint_test/Development/TOO_Obs
+
+update_new_obs_list.py
+
+find_too_ddt_email.py

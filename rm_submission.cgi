@@ -1,0 +1,532 @@
+#!/soft/ascds/DS.release/ots/bin/perl
+use CGI qw/:standard :netscape /;
+
+#########################################################################################
+#											#
+# rm_submission.cgi: remove an accidental submission from database			#
+#											#
+# 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
+#		Last Update: Mar. 01, 2011 						#
+# This script removes an obsid from database.    	                            	#
+#											#
+#########################################################################################
+
+#
+#---- if this is usint version, set the following param to 'yes', otherwise 'no'
+#
+
+$usint_on = 'yes';                     ##### USINT Version
+#$usint_on = 'no';                      ##### USER Version
+#$usint_on = 'test_yes';                 ##### Test Version USINT
+#$usint_on = 'test_no';                 ##### Test Version USER
+
+
+#
+#---- set directory paths : updated to read from a file (02/25/2011)
+#
+
+open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+while(<IN>){
+        chomp $_;
+        @atemp    = split(/:/, $_);
+        $atemp[0] =~ s/\s+//g;
+        if($atemp[0] =~ /obs_ss/){
+                $obs_ss   = $atemp[1];
+        }elsif($atemp[0]  =~ /pass_dir/){
+                $pass_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /htemp_dir/){
+                $temp_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /data_dir/){
+                $data_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /ocat_dir/){
+                $real_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /test_dir/){
+                $test_dir = $atemp[1];
+        }
+}
+close(IN);
+
+#
+#--- if this is a test case, use the first directory, otherwise use the real one
+#
+
+if($usint_on =~ /test/i){
+        $ocat_dir = $test_dir;
+}else{
+        $ocat_dir = $real_dir;
+}
+
+print "Content-type: text/html\n\n";	# start html setting
+print start_html(-bgcolor=>"white"); 
+
+print start_form();			# starting a form
+
+
+#---------------------------------------------------------------------
+# ----- here are non CXC GTOs who have an access to data modification.
+#---------------------------------------------------------------------
+
+@special_user = ('isobe','mta');
+$no_sp_user = 2;
+
+#######################
+$usint_on = 'yes';
+#$usint_on = 'no';
+#######################
+
+if($usint_on eq 'yes'){
+        open(FH, "$pass_dir/usint_users");
+        while(<FH>){
+                chomp $_;
+                @atemp = split(//,$_);
+                if($atemp[0] ne '#'){
+                        @btemp = split(/\s+/,$_);
+                        push(@special_user, $btemp[0]);
+                        push(@special_email, $btemp[1]);
+                }
+        }
+}
+
+#------------------------------
+#---- read a user-password list
+#------------------------------
+
+open(FH, "<$pass_dir/.htpasswd");
+
+%pwd_list = ();				# save the user-password list
+while(<FH>) {
+        chomp $_;
+        @passwd = split(/:/,$_);
+        $pwd_list{"$passwd[0]"} = $passwd[1];
+        push(@user_name_list, $passwd[0]);
+}
+close(FH);
+
+print "<HEAD><TITLE>Obscat Submission Cancellation  Form</TITLE></HEAD>";
+print "<BODY BGCOLOR=\"#FFFFFF\">";
+
+
+#------------------------------------
+#---- check inputed user and password
+#------------------------------------
+
+match_user();			# this sub match a user to a password
+
+#--------------------------------------------------------------
+#--------- if a user and a password do not match ask to re-type
+#--------------------------------------------------------------
+
+if($pass eq '' || $pass eq 'no'){
+	if(($pass eq 'no') && ($ac_user  ne ''|| $pass_word ne '')){
+		print "<font color='red'>Name and/or Password are not valid.";
+		print " Please try again.</font><br>";
+	}
+	password_check();	# this one create password input page
+
+}elsif($pass eq 'yes'){		# ok a user and a password matched
+
+	$sp_user = 'no';
+
+#-------------------------------------------
+#------ check whether s/he is a special user
+#-------------------------------------------
+
+	if($usint_on eq 'yes'){
+		$sp_user = 'yes';
+	}else{
+		special_user();
+	}
+	
+#-------------------------------------------------------
+#----- go to the main part to print a verification page
+#----- check whether there are any changes, if there are
+#----- go into update_info sub to update the table
+#-------------------------------------------------------
+
+	$rm_obsrev = '';
+	$rm_obsrev = param('Remove');
+	if($rm_obsrev){
+		update_info();		# this sub update updates_table.list
+	}
+
+	remve_submission();		# this sub creates a html page
+
+}else{
+	print 'Something wrong. Exit<br>';
+	exit(1);
+}
+
+print end_html();
+
+
+#########################################################################
+### password_check: open a user - a password input page               ###
+#########################################################################
+
+sub password_check{
+	print '<h3>Please type your user name and password</h3>';
+	print '<table><tr><th>Name</th><td>';
+	print textfield(-name=>'ac_user', -value=>'', -size=>20);
+	print '</td></tr><tr><th>Password</th><td>';
+	print password_field( -name=>'password', -value=>'', -size=>20);
+	print '</td></tr></table><br>';
+	
+	print '<input type="submit" name="Check" value="Submit">';
+}
+
+
+#########################################################################
+### match_user: check a user and a password matches                   ###
+#########################################################################
+
+sub match_user{
+	$ac_user = param('ac_user');
+	$ac_user =~s/^\s+//g; 
+	$pass_word = param('password');
+	$pass_word =~s/^\s+//g;
+	OUTER:
+	foreach $test_name (@user_name_list){
+		$ppwd  = $pwd_list{"$ac_user"};
+		$ptest = crypt("$pass_word","$ppwd");
+
+		if(($ac_user eq $test_name) && ($ptest  eq $ppwd)){
+			$pass_status = 'match';
+			last OUTER;
+		}
+	}
+
+	if($pass_status eq 'match'){
+		$pass = 'yes';
+	}else{
+		$pass = 'no';
+	}
+}
+
+
+#########################################################################
+### special_user: check whether the user is a special user            ###
+#########################################################################
+
+sub special_user{
+	$sp_user = 'no';
+	OUTER:
+	foreach $comp (@special_user){
+		$user = lc ($ac_user);
+		if($ac_user eq $comp){
+			$sp_user = 'yes';
+			last OUTER;
+		}
+	}
+}
+
+#########################################################################
+### pi_check: check whether pi has an access to the data              ###
+#########################################################################
+
+sub pi_check{
+	$user_i = 0;
+	$luser  = lc($ac_user);
+	$luser  =~ s/\s+//g;
+
+        open(FH, "$pass_dir/user_email_list");
+        while(<FH>){
+                chomp $_;
+                @atemp = split(/\s+/, $_);
+		if($luser eq $atemp[2]){
+			$usr_last_name     = $atemp[0];
+			$usr_first_name    = $atemp[1];
+			$usr_email_address = $atemp[3];
+		}
+        }
+        close(FH);
+
+	open(FH,"$obs_ss/access_list");
+	@user_data_list = ();
+	while(<FH>){
+		chomp $_;
+		@dtemp = split(/\s+/, $_);
+		@etemp = split(/:/,$dtemp[3]);
+		@ftemp = split(/:/,$dtemp[4]);
+		if(($usr_last_name eq $etemp[0] && $usr_first_name eq $etemp[1])
+			 || ($usr_last_name eq $ftemp[0] && $usr_first_name eq $ftemp[1])){
+			push(@user_data_list, $dtemp[0]);
+		}
+	}
+	close(FH);
+}
+
+
+###############################################################################################
+### remve_submission: remove an submitted obsid from database				  #####
+###############################################################################################
+
+
+sub remve_submission{
+
+#-------------------------------------------
+#----- a couple of hidden parameters to pass
+#-------------------------------------------
+#	print start_form();
+	print hidden(-name=>'ac_user', -vaule=>"$ac_user");
+	print hidden(-name=>'password', -value=>"$password");
+
+#------------------------------------------------------------------------------------------
+#----@pass_list will hold all editable entries so that we can pass them as parameters later
+#------------------------------------------------------------------------------------------
+	@pass_list = ();
+
+	print "<h1><U>Obs Data Submission Cancellation Page</U></h1>";
+
+	print "<h3>If you need to remove an accidental submission, please choose the obsid and";
+	print " and click a button from \"Remove\" side. If it says \"NO ACCESS\", it means that someone already";
+	print " made parameter changes, and cannot remove that submission.</h3>";
+	print "<h3><font color=red>If it is once removed, the change is permanent; be careful to select a correct one</h3>";
+	print "<br>";
+########
+#	print "<B><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/index.html\">Verification Page ";
+#
+#	print "Support Observation Search Form</A></B><BR>";
+#	print "<B><A HREF=\"http://asc.harvard.edu/~mta/CUS/\">Chandra Uplink Support Organizational Page";
+	print '<p>';
+	print "<B><A HREF=\"https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form";
+	print '</p>';
+########
+
+#####
+	open (FILE, "< $ocat_dir/updates_table.list");
+	@revisions = <FILE>;
+	close (FILE);
+	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"http://asc.harvard.edu/~mta/CUS/Usint/rm_submission.cgi\">";
+#	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"http://asc.harvard.edu/cgi-gen/mta/Obscat/rm_submission.cgi\">";
+#	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"https://icxc.harvard.edu/cgi-bin/obs_ss/rm_submission.cgi\">";
+#####
+
+	print "<center>";
+	print "<TABLE BORDER=\"1\" CELLPADDING=\"5\">";
+	print "<TR><TH>OBSID.revision</TH></TH>";
+	print "<TH>Remove?</TH></TR>";
+
+#---------------------------------------------------------
+#----- because log is appended to, rather than added to...
+#---------------------------------------------------------
+
+	if($cancelled_line){
+    		@values= split ("\t", $cancelled_line);
+    		$obsrev = $values[0];
+    		@atemp = split(/\./,$obsrev);
+    		$obsid = $atemp[0];
+    		$general_status = $values[1];
+    		$acis_status = $values[2];
+    		$si_mode_status = $values[3];
+    		$dutysci_status = $values[4];
+    		$seqnum = $values[5];
+    		$user = $values[6];
+    		@atemp = split(/\./,$obsrev);
+    		$tempid = $atemp[0];
+
+		print "<TD>$obsrev</A><BR>$seqnum<BR>$ftime<BR>$user</TD>";
+		print "</TD><TD><font color=red>Cancelled</font></td></tr> ";
+	}
+
+	@revisions= reverse(@revisions);
+	$today = `date '+%D'`;
+	chop $today;
+
+	foreach $line (@revisions){
+    		chop $line;
+    		@values= split ("\t", $line);
+    		$obsrev = $values[0];
+    		@atemp = split(/\./,$obsrev);
+    		$obsid = $atemp[0];
+    		$general_status = $values[1];
+    		$acis_status = $values[2];
+    		$si_mode_status = $values[3];
+    		$dutysci_status = $values[4];
+    		$seqnum = $values[5];
+    		$user = $values[6];
+    		@atemp = split(/\./,$obsrev);
+    		$tempid = $atemp[0];
+
+#-------------------------------------------------------------------------
+#---- checking whether a ac_user has a permission to sign off the case.
+#---- $user and $ac_user could be same, but usually different persons.
+#-------------------------------------------------------------------------
+    		$sign_off = 'no';
+   		if($sp_user eq 'yes'){ 
+			$sign_off = 'yes';
+		}else{
+    			pi_check();
+			OUTER:
+			foreach $comp (@user_data_list){
+				if($obsid == $comp){
+					$sign_off = 'yes';
+					last OUTER;
+				}
+			}
+		}
+
+    		($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) 
+					= stat "/data/udoc1/ocat/updates/$obsrev";
+#    		($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) 
+#			= stat "/proj/ascwww/AXAF/extra/science/cgi-gen/mta/Obscat/ocat/updates/$obsrev";
+
+#----------------
+#------ get time
+#----------------
+    		($t0,$t1,$t2,$t3,$t4,$t5,$t6,$t7,$t8) = localtime($mtime);
+
+    		$month = $t4 + 1;
+    		$day = $t3;
+    		$year = $t5 + 1900;
+    		$ftime ="$month/$day/$year";
+
+#----------------------------------------------------------------------------------------------
+#---- if dutysci_status is NA (means not signed off yet), print the entry for the verification
+#----------------------------------------------------------------------------------------------
+
+    		if ($dutysci_status =~/NA/){
+#--------------------
+#---- OBSID & revison
+#--------------------
+			$usint_user = 'no';
+			OUTER:
+			foreach $comp (@special_user){
+				if($user eq $comp){
+					$usint_user = 'yes';
+					last OUTER;
+				}
+			}
+			if($usint_user eq 'no'){
+				print '<TR bgcolor=yellow>';
+			}else{
+				print "<TR>";
+			}
+##########
+#			print "<TD><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/chkupdata.cgi";
+			print "<TD><A HREF=\"http://asc.harvard.edu/~mta/CUS/Usint/chkupdata.cgi";
+##########
+			print "\?$obsrev\">$obsrev</A><BR>$seqnum<BR>$ftime<BR>$user</TD>";
+
+			$rm_permission = 'yes';
+#--------------------
+#----- general obscat 
+#--------------------
+			if ($general_status ne 'NULL' && $general_status ne 'NA'){
+	    			$rm_permission = 'no';
+			}
+#------------------
+#----- acis obscat
+#------------------
+			if ($acis_status ne 'NULL' && $acis_status ne 'NA'){
+	    			$rm_permission = 'no';
+			}
+#-------------
+#----- si mode
+#-------------
+			if ($si_mode_status ne 'NULL' && $si_mode_status ne 'NA'){
+				$rm_permission = 'no';
+			}
+
+			if($rm_permission eq 'yes'){
+				print "</TD><TD><INPUT TYPE=\"submit\" NAME=\"Remove\" VALUE=\"$obsrev\"></td></tr>";
+			}else{
+				print "</TD><TD><font color=red>NO ACCESS</font></td></tr> ";
+			}
+		}
+	}
+
+#-------------------------------
+#-----pass the changes as params 
+#-------------------------------
+	$ap_cnt = 0;
+	foreach $ent (@pass_list){
+		$name = 'pass_name.'."$ap_cnt";
+		print hidden(-name=>"$name", -value=>"$ent");
+		$ap_cnt++;
+	}
+	print hidden(-name=>'ap_cnt', -value=>"$ap_cnt");
+	
+	print "</TABLE></FORM></BODY></HTML>";
+	print "</center>";
+}  
+
+###################################################################################
+### update_info: will perform updates to table                                 ####
+###################################################################################
+
+sub update_info {
+
+	$obsline = $rm_obsrev;
+	$rm_obsrev_save = "$rm_obsrev".'~';
+
+#
+#--- copy the unwated file, and save just in a case, the user want it back
+#
+	system("mv $ocat_dir/updates/$rm_obsrev $ocat_dir/updates/$rm_obsrev_save");
+
+#
+#--- open the table and read the data in
+#
+    	$j=0;
+	open (INFILE, "< $ocat_dir/updates_table.list");
+    	@revcopy = <INFILE>;
+    	close (INFILE);
+	@newoutput=();
+	$last_sign = 0;
+	$cancelled_line = '';
+	foreach $newline (@revcopy){
+               	chop $newline;
+               	@newvalues= split ("\t", $newline);
+               	$newobsrev = $newvalues[0];
+               	$newgeneral_status = $newvalues[1];
+               	$newacis_status = $newvalues[2];
+               	$newsi_mode_status = $newvalues[3];
+               	$newdutysci_status = $newvalues[4];
+               	$newseqnum = $newvalues[5];
+               	$newuser = $newvalues[6];
+#-------------------------------------------
+#---- there is obs id match, remove the line
+#-------------------------------------------
+		if($newobsrev eq $obsline){
+    			$j++;
+			$cancelled_line = $newline;
+#---------------------------------------------
+#--- id did not match; so just write the line
+#---------------------------------------------
+		} else {
+    			$newline="$newline\n";
+    			push (@newoutput,$newline);
+		}
+	}
+#----------------------------------------------------------------------
+#---- start updating the updates_table.list, if there are any changes.
+#----------------------------------------------------------------------
+    	if ($j == 1){
+#####
+		chdir "$ocat_dir";
+#####
+		$status=`/usr/ccs/bin/sccs info $ocat_dir`;
+		if ($status=~/Nothing being edited/ig){
+	    		$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
+
+	    		open (OUTFILE, "+> $ocat_dir/updates_table.list");
+	    		foreach $outline (@newoutput){
+
+				print OUTFILE "$outline";
+	    		}
+	    		close (OUTFILE);
+	    		$checkin=`/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
+
+# else, if the file is being updated, print an error
+		} else {
+    			print "<B><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<BR>";
+    			print "Please use the back button to return to the previous page, and resubmit.</font></B>";
+    			print "</BODY>";
+    			print "</HTML>";
+#-----------------------------------------------------------------------
+#----- if there is an error, exit now so no mail or file writing happens
+#-----------------------------------------------------------------------
+    			exit();
+    		}
+	}
+}

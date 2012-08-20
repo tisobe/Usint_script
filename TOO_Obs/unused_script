@@ -1,0 +1,189 @@
+#!/usr/local/bin/python2.6
+
+import sys
+import os
+import string
+import re
+
+#
+#--- reading directory list
+#
+
+path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
+#path = '/data/udoc1/ocat/Info_save/dir_list'                                #---- live directory list path
+
+f    = open(path, 'r')
+data = [line.strip() for line in f.readlines()]
+f.close()
+
+for ent in data:
+    atemp = re.split(':', ent)
+    var  = atemp[1].strip()
+    line = atemp[0].strip()
+    exec "%s = %s" %(var, line)
+
+#
+#--- append path to a privte folder
+#
+
+sys.path.append(bin_dir)
+
+import tooddtFunctions as tdfnc
+
+
+#---------------------------------------------------------------------------------------------
+#-- updateNewObsList: update new_obs_list                                                  ---
+#---------------------------------------------------------------------------------------------
+
+def updateNewObsList(inList):
+
+    'update new_obs_list for a given obsid list'
+
+#
+#--- read new_obs_list
+#
+    type   = []
+    seq    = []
+    obsid  = []
+    status = []
+    poc    = []
+    ao     = []
+    date   = []
+
+    orgCnt = readNewObsList(type, seq, obsid, status, poc,ao, date)
+
+#
+#--- read monitor/group observations already  in the list
+#
+    grpObsid = []
+    grpPoc   = []
+    grpID    = []
+    grpSeq   = []
+
+    grpCnt = readMonitorList(grpObsid, grpPoc, grpID, grpSeq)
+
+
+#
+#--- check the obsids in the new list are actually new for new_obs_list
+#
+    newList = list(set(inList).difference.(set(obsid)))
+
+    if len(newList) > 0:
+        for ent in newList:
+            (ntype, nseq, nstatus, nao, ndate, target, grating, instrument) = findInfo(int(ent), group = [], monitor = []))
+
+            if (nstatus == 'unobserved') or (nstatus == 'scheduled') or (nstatus == 'observed'):
+                if ntype.lower() == 'too' or ntype.lower() == 'ddt':
+
+                    npoc = tdfnc.find_person_in_charge(target, grating)        #---- find today's person in charge
+#
+#--- check whether this obsid is in the past mointor/group list, and assigned poc already
+#
+                    mchk = 0
+                    for i in range(0, len(grpObsid)):
+                        if nseq == grpSeq[i]
+                            npoc = grpPoc[i]
+                            mchk += 1
+                            break
+
+                    if mchk == 0:
+#
+#--- if this obsid is not in the previous monitor/group list, check  whether this is monitor/group opbservation
+#--- and if so add to the monitor list
+#
+                        if len(group) > 1:
+                            for gent in group:
+                                grpObsid.append(gent)
+                                grpPoc.append(npoc)
+                                grpID.append(ent)
+                                grpSeq.append(nseq)
+                        elif len(monitor) > 1:
+                            for ment in monitor:
+                                grpObsid.append(ment)
+                                grpPoc.append(npoc)
+                                grpID.append(ent)
+                                grpSeq.append(nseq)
+
+                    else:
+                        npoc = tdfnc.match_usint_person(ntype, grating, nseq, instrument)   #--- find poc from seq # 
+
+                    type.append(ntype)
+                    seq.append(nseq)
+                    obsid.append(ent)
+                    poc.append(npoc)
+                    ao.append(nao)
+                    date.append(ndate)
+
+                newCnt = len(obsid)
+                if newCnt > orgCnt:
+#
+#--- update new_obs_list
+#
+                    cmd  = 'mv ' too_dir + 'new_obs_list ' + too_dir + 'new_obs_ist~'   #--- keep the previous version
+                    os.system(cmd)
+                    line = too_dir + 'new_obs_list'
+                    f    = open(line, 'w')
+                    for i in range(0, len(obsid)):
+                        f.write('%s\t%d\t%d\t%s\%s\%d\%s\n'  % (type[i], int(seq[i]), int(obsid[i]), status[i], poc[i], int(ao[i]), date[i]))
+     
+                    f.close()
+
+
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
+def readNewObsList(type, seq, obsid, status, poc,ao, date):
+
+    line = too_dir + 'new_obs_list'
+    f    = open(line, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+
+    for ent in data:
+        atemp = re.split('\s+|\t+', ent)
+#
+#---find the status of the observation
+#
+        (ntype, nseq, nstatus, nao, ndate, target, grating, instrument) = findInfo(int(atemp[2]), group = [], monitor = [])
+#
+#--- drop canceled/archived observations
+#
+        if (nstatus == 'unobserved') or (nstatus == 'scheduled') or (nstatus == 'observed'):
+
+            type.append(atemp[0])
+            seq.append(atemp[1])
+            obsid.append(atemp[2])
+            status.append(atemp[3])
+            poc.append(atemp[4])
+            ao.append(atemp[5])
+            date.append(atemp[6])
+
+    return len(obsid)
+
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------
+
+def readMonitorList(grpObsid, grpPoc, grpID, grpSeq):
+    line    = too_dir + 'monitor_too_ddt'
+    f = open(line, 'r')
+    data= [line.strip() for line in f.readlines()]
+    f.close()
+
+    for ent in data:
+        atemp = re.split('\s+|\t+', ent)
+        grpObsid.append(atemp[0])
+        grpPoc.append(atemp[1])
+        grpID.append(atemp[2])
+        grpSeq.append(atemp[3])
+
+    return len(grpObsiid)
+
+
+
+#---------------------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+

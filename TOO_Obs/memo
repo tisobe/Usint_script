@@ -1,0 +1,51 @@
+
+
+Which python installation will you be using?  If you're going to try to 
+work with one of the sybase databases here, you'll need a sybase module 
+(such as the one provided by python-sybase 
+
+http://python-sybase.sourceforge.net/
+
+) in your python path.  There's some documentation on their site. 
+
+If you use our python (/proj/sot/ska/bin/python" there's already a Sybase 
+module in there.  
+
+There's also our convenience library Ska.DBI which I've attached for a 
+reference of how we make handles and use them. I just put some examples of 
+stuff using that Ska.DBI module in /pool14/jeanconn/py_database (I put 
+together that stuff for Dong-Woo a while ago).
+
+
+
+From Scott Aug 2, 2012
+-----------------------
+
+
+
+On Wed, May 23, 2012 at 7:28 AM, Takashi Isobe <isobe@head.cfa.harvard.edu> wrote:
+
+Hi Scott
+I am rewriting the scripts which picking up DDT/TOO observation. I am still bit fuzzy about when the observation is "approved," and want to make sure.
+
+There are three ways that I find DDT/TOO observations.
+
+1. from SQL database.
+2. from DDT/TOO approved
+3. from ddttoo.html page
+
+I know that if DDT/TOO observations appear on 2 and/or 3, the observations are approved for sure, but I am not sure whether the observations are approved when they appear on SQL database. Obsid usually appears on SQL database first, and if there is one (it seems that email is not always sent out, but I could be wrong), email second, then finally to ddttoo.html. Time difference between 1 and 3 is as large as two weeks (ddttoo.html does not list observations until exact observation data assigned.)
+
+Can you clarify exactly when DDT/TOO observations are approved?
+Thanks
+
+Takashi
+
+ 
+
+ The SQL database IS THE authority.
+
+ The approved email is acceptable if you find it easier to parse, but the speed advantage is not significant. 
+ ddttoo.html is not relevent to the conversation as you say it can be well behind the reality we need. 
+
+

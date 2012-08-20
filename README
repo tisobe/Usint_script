@@ -1,0 +1,687 @@
+
+---------------------
+USINT Related Scripts
+---------------------
+
+When you use one of these scripts, you must comment out all but one of the following 
+setting in the script:
+
+$usint_on = 'yes';                     ##### USINT Version
+						/data/mta4/www/CUS/Usint (user cus)
+$usint_on = 'no';                      ##### USER Version
+						/proj/web-icxc/cgi-bin/obs_ss
+$usint_on = 'test_yes';                ##### Test Version USINT
+$usint_on = 'test_no';                 ##### Test Version USER
+						/proj/web-cxc/cgi-gen/mta/Obscat/
+#
+#---- set a name and email address of a test person
+#
+
+$test_user  = 'isobe';
+$test_email = 'isobe@head.cfa.harvard.edu';
+
+#$test_user  = 'mta';
+#$test_email = 'isobe@head.cfa.harvard.edu';
+
+#$test_user  = 'brad';
+#$test_email = 'brad@head.cfa.harvard.edu';
+
+#$test_user  = 'swolk';
+#$test_email = 'swolk@head.cfa.harvard.edu';
+
+#
+#--- sot contact email address
+#
+
+$sot_contact = 'swolk@head.cfa.harvard.edu';
+
+#
+#--- $mtaobs is a super observer and s/he can access to all GTO/GO observations as an observer
+#--- (useful for testing none-usint user version of ocat data page)
+#
+
+$mtaobs     = 'mtadude';
+
+#
+#--- cus email address
+#
+
+$cus_email  = 'cus@head.cfa.harvard.edu';
+
+#
+#---- set directory pathes
+#
+
+$obs_ss   = '/proj/web-icxc/cgi-bin/obs_ss/';                   #--- none usint user site
+$pass_dir = '/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/';         #--- a directory contatins user name file etc
+$temp_dir = '/data/mta4/www/CUS/Usint/Temp/';                   #--- a temporary file is created in this directory
+$data_dir = './';
+
+#
+#--- if this is a test case, use the first directory, otherwise use the real one
+#
+
+if($usint_on =~ /test/i){
+        $ocat_dir = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/';
+}else{
+        $ocat_dir = '/data/udoc1/ocat/';
+}
+
+#
+#--- set html pages
+#
+
+$usint_http   = 'https://icxc.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
+$obs_ss_http  = 'https://icxc.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
+$test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';   #--- web site for test
+
+$mp_http      = 'http://asc.harvard.edu/';                      #--- web site for mission planning related
+$chandra_http = 'http://cxc.harvard.edu/';                      #--- chandra main web site
+$cdo_http     = 'https://icxc.harvard.edu/cgi-bin/cdo/';        #--- CDO web site
+
+
+
+
+#################
+ocatdata2html.cgi
+#################
+
+This script dynamically creates Ocat Data Page based on obsid.
+There are two different versions:
+
+ocatdata2html.cgi:		All none-essential parts are removed and run faster.
+			    	In the test directory, it is kept as "ocatdata2html_lite.cgi
+
+ocatdata2html_full.cgi:		This is the original version, and fully loaded. 
+
+ ----------
+ sub list:
+ ---------
+   password_check:     open a user - a password input page
+
+   match_user:         check a user and a password matches
+
+   special_user:       check whether the user is a special user
+
+   pi_check:           check whether pi has an access to the datau
+
+   pass_param:         passing cgi parameter values to the next window
+
+   read_databases:      read out values from databases
+
+   data_close_page:    display data for closed observation
+
+   data_input_page:    create data input page--- Ocat Data Page
+
+   pre_submit:         preparing the data for submission
+
+   chk_entry:          calling entry_test to check input value range and restrictions
+
+   entry_test:         check input value range and restrictions
+
+    restriction_check: check special restrictions for input
+
+   print_clone_page:   print comment entry for clone case
+
+   read_range:         read conditions for values
+
+   read_user_name:     reading authorized user names
+
+   user_warning:       warning a user, a user name mistake
+
+   submit_entry:       check and submitting the modified input values
+
+   read_name:          read descriptive name of database name
+
+   find_name:          match database name to descriptive name
+
+   oredit:             update approved list, updates_list, updates data, and send out email
+
+   mod_time_format:    convert and devide input data format
+
+   lts_date_check:     check ltd_date is in 30 days or not
+
+   series_rev: 	       getting mointoring observation things 
+
+   series_fwd: 	       getting monitoring observation things
+
+   find_planned_roll:  get planned roll from mp web page
+
+   rm_from_approved_list:  remove entry from approved list
+
+   send_mail_to_usint:     sending out full support request email to USINT
+
+   mail_out_to_usint:      sending email to USINT 
+
+   send_email_to_mp:       sending email to MP if the obs is in an active OR list
+
+   keep_ccd_selection_record: keep ccd selectionin record. 
+
+   find_usint:                find an appropriate usint email address for a given obs.
+
+   
+
+ ----------------------------------
+ data/files needed for this script
+ ----------------------------------
+
+  /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htpasswd:           user/password list.
+
+  /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htgroup:            read user names
+
+  /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/cxc_user:            cxc user list
+
+  /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/user_email_list:     list of user/usint list
+
+  /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users:         list of usint persons
+
+  /proj/web-icxc/cgi-bin/obs_ss/access_list:                   list of scheduled/unobserved list
+
+  ./ocat_values:                       a file contains codtion/restriction for the param
+
+  ./name_list:                         a file contains descritive names for params
+
+  /data/udoc1/ocat/approved:           an approved obsid list
+
+  /data/udoc1/ocat/updates_table.list  a file contains updated file list
+
+  /data/udoc1/ocat/updates/$obsid.*    database to save updated information
+
+  sql database
+
+
+############
+orupdate.cgi
+############
+
+This script displays target paramter update status form page.
+
+--------
+sub list
+--------
+
+password_check: 	open a user - a password input page
+
+match_user: 		check a user and a password matches
+
+special_user: 		check whether the user is a special user
+
+pi_check: 		check whether pi has an access to the data 
+
+get_database_values: 	get a few database values for checking 
+
+orupdate_main: 		printing a verification page
+
+update_info: 		will perform updates to table
+
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htpasswd
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/user_email_list
+
+/proj/web-icxc/cgi-bin/obs_ss/access_list
+
+/proj/web-cxc/cgi-gen/mta/Obscat/ocat/updates_table.list
+
+/data/udoc1/ocat/updates_table.list
+
+
+#############
+chkupdata.cgi
+#############
+
+a script to display past data, requested changes, and data in database.
+
+--------
+sub list
+--------
+check_update_database: 	find a newest entry for obsid
+
+html_print: 		printing html page
+
+match_param: 		comparing parameters to determine whether it is different from 
+			that of database
+
+chk_frac: 		check fraction so that you can round number
+
+color_coding: 		html print with color code
+
+mod_time_format: 	convert and devide input data format
+
+read_databases: 	read out values from databases 
+
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/data/udoc1/ocat/updates/$dat		data file name, something like 5432.001
+
+
+################
+target_param.cgi	<---- 	THIS SCRIPT IS NOT LONGER UNDER MTA RESPONSIBLITY
+################
+
+This script works similar to ocatdata2html.cgi, but only displaying information
+without editting capablility.
+
+Note: 	there are a few different version of target_param.cgi available because
+	a few different groups independely modified the original target_param.cgi
+	written by Roy Kilgard, April 2000.
+
+#################
+rm_submission.cgi
+#################
+
+This script removes an accidental submission from database.
+
+--------
+sub list
+--------
+
+password_check: 	open a user - a password input page
+
+match_user: 		check a user and a password matches
+
+special_user: 		check whether the user is a special user
+
+pi_check: 		check whether pi has an access to the data
+
+remve_submission: 	remove an submitted obsid from database 
+
+update_info: 		will perform updates to table 
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htpasswd
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/user_email_list
+
+/proj/web-icxc/cgi-bin/obs_ss/access_list
+
+/data/udoc1/ocat/updates_table.list
+
+Note: 	make sure that "/data/udoc1/ocat/updates_table.list" is accessible, not
+	/proj/ascwww/AXAF/extra/science/cgi-gen/mta/Obscat/ocat/updates_table.list
+	or other data file. the latter is for test and not affect the real data.
+
+
+###################
+express_signoff.cgi
+###################
+
+This script let a user to sign off multiple obsids at one process.
+
+---------
+sub list
+---------
+
+password_check: 	open a user - a password input page  
+
+match_user: 		check a user and a password matches
+
+input_obsid: 		a page to write in list of obsids
+
+read_databases: 	read out values from databases
+
+prep_submit: 		preparing the data for submission
+
+read_user_name:	 	reading authorized user names
+
+user_warning: 		warning a user, a user name mistake
+
+submit_entry: 		check and submitting the modified input values
+
+read_name: 		read descriptive name of database name
+
+find_name: 		match database name to descriptive name
+
+oredit: 		update approved list, updates_list, updates data, and send out email
+
+mod_time_format: 	convert and devide input data format 
+
+lts_date_check:   	check ltd_date is in 30 days or not 
+
+series_rev: 		getting mointoring observation things 
+
+series_fwd: 		getting monitoring observation things
+
+find_planned_roll: 	get planned roll from mp web page
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/data/udoc1/ocat/approved
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htpasswd
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/.htgroup
+
+/data/udoc1/ocat/approved
+
+/proj/web-cxc/cgi-gen/mta/Obscat/ocat/updates_table.list
+
+/proj/web-icxc/cgi-bin/obs_ss/mp_long_term
+
+
+The following directory is needed to process temporary files
+
+/data/mta4/www/CUS/Usint/Temp/
+
+
+#############
+orupdated.cgi
+#############
+
+This script generates a dynamic webpage for keeping track of updates to target parameters.
+
+This one has not modifed from that of originally written by R. Kilgard, Jan 30/31 2000.
+
+#############
+plot_pspc.cgi
+#############
+
+See /proj/web-cxc/cgi-gen/mta/Obscat/PSPC_page/README
+
+#####################
+make_access_list.perl
+#####################
+
+This script makes a list of observations supplied with PI and Observer's names.
+
+Input
+	sql database
+
+Output
+	./access_list ($obsid\t$status\t$type\t$PI_name\t$Observer)
+
+Note: this script is kept only in /proj/web-icxc/cgi-bin/obs_ss/.Pass_dir
+      and "access_list" will be kept in /proj/web-icxc/cgi-bin/obs_ss/.
+
+
+######################
+find_planned_roll.perl
+######################
+
+This script reads MP long term web page and extract obsid and planned roll angle.
+
+Input
+-----
+/proj/web-icxc/htdocs/mp/lts/lts-current.html
+
+Output
+-----
+/proj/web-icxc/cgi-bin/obs_ss/mp_long_term
+
+Sub list
+-------- 
+find_planned_roll
+
+#######################
+find_scheduled_obs.perl
+#######################
+
+this script finds MP scheduled observations, and makes a list: output is scheduled_obs_list.
+it also produce sign_off_request and send out eamil to USINT if there are obsid not signed off.
+
+this script needs two other scripts to run 
+
+find_scheduled_obs_wrap_script
+find_scheduled_obs_run_script
+
+these two set environment for find_scheduled_obs.perl so that all parameters needed can be read in
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/data/mpcrit1/mplogs/$uyear/$lmon*/input/*.or:	 active or data list files
+$obs_ss/scheduled_obs_list:			 input/output--- a list of obsids in OR
+$obs_ss/sign_off_request			 input/output--- a list of not signed off obsids
+
+---------
+sub list
+---------
+
+conv_month_num_to_chr: 	change month format to e.g. 1 to Jan
+find_usint:	 	find an appropriate usint email address for a given obs.
+cnv_time_to_t1998: 	change time format to sec from 1998.1.1
+
+######################
+send_sign_off_req.perl
+######################
+
+this script reads updates_tables.list and find which one is required to be signed off, 
+and send out email to a user who is not a usint person.
+
+--------
+sub list
+--------
+update_info: 		will perform updates to table
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/user_email_list
+
+/data/udoc1/ocat/updates_table.list
+
+
+###############
+chk_arcops.perl
+###############
+
+this script check any obsids in the arcops list are signed off, and if they are, add them into 
+the approved list
+
+this scripts needs two other environment setting scripts:
+
+chk_arcops_wrap_script
+chk_arcops_run_script
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+$ocat_dir/arcops_list
+$ocat_dir/approved
+$ocat_dir/updates_table.list
+
+--------
+sub list
+--------
+
+send_mail:	 sending email to submitter about the approval of the obsid
+find_usint:	 find an appropriate usint email address for a given obs.
+
+#########
+naggem.pl
+#########
+
+This is a script to parse the updates log and nag (via email) people who haven't 
+signed off changes they requested
+
+--------
+sub list
+--------
+
+nag_updaters: 	run the weekly nag script
+
+conv_time: 	day from 2000.1.1 
+
+----------------------------------
+data/files needed for this script
+----------------------------------
+
+/data/udoc1/ocat/updates_table.list
+
+/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/usint_users
+
+
+##############
+user_help.html
+##############
+
+a html page giving  user help
+
+#########
+info.html
+#########
+
+a information about entries in ocatdata2html.cgi page.
+
+###########
+ocat_values
+###########
+
+This is a data file used by ocatdata2html.cgi, and lists what are the
+parameters restrictions.
+
+1. Value ranges are delimited by ",", if it is words or discrete values.
+2. Value ranges are in "(xxx<>yyy)" format, if it is in a continuous range, 
+   such as xxxx <= X <= yyyy
+3. If there is no range for the entry, "OPEN" is given for the value range.
+4. If there is no range for the entry, but there is restrictions, "REST" is given 
+   for the value range.
+5. If there is no restriction, "NONE" is given in the restriction condition.
+6. If there are more than one possible restricitons, they are delimited by ";".
+7. The condition of the restriction is given in "(<condition>)", following "=" 
+   after a  related database name.
+8. If the restriction value must be null, "NULL" is given for the restriction 
+   condtion.
+9. If the restriction value must have a value, "MUST" is given for the restriction 
+   condtion.
+
+
+############
+searach.html
+############
+
+This is a html page to input serarch criteria to sot_answer.cgi
+Currently this page is pointing to /data/mta4/www/CUS/Usint/sot_answer.cgi
+
+
+##############
+sot_answer.cgi		<---- 	THIS SCRIPT IS NOT LONGER UNDER MTA
+##############
+
+This script get queries from search.html page and find data matched to the criteria.
+This script is copied from /data/udoc2/targets/answer.cgi, but specifically modified for SOT/USINT use.
+
+---------
+sub list
+---------
+
+field_checker:  Counter to check # of fields entered 
+field_checker_sciins: Counter to check # of fields entered for Sci Inst
+field_checker_mode: Counter to check # of fields entered for ACIS Mode
+field_checker_gratin: Counter to check # of fields entered for Grating
+field_checker_type: Counter to check # of fields entered for Obs type
+field_checker_status:  Counter to check # of fields entered for Obs status
+field_checker_joint: Counter to check # of fields entered for Joint proposal
+match_fields:  Finds matching fields and increments counters
+match_fields_mode: Finds matching fields and increments counters
+match_fields_cat:   Finds matching categories
+match_fields_cycle: Finds matching observing cycle
+match_fields_status: Finds matching fields and increments counters for status
+match_fields_joint: Finds matching fields and increments counters for joint
+match_fields_target: Finds matching targets and increments counters for status
+match_fields_range: Finds matching fields and increments counters for range searches
+ra2deci: Convert $ fields{ra} from hms to decimal
+dec2deci:  Convert $ fields{dec} from dms to decimal 
+coor_search: Searches on coordinates - both exact and radius searches    
+deci2ra: Convert $ra from decimal to hms
+deci2dec:  Convert $dec from decimal to dms
+sim2coord: Gets the coordinates from Simbad
+
+---------------------------------
+data/file needed for this script
+---------------------------------
+
+/proj/web-icxc/cgi-bin/obs_ss/sot_ocat.out
+/proj/web-icxc/cgi-bin/obs_ss/sot_ocat_ra.out
+
+
+############
+sot_data.ksh
+############
+
+This is a ksh script to run sot_data.sql.
+Cron job on rhodes run this script once a day.
+
+---------------------------------
+data/file needed for this script
+---------------------------------
+
+/data/mta4/MTA/data/.ocatpasswd
+
+############
+sot_data.sql
+############
+
+This sql script obtains specified column values from database from all data
+and put into two data files.
+This is a slim-down version of /data/udoc2/targets/joh.sql, specifically made
+for SOT/USINT use. Only columns needed for sot_answer.cgi are extracted.
+
+------
+output
+------
+/proj/web-icxc/cgi-bin/obs_ss/sot_ocat.out
+/proj/web-icxc/cgi-bin/obs_ss/sot_ocat_ra.out
+
+
+##################
+find_mismatch.perl
+##################
+
+This script compares files in updates and a entries in  update_table.list and if there are mismatch, notify
+the problem to a test user. 
+
+-----
+input
+-----
+/data/udoc1/ocat/updates_table.list
+/data/udoc1/ocat/updates/*
+
+------
+output
+------
+email notification
+
+
+#####################
+sendout_obs_info.perl  ----- THIS SCRIPT IS NO LONGER AVAIALBLE 
+#####################
+
+This script creates a list of database entries of the newly submitted observations.
+The data are used by Ed Kellog's group. The list is emailed out to emk.
+
+---------------------------------
+data/file needed for this script
+---------------------------------
+/proj/web-icxc/cgi-bin/obs_ss/past_updates_table
+/data/udoc1/ocat/updates_table.list
+
+---------
+sub list
+---------
+read_databases: read the SQL database.
+
+
