@@ -9,7 +9,7 @@
 #												#
 #	author: T. Isobe (tisobe@cfa.harvard.edu)						#
 #	Oct 1, 2003   --- first version								#
-#	Last Update: Aug 03, 2011								#
+#	Last Update: Aug 28, 2012								#
 #												#
 #################################################################################################	
 
@@ -213,9 +213,9 @@ sub update_info {
 #####
 		chdir "$ocat_dir";
 #####
-		$status=`/usr/ccs/bin/sccs info $ocat_dir`;
+		$status=`/usr/bin/sccs info $ocat_dir`;
 		if ($status=~/Nothing being edited/ig){
-	    		$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
+	    		$checkout = `/usr/bin/sccs edit $ocat_dir/updates_table.list`;
 
 	    		open (OUTFILE, "+>$ocat_dir/updates_table.list");
 	    		foreach $outline (@newoutput){
@@ -223,7 +223,7 @@ sub update_info {
 				print OUTFILE "$outline";
 	    		}
 	    		close (OUTFILE);
-	    		$checkin=`/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
+	    		$checkin=`/usr/bin/sccs delget -y $ocat_dir/updates_table.list`;
 	    		@newoutput=();
 
 # else, if the file is being updated, print an error
