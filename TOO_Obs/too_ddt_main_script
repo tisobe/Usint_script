@@ -1,5 +1,5 @@
 source /home/mta/.ascrc 
 
-cd /proj/web-icxc/cgi-bin/obs_ss/Usint_test/Development/TOO_Obs
+cd /data/mta4/CUS/www/Usint/TOO_Obs
 
-update_new_obs_list.py
+/data/mta4/CUS/www/Usint/TOO_Obs/update_new_obs_list.py

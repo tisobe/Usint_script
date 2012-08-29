@@ -6,7 +6,7 @@
 #                                                                                                               #
 #           author: t. isobe (tisobe@cfa.harvard.edu)                                                           #
 #                                                                                                               #
-#           last update: Jul 10, 2012                                                                           #
+#           last update: Aug 29, 2012                                                                           #
 #                                                                                                               #
 #################################################################################################################
 
@@ -21,8 +21,8 @@ import getpass
 #--- reading directory list
 #
 
-path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
-#path = '/data/udoc1/ocat/Info_save/dir_list_py'                                #---- live directory list path
+#path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
+path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list'                                #---- live directory list path
 
 f    = open(path, 'r')
 data = [line.strip() for line in f.readlines()]
