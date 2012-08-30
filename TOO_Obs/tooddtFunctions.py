@@ -6,7 +6,7 @@
 #                                                                                                                   #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                                   #
 #                                                                                                                   #
-#       last update: Aug 29, 2012                                                                                   #
+#       last update: Aug 30, 2012                                                                                   #
 #                                                                                                                   #
 #####################################################################################################################
 
@@ -595,7 +595,7 @@ def send_email(type, list, tempdir='NA'):
 #
 #--- send out email to notify completion of backup
 #
-        cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Observations---test version---" isobe@head.cfa.harvard.edu'
+        cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Observations" isobe@head.cfa.harvard.edu'
         os.system(cmd)
 
         cmd = 'rm ' + tempfile
@@ -605,31 +605,28 @@ def send_email(type, list, tempdir='NA'):
         for ent in list:
             atemp = re.split('\s+|\t+', ent)
             email = findemail(atemp[4])
-	    obsid = atemp[2]
+            obsid = atemp[2]
 
             f = open(tempfile, 'w')
-	    line  = '\nA new ' + type.upper() + ' observation (OBSID: ' + obsid + ') is assigned to you. Please check:\n\n'
+            line  = '\nA new ' + type.upper() + ' observation (OBSID: ' + obsid + ') is assigned to you. Please check:\n\n'
             f.write(line)
-	    line =  'https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?' + obsid + '\n\n'
-	    f.write(line)
-	    line = 'for more information.\n\n'
-	    f.write(line)
+            line =  'https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?' + obsid + '\n\n'
+            f.write(line)
+            line = 'for more information.\n\n'
+            f.write(line)
             line = 'If this you are not the final support astronomer for this observations, \n'
-	    f.write(line)
+            f.write(line)
             line = 'please reply to isobe@cfa.harvard.edu cc:cus@cfa.harvard.edu.\n'
-	    f.write(line)
+            f.write(line)
             f.close()
 
-            subject = 'Subject: New ' + type.upper() + ' Observation (' + email + ')---test version----'
+            subject = 'Subject: New ' + type.upper() + ' Observation (' + email + ')'
             cmd = 'cat ' + tempfile + ' | mailx -s"' + subject + '" isobe@head.cfa.harvard.edu'
             os.system(cmd)
 
-#
-#---- ACTIVATE WHEN IT IS READ!!!
-#   
-#            subject = 'Subject: New ' + type.upper() + ' Observation '
-#            cmd = 'cat ' + tempfile + ' | mailx -s"' + subject + '"  ' + email + ' -c"swolk@head.cfa.harvard.edu cus@head.cfa.harvard.edu" ' 
-#            os.system(cmd)
+            subject = 'Subject: New ' + type.upper() + ' Observation '
+            cmd = 'cat ' + tempfile + ' | mailx -s"' + subject + '"  ' + email + ' -c"swolk@head.cfa.harvard.edu cus@head.cfa.harvard.edu" ' 
+            os.system(cmd)
 
             cmd = 'rm ' + tempfile
             os.system(cmd)
@@ -814,7 +811,7 @@ def update_monitor_list(new_ddt_too_list, new_ddt_too_person):
 
             f.close()
 
-            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry---test version---" -rcus@head.cfa.harvard.edu isobe@head.cfa.harvard.edu'
+            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry" -rcus@head.cfa.harvard.edu isobe@head.cfa.harvard.edu'
             os.system(cmd)
 
 
