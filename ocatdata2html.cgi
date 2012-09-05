@@ -183,6 +183,8 @@ use CGI qw/:standard :netscape /;
 #
 # sql reading update: $sqlh1 = $dbh1->prepare(qq(select soe_roll from soe where obsid=$obsid and unscheduled='N'));
 # (Oct, 27, 2011)
+# roll_constraint and time_constraint now have only constraint and preference choice
+# (Spt. 05, 2012)
 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -2574,10 +2576,10 @@ sub pass_param {
 		elsif($window_constraint[$j] eq 'CONSTRAINT'){$dwindow_constraint[$j] = 'CONSTRAINT'}
 		elsif($window_constraint[$j] eq 'P')         {$dwindow_constraint[$j] = 'PREFERENCE'}
 		elsif($window_constraint[$j] eq 'PREFERENCE'){$dwindow_constraint[$j] = 'PREFERENCE'}
-		elsif($window_constraint[$j] eq 'N')         {$dwindow_constraint[$j] = 'NONE'}
-		elsif($window_constraint[$j] eq 'NONE')      {$dwindow_constraint[$j] = 'NONE'}
-		elsif($window_constraint[$j] eq 'NULL')      {$dwindow_constraint[$j] = 'NULL'}
-		elsif($window_constraint[$j] eq '')          {$dwindow_constraint[$j] = 'NULL'}
+#		elsif($window_constraint[$j] eq 'N')         {$dwindow_constraint[$j] = 'NONE'}
+#		elsif($window_constraint[$j] eq 'NONE')      {$dwindow_constraint[$j] = 'NONE'}
+#		elsif($window_constraint[$j] eq 'NULL')      {$dwindow_constraint[$j] = 'NULL'}
+#		elsif($window_constraint[$j] eq '')          {$dwindow_constraint[$j] = 'NULL'}
 	}
 
 #
@@ -2608,8 +2610,8 @@ sub pass_param {
 						$tstart[$j]	         = $tstart[$jj];
 						$tstop[$j]	         = $tstop[$jj];
 
-						$window_constraint[$jj]  = 'NULL';
-						$dwindow_constraint[$jj] = 'NULL';
+#						$window_constraint[$jj]  = 'NULL';
+#						$dwindow_constraint[$jj] = 'NULL';
 						$start_month[$jj] 	 =  '';
 						$start_date[$jj]	 =  '';
 						$start_year[$jj]	 =  '';
@@ -2626,8 +2628,8 @@ sub pass_param {
 						next TOUT1;
 					}elsif($jj == $time_ordr){
 
-						$window_constraint[$j]   = 'NULL';
-						$dwindow_constraint[$j]  = 'NULL';
+#						$window_constraint[$j]   = 'NULL';
+#						$dwindow_constraint[$j]  = 'NULL';
 						$start_month[$j]	 =  '';
 						$start_date[$j]	         =  '';
 						$start_year[$j]	         =  '';
@@ -2671,17 +2673,17 @@ sub pass_param {
 		if($roll_constraint[$j]    eq 'CONSTRAINT'){$droll_constraint[$j] = 'CONSTRAINT'}
 		elsif($roll_constraint[$j] eq 'P')         {$droll_constraint[$j] = 'PREFERENCE'}
 		elsif($roll_constraint[$j] eq 'PREFERENCE'){$droll_constraint[$j] = 'PREFERENCE'}
-		elsif($roll_constraint[$j] eq 'N')         {$droll_constraint[$j] = 'NONE'}
-		elsif($roll_constraint[$j] eq 'NONE')      {$droll_constraint[$j] = 'NONE'}
-		elsif($roll_constraint[$j] eq 'NULL')      {$droll_constraint[$j] = 'NULL'}
-		elsif($roll_constraint[$j] eq '')          {$droll_constraint[$j] = 'NULL'}
+#		elsif($roll_constraint[$j] eq 'N')         {$droll_constraint[$j] = 'NONE'}
+#		elsif($roll_constraint[$j] eq 'NONE')      {$droll_constraint[$j] = 'NONE'}
+#		elsif($roll_constraint[$j] eq 'NULL')      {$droll_constraint[$j] = 'NULL'}
+#		elsif($roll_constraint[$j] eq '')          {$droll_constraint[$j] = 'NULL'}
 
 		if($roll_180[$j]    eq 'Y')   {$droll_180[$j] = 'YES'}
 		elsif($roll_180[$j] eq 'YES') {$droll_180[$j] = 'YES'}
-		elsif($roll_180[$j] eq 'N')   {$droll_180[$j] = 'NO'}
-		elsif($roll_180[$j] eq 'NO')  {$droll_180[$j] = 'NO'}
-		elsif($roll_180[$j] eq 'NULL'){$droll_180[$j] = 'NULL'}
-		elsif($roll_180[$j] eq '')    {$droll_180[$j] = 'NULL'}
+#		elsif($roll_180[$j] eq 'N')   {$droll_180[$j] = 'NO'}
+#		elsif($roll_180[$j] eq 'NO')  {$droll_180[$j] = 'NO'}
+#		elsif($roll_180[$j] eq 'NULL'){$droll_180[$j] = 'NULL'}
+#		elsif($roll_180[$j] eq '')    {$droll_180[$j] = 'NULL'}
 	}
 
 
@@ -2689,8 +2691,8 @@ sub pass_param {
 #--- added 10/20/11
 #
 	if($check eq 'Remove Null Roll Entry '){
+		$new_ordr = $roll_ordr;
 		if($roll_ordr > 1){
-			$new_ordr = $roll_ordr;
 			TOUT1:
 			for($j = 1; $j <= $roll_ordr; $j++){
 				if($roll_constraint[$j] =~ /Y/i || $roll_constraint[$j] =~ /CONST/i || $roll_constraint[$j] =~ /P/i){
@@ -2705,8 +2707,8 @@ sub pass_param {
 						$roll[$j]	       = $roll[$jj];
 						$roll_tolerance[$j]    = $roll_tolerance[$jj];
 
-						$roll_constraint[$jj]  = 'NULL';
-						$droll_constraint[$jj] = 'NULL';
+#						$roll_constraint[$jj]  = 'NULL';
+#						$droll_constraint[$jj] = 'NULL';
 						$roll_180[$jj]	       = 'NULL';
 						$droll_180[$jj]	       = 'NULL';
 						$roll[$jj]	       = '';
@@ -2716,8 +2718,8 @@ sub pass_param {
 						next TOUT1;
 
 					}elsif($jj == $roll_ordr){
-						$roll_constraint[$jj]  = 'NULL';
-						$droll_constraint[$jj] = 'NULL';
+#						$roll_constraint[$jj]  = 'NULL';
+#						$droll_constraint[$jj] = 'NULL';
 						$roll_180[$jj]	       = 'NULL';
 						$droll_180[$jj]	       = 'NULL';
 						$roll[$jj]	       = '';
@@ -4318,23 +4320,23 @@ sub read_databases{
 	for($k = 1; $k <= $time_ordr; $k++){
 		if($window_constraint[$k]    eq 'Y')   {$dwindow_constraint[$k] = 'CONSTRAINT'}
 		elsif($window_constraint[$k] eq 'P')   {$dwindow_constraint[$k] = 'PREFERENCE'}
-		elsif($window_constraint[$k] eq 'N')   {$dwindow_constraint[$k] = 'NONE'}
-		elsif($window_constraint[$k] eq 'NULL'){$dwindow_constraint[$k] = 'NULL'}
-		elsif($window_constraint[$k] eq ''){
-				$window_constraint[$k]  = 'NULL';
-				$dwindow_constraint[$k] = 'NULL';
-		}
+#		elsif($window_constraint[$k] eq 'N')   {$dwindow_constraint[$k] = 'NONE'}
+#		elsif($window_constraint[$k] eq 'NULL'){$dwindow_constraint[$k] = 'NULL'}
+#		elsif($window_constraint[$k] eq ''){
+#				$window_constraint[$k]  = 'NULL';
+#				$dwindow_constraint[$k] = 'NULL';
+#		}
 	}	
 	
 	for($k = 1; $k <= $roll_ordr; $k++){
 		if($roll_constraint[$k]    eq 'Y')   {$droll_constraint[$k] = 'CONSTRAINT'}
 		elsif($roll_constraint[$k] eq 'P')   {$droll_constraint[$k] = 'PREFERENCE'}
-		elsif($roll_constraint[$k] eq 'N')   {$droll_constraint[$k] = 'NONE'}
-		elsif($roll_constraint[$k] eq 'NULL'){$droll_constraint[$k] = 'NULL'}
-		elsif($roll_constraint[$k] eq ''){
-				$roll_constraint[$k]  = 'NULL';
-				$droll_constraint[$k] = 'NULL';
-		}
+#		elsif($roll_constraint[$k] eq 'N')   {$droll_constraint[$k] = 'NONE'}
+#		elsif($roll_constraint[$k] eq 'NULL'){$droll_constraint[$k] = 'NULL'}
+#		elsif($roll_constraint[$k] eq ''){
+#				$roll_constraint[$k]  = 'NULL';
+#				$droll_constraint[$k] = 'NULL';
+#		}
 
 		if($roll_180[$k]    eq 'Y'){$droll_180[$k] = 'YES'}
 		elsif($roll_180[$k] eq 'N'){$droll_180[$k] = 'NO'}
@@ -5275,90 +5277,108 @@ sub data_close_page{
 
 	print '<h2>Time Constraints</h2>';
 
-	print '<table><tr><th>';
-	print '<a href="#" onClick="WindowOpen(window_flag);return false;">Time Constraint? </th><td>';
-	print "$dwindow_flag";
-	print '</td></tr></table>';
+	print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
+	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
-		<th><a href="#" onClick="WindowOpen(window_constraint);return false;">Window Constraint</a><th>
-		<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
+	if($dwindow_flag =~ /N/i){
+                print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. </h3>";
 
+                print "<input type=\"hidden\" name=\"WINDOW_CONSTRAINT1\" value=\"$dwindow_constraint[1]\">";
+                print "<input type=\"hidden\" name=\"START_MONTH1\" value=\"$start_month[1]\">";
+                print "<input type=\"hidden\" name=\"START_DATE1\" value=\"$start_date[1]\">";
+                print "<input type=\"hidden\" name=\"START_YEAR1\" value=\"$start_year[1]\">";
+                print "<input type=\"hidden\" name=\"START_TIME1\" value=\"$start_time[1]\">";
 
-	for($k = 1; $k <= $time_ordr; $k++){
-		if($start_month[$k] =~/\d/){
-			if($start_month[$k]    == 1) {$wstart_month = 'Jan'}
-			elsif($start_month[$k] == 2) {$wstart_month ='Feb'}
-			elsif($start_month[$k] == 3) {$wstart_month ='Mar'}
-			elsif($start_month[$k] == 4) {$wstart_month ='Apr'}
-			elsif($start_month[$k] == 5) {$wstart_month ='May'}
-			elsif($start_month[$k] == 6) {$wstart_month ='Jun'}
-			elsif($start_month[$k] == 7) {$wstart_month ='Jul'}
-			elsif($start_month[$k] == 8) {$wstart_month ='Aug'}
-			elsif($start_month[$k] == 9) {$wstart_month ='Sep'}
-			elsif($start_month[$k] == 10){$wstart_month ='Oct'}
-			elsif($start_month[$k] == 11){$wstart_month ='Nov'}
-			elsif($start_month[$k] == 12){$wstart_month ='Dec'}
-			else{$wstart_month = 'NULL'}
-			$start_month[$k]   = $wstart_month;
-		}
+                print "<input type=\"hidden\" name=\"END_MONTH1\" value=\"$end_month[1]\">";
+                print "<input type=\"hidden\" name=\"END_DATE1\" value=\"$end_date[1]\">";
+                print "<input type=\"hidden\" name=\"END_YEAR1\" value=\"$end_year[1]\">";
+                print "<input type=\"hidden\" name=\"END_TIME1\" value=\"$end_time[1]\">";
+
+        }else{
+		print '<table><tr><th>';
+		print '<a href="#" onClick="WindowOpen(window_flag);return false;">Time Constraint? </th><td>';
+		print "$dwindow_flag";
+		print '</td></tr></table>';
 	
-		if($end_month[$k] =~ /\d/){
-			if($end_month[$k]    == 1) {$wend_month = 'Jan'}
-			elsif($end_month[$k] == 2) {$wend_month ='Feb'}
-			elsif($end_month[$k] == 3) {$wend_month ='Mar'}
-			elsif($end_month[$k] == 4) {$wend_month ='Apr'}
-			elsif($end_month[$k] == 5) {$wend_month ='May'}
-			elsif($end_month[$k] == 6) {$wend_month ='Jun'}
-			elsif($end_month[$k] == 7) {$wend_month ='Jul'}
-			elsif($end_month[$k] == 8) {$wend_month ='Aug'}
-			elsif($end_month[$k] == 9) {$wend_month ='Sep'}
-			elsif($end_month[$k] == 10){$wend_month ='Oct'}
-			elsif($end_month[$k] == 11){$wend_month ='Nov'}
-			elsif($end_month[$k] == 12){$wend_month ='Dec'}
-			else{$wend_month = 'NULL'}
-			$end_month[$k]   = $wend_month;
-		}
-
-		print '<tr><td align=center><b>';
-		print "$k";
-		print '</b></td><td>';
-
-		print "$dwindow_constraint[$k]";
-		print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td align=center>';
-
-		print "$start_month[$k]";
-		print '</td><td align=center>';
+		print '<table cellspacing="0" cellpadding="5">';
+		print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
+			<th><a href="#" onClick="WindowOpen(window_constraint);return false;">Window Constraint</a><th>
+			<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
+	
+	
+		for($k = 1; $k <= $time_ordr; $k++){
+			if($start_month[$k] =~/\d/){
+				if($start_month[$k]    == 1) {$wstart_month = 'Jan'}
+				elsif($start_month[$k] == 2) {$wstart_month ='Feb'}
+				elsif($start_month[$k] == 3) {$wstart_month ='Mar'}
+				elsif($start_month[$k] == 4) {$wstart_month ='Apr'}
+				elsif($start_month[$k] == 5) {$wstart_month ='May'}
+				elsif($start_month[$k] == 6) {$wstart_month ='Jun'}
+				elsif($start_month[$k] == 7) {$wstart_month ='Jul'}
+				elsif($start_month[$k] == 8) {$wstart_month ='Aug'}
+				elsif($start_month[$k] == 9) {$wstart_month ='Sep'}
+				elsif($start_month[$k] == 10){$wstart_month ='Oct'}
+				elsif($start_month[$k] == 11){$wstart_month ='Nov'}
+				elsif($start_month[$k] == 12){$wstart_month ='Dec'}
+				else{$wstart_month = 'NULL'}
+				$start_month[$k]   = $wstart_month;
+			}
 		
-		print "$start_date[$k]";
-		print '</td><td align=center>';
+			if($end_month[$k] =~ /\d/){
+				if($end_month[$k]    == 1) {$wend_month = 'Jan'}
+				elsif($end_month[$k] == 2) {$wend_month ='Feb'}
+				elsif($end_month[$k] == 3) {$wend_month ='Mar'}
+				elsif($end_month[$k] == 4) {$wend_month ='Apr'}
+				elsif($end_month[$k] == 5) {$wend_month ='May'}
+				elsif($end_month[$k] == 6) {$wend_month ='Jun'}
+				elsif($end_month[$k] == 7) {$wend_month ='Jul'}
+				elsif($end_month[$k] == 8) {$wend_month ='Aug'}
+				elsif($end_month[$k] == 9) {$wend_month ='Sep'}
+				elsif($end_month[$k] == 10){$wend_month ='Oct'}
+				elsif($end_month[$k] == 11){$wend_month ='Nov'}
+				elsif($end_month[$k] == 12){$wend_month ='Dec'}
+				else{$wend_month = 'NULL'}
+				$end_month[$k]   = $wend_month;
+			}
 
-		print "$start_year[$k]";
-		print '</td><td align=center>';
-
-		print "$start_time[$k]";
-
-#		print '</td><td>',"$tstart[$k]";
-		print '</td></tr><tr><td></td><td></td>';
-
-		print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td align=center>';
-
-		print "$end_month[$k]";
-		print '</td><td align=center>';
-
-		print "$end_date[$k]";
-		print '</td><td align=center>';
-
-		print "$end_year[$k]";
-		print '</td><td align=center>';
-
-		print "$end_time[$k]";
-#		print '</td><td>',"$tstop[$k]";
-		print '</td></tr>';
-	}
-	print '</table>';
+			print '<tr><td align=center><b>';
+			print "$k";
+			print '</b></td><td>';
 	
+			print "$dwindow_constraint[$k]";
+			print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td align=center>';
+	
+			print "$start_month[$k]";
+			print '</td><td align=center>';
+			
+			print "$start_date[$k]";
+			print '</td><td align=center>';
+	
+			print "$start_year[$k]";
+			print '</td><td align=center>';
+	
+			print "$start_time[$k]";
+
+#			print '</td><td>',"$tstart[$k]";
+			print '</td></tr><tr><td></td><td></td>';
+
+			print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td align=center>';
+	
+			print "$end_month[$k]";
+			print '</td><td align=center>';
+	
+			print "$end_date[$k]";
+			print '</td><td align=center>';
+	
+			print "$end_year[$k]";
+			print '</td><td align=center>';
+	
+			print "$end_time[$k]";
+#			print '</td><td>',"$tstop[$k]";
+			print '</td></tr>';
+		}
+		print '</table>';
+	}
 	print '<hr />';
 
 #--------------------------------------
@@ -5371,36 +5391,50 @@ sub data_close_page{
 
 	print "<br /><br />";
 
-	print '<table><tr><th><a href="#" onClick="WindowOpen(roll_flag);return false;">Roll Constraint? </th><td>';
-	print "$droll_flag";
-	print '</td></tr></table>';
+        $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_constraint);return false;">Type of Constraint</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_180);return false;">Roll180?</a></th>
-		<th><a href="#" onClick="WindowOpen(roll);return false;">Roll</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_tolerance);return false;">Roll Tolerance</a></th></tr>';
+        print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
+        print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
-	for($k = 1; $k <= $roll_ordr; $k++){
-		print '<tr><td align=center><b>';
-		print "$k";	
-		print '</b></td><td>';
-		$troll_constraint = 'ROLL_CONSTRAINT'."$k";
-		print "$droll_constraint[$k]";
+        if($droll_flag =~ /N/i){
+                print '<h3 style="padding-bottom:40px">There Is No Roll Constraint.</h3>';
 
-		print '</td><td align=center>';
-		$troll_180 = 'ROLL_180'."$k";
-		print "$droll_180[$k]";
-		print '</td><td align=center>';
-		$troll = 'ROLL'."$k";
-		print "$roll[$k]";
-		print '</td><td align=center>';
-		$troll_tolerance = 'ROLL_TOLERANCE'."$k";
-		print "$roll_tolerance[$k]";
-		print '</td></tr>';
+                print "<input type=\"hidden\" name=\"ROLL_CONSTRAINT1\" value=\"$droll_constraint[1]\">";
+                print "<input type=\"hidden\" name=\"ROLL_1801\" value=\"$droll_180[1]\">";
+                print "<input type=\"hidden\" name=\"ROLL_TOLERANCE1\" value=\"$droll_tolerance[1]\">";
+        }else{
+
+		print '<table><tr><th><a href="#" onClick="WindowOpen(roll_flag);return false;">Roll Constraint? </th><td>';
+		print "$droll_flag";
+		print '</td></tr></table>';
+	
+		print '<table cellspacing="0" cellpadding="5">';
+		print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_constraint);return false;">Type of Constraint</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_180);return false;">Roll180?</a></th>
+			<th><a href="#" onClick="WindowOpen(roll);return false;">Roll</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_tolerance);return false;">Roll Tolerance</a></th></tr>';
+	
+		for($k = 1; $k <= $roll_ordr; $k++){
+			print '<tr><td align=center><b>';
+			print "$k";	
+			print '</b></td><td>';
+			$troll_constraint = 'ROLL_CONSTRAINT'."$k";
+			print "$droll_constraint[$k]";
+	
+			print '</td><td align=center>';
+			$troll_180 = 'ROLL_180'."$k";
+			print "$droll_180[$k]";
+			print '</td><td align=center>';
+			$troll = 'ROLL'."$k";
+			print "$roll[$k]";
+			print '</td><td align=center>';
+			$troll_tolerance = 'ROLL_TOLERANCE'."$k";
+			print "$roll_tolerance[$k]";
+			print '</td></tr>';
+		}
+		print '</table>';
 	}
-	print '</table>';
 
 #---------------------------------------
 #----- Other Constraint Case starts here
@@ -6515,205 +6549,222 @@ if($sp_user eq 'no'){
 #	}
 #	print '</td></tr></table>';
 
-	if($sp_user eq 'yes'){
-		print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
-		print '<br />';
-#		print '<spacer type=horizontal size=30>';
-		print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
-		print '<spacer type=horizontal size=30>';
-#		print textfield(-name=>'TIME_ORDR', -value=>"$time_ordr", -size=>'3');
+        print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
+        print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
-		print '<spacer type=horizontal size=50>';
-		print submit(-name=>'Check',-value=>'     Add Time Rank     ')	;
-		print submit(-name=>'Check',-value=>'Remove Null Time Entry ')  ;
-	}
+        if($dwindow_flag =~ /N/i){
+                print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. </h3>";
 
-	print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
-	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
+                print "<input type=\"hidden\" name=\"WINDOW_CONSTRAINT1\" value=\"$dwindow_constraint[1]\">";
+                print "<input type=\"hidden\" name=\"START_MONTH1\" value=\"$start_month[1]\">";
+                print "<input type=\"hidden\" name=\"START_DATE1\" value=\"$start_date[1]\">";
+                print "<input type=\"hidden\" name=\"START_YEAR1\" value=\"$start_year[1]\">";
+                print "<input type=\"hidden\" name=\"START_TIME1\" value=\"$start_time[1]\">";
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
-		<th><a href="#" onClick="WindowOpen(window_constraint);return false;">Window Constraint</a><th>
-		<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
+                print "<input type=\"hidden\" name=\"END_MONTH1\" value=\"$end_month[1]\">";
+                print "<input type=\"hidden\" name=\"END_DATE1\" value=\"$end_date[1]\">";
+                print "<input type=\"hidden\" name=\"END_YEAR1\" value=\"$end_year[1]\">";
+                print "<input type=\"hidden\" name=\"END_TIME1\" value=\"$end_time[1]\">";
 
-	for($k = 1; $k <= $time_ordr; $k++){
-		if($start_month[$k] =~/\d/){
-			if($start_month[$k]    == 1) {$wstart_month = 'Jan'}
-			elsif($start_month[$k] == 2) {$wstart_month = 'Feb'}
-			elsif($start_month[$k] == 3) {$wstart_month = 'Mar'}
-			elsif($start_month[$k] == 4) {$wstart_month = 'Apr'}
-			elsif($start_month[$k] == 5) {$wstart_month = 'May'}
-			elsif($start_month[$k] == 6) {$wstart_month = 'Jun'}
-			elsif($start_month[$k] == 7) {$wstart_month = 'Jul'}
-			elsif($start_month[$k] == 8) {$wstart_month = 'Aug'}
-			elsif($start_month[$k] == 9) {$wstart_month = 'Sep'}
-			elsif($start_month[$k] == 10){$wstart_month = 'Oct'}
-			elsif($start_month[$k] == 11){$wstart_month = 'Nov'}
-			elsif($start_month[$k] == 12){$wstart_month = 'Dec'}
-			else{$wstart_month = 'NULL'}
-			$start_month[$k]   = $wstart_month;
-		}
+        }else{
+
+		if($sp_user eq 'yes'){
+			print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
+			print '<br />';
+#			print '<spacer type=horizontal size=30>';
+			print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
+			print '<spacer type=horizontal size=30>';
+#			print textfield(-name=>'TIME_ORDR', -value=>"$time_ordr", -size=>'3');
 	
-		if($end_month[$k] =~ /\d/){
-			if($end_month[$k]    == 1) {$wend_month = 'Jan'}
-			elsif($end_month[$k] == 2) {$wend_month = 'Feb'}
-			elsif($end_month[$k] == 3) {$wend_month = 'Mar'}
-			elsif($end_month[$k] == 4) {$wend_month = 'Apr'}
-			elsif($end_month[$k] == 5) {$wend_month = 'May'}
-			elsif($end_month[$k] == 6) {$wend_month = 'Jun'}
-			elsif($end_month[$k] == 7) {$wend_month = 'Jul'}
-			elsif($end_month[$k] == 8) {$wend_month = 'Aug'}
-			elsif($end_month[$k] == 9) {$wend_month = 'Sep'}
-			elsif($end_month[$k] == 10){$wend_month = 'Oct'}
-			elsif($end_month[$k] == 11){$wend_month = 'Nov'}
-			elsif($end_month[$k] == 12){$wend_month = 'Dec'}
-			else{$wend_month = 'NULL'}
-			$end_month[$k]   = $wend_month;
+			print '<spacer type=horizontal size=50>';
+			print submit(-name=>'Check',-value=>'     Add Time Rank     ')	;
+			print submit(-name=>'Check',-value=>'Remove Null Time Entry ')  ;
 		}
 
-		if($sp_user eq 'no'){
+		print '<table cellspacing="0" cellpadding="5">';
+		print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
+			<th><a href="#" onClick="WindowOpen(window_constraint);return false;">Window Constraint</a><th>
+			<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
+
+		for($k = 1; $k <= $time_ordr; $k++){
+			if($start_month[$k] =~/\d/){
+				if($start_month[$k]    == 1) {$wstart_month = 'Jan'}
+				elsif($start_month[$k] == 2) {$wstart_month = 'Feb'}
+				elsif($start_month[$k] == 3) {$wstart_month = 'Mar'}
+				elsif($start_month[$k] == 4) {$wstart_month = 'Apr'}
+				elsif($start_month[$k] == 5) {$wstart_month = 'May'}
+				elsif($start_month[$k] == 6) {$wstart_month = 'Jun'}
+				elsif($start_month[$k] == 7) {$wstart_month = 'Jul'}
+				elsif($start_month[$k] == 8) {$wstart_month = 'Aug'}
+				elsif($start_month[$k] == 9) {$wstart_month = 'Sep'}
+				elsif($start_month[$k] == 10){$wstart_month = 'Oct'}
+				elsif($start_month[$k] == 11){$wstart_month = 'Nov'}
+				elsif($start_month[$k] == 12){$wstart_month = 'Dec'}
+				else{$wstart_month = 'NULL'}
+				$start_month[$k]   = $wstart_month;
+			}
+		
+			if($end_month[$k] =~ /\d/){
+				if($end_month[$k]    == 1) {$wend_month = 'Jan'}
+				elsif($end_month[$k] == 2) {$wend_month = 'Feb'}
+				elsif($end_month[$k] == 3) {$wend_month = 'Mar'}
+				elsif($end_month[$k] == 4) {$wend_month = 'Apr'}
+				elsif($end_month[$k] == 5) {$wend_month = 'May'}
+				elsif($end_month[$k] == 6) {$wend_month = 'Jun'}
+				elsif($end_month[$k] == 7) {$wend_month = 'Jul'}
+				elsif($end_month[$k] == 8) {$wend_month = 'Aug'}
+				elsif($end_month[$k] == 9) {$wend_month = 'Sep'}
+				elsif($end_month[$k] == 10){$wend_month = 'Oct'}
+				elsif($end_month[$k] == 11){$wend_month = 'Nov'}
+				elsif($end_month[$k] == 12){$wend_month = 'Dec'}
+				else{$wend_month = 'NULL'}
+				$end_month[$k]   = $wend_month;
+			}
+	
+			if($sp_user eq 'no'){
 #
 #---- if you are not USINT user, you cannot edit here
 #
-               		print '<tr><td align=center><b>';
-                	print "$k";
-                	print '</b></td><td>';
+               			print '<tr><td align=center><b>';
+                		print "$k";
+                		print '</b></td><td>';
+	
+                		print "$dwindow_constraint[$k]";
+                		print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td align= center>';
+	
+                		print "$start_month[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$start_date[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$start_year[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$start_time[$k]";
 
-                	print "$dwindow_constraint[$k]";
-                	print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td align= center>';
+#               		print '</td><td>',"$tstart[$k]";
+                		print '</td></tr><tr><td></td><td></td>';
+	
+                		print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td align=center>';
+	
+                		print "$end_month[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$end_date[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$end_year[$k]";
+                		print '</td><td align=center>';
+	
+                		print "$end_time[$k]";
+#               		print '</td><td>',"$tstop[$k]";
+                		print '</td></tr>';
 
-                	print "$start_month[$k]";
-                	print '</td><td align=center>';
-
-                	print "$start_date[$k]";
-                	print '</td><td align=center>';
-
-                	print "$start_year[$k]";
-                	print '</td><td align=center>';
-
-                	print "$start_time[$k]";
-
-#               	print '</td><td>',"$tstart[$k]";
-                	print '</td></tr><tr><td></td><td></td>';
-
-                	print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td align=center>';
-
-                	print "$end_month[$k]";
-                	print '</td><td align=center>';
-
-                	print "$end_date[$k]";
-                	print '</td><td align=center>';
-
-                	print "$end_year[$k]";
-                	print '</td><td align=center>';
-
-                	print "$end_time[$k]";
-#               	print '</td><td>',"$tstop[$k]";
-                	print '</td></tr>';
-
-			$twindow_constraint = 'WINDOW_CONSTRAINT'."$k";
-			$tstart_month       = 'START_MONTH'."$k";
-			$tstart_date        = 'START_DATE'."$k";
-			$tstart_year        = 'START_YEAR'."$k";
-			$tstart_time        = 'START_TIME'."$k";
-			$tend_month         = 'END_MONTH'."$k";
-			$tend_date          = 'END_DATE'."$k";
-			$tend_year          = 'END_YEAR'."$k";
-			$tend_time          = 'END_TIME'."$k";
-
-			print "<input type=\"hidden\" name=\"$twindow_constraint\" value=\"$dwindow_constraint[$k]\">";
-			print "<input type=\"hidden\" name=\"$tstart_month\" value=\"$start_month[$k]\">";
-			print "<input type=\"hidden\" name=\"$tstart_date\"  value=\"$start_date[$k]\">";
-			print "<input type=\"hidden\" name=\"$tstart_year\"  value=\"$start_year[$k]\">";
-			print "<input type=\"hidden\" name=\"$tstart_time\"  value=\"$start_time[$k]\">";
-			print "<input type=\"hidden\" name=\"$tend_month\"   value=\"$end_month[$k]\">";
-			print "<input type=\"hidden\" name=\"$tend_date\"    value=\"$end_date[$k]\">";
-			print "<input type=\"hidden\" name=\"$tend_year\"    value=\"$end_year[$k]\">";
-			print "<input type=\"hidden\" name=\"$tend_time\"    value=\"$end_time[$k]\">";
-		}else{
+				$twindow_constraint = 'WINDOW_CONSTRAINT'."$k";
+				$tstart_month       = 'START_MONTH'."$k";
+				$tstart_date        = 'START_DATE'."$k";
+				$tstart_year        = 'START_YEAR'."$k";
+				$tstart_time        = 'START_TIME'."$k";
+				$tend_month         = 'END_MONTH'."$k";
+				$tend_date          = 'END_DATE'."$k";
+				$tend_year          = 'END_YEAR'."$k";
+				$tend_time          = 'END_TIME'."$k";
+	
+				print "<input type=\"hidden\" name=\"$twindow_constraint\" value=\"$dwindow_constraint[$k]\">";
+				print "<input type=\"hidden\" name=\"$tstart_month\" value=\"$start_month[$k]\">";
+				print "<input type=\"hidden\" name=\"$tstart_date\"  value=\"$start_date[$k]\">";
+				print "<input type=\"hidden\" name=\"$tstart_year\"  value=\"$start_year[$k]\">";
+				print "<input type=\"hidden\" name=\"$tstart_time\"  value=\"$start_time[$k]\">";
+				print "<input type=\"hidden\" name=\"$tend_month\"   value=\"$end_month[$k]\">";
+				print "<input type=\"hidden\" name=\"$tend_date\"    value=\"$end_date[$k]\">";
+				print "<input type=\"hidden\" name=\"$tend_year\"    value=\"$end_year[$k]\">";
+				print "<input type=\"hidden\" name=\"$tend_time\"    value=\"$end_time[$k]\">";
+			}else{
 #
 #----- yes the user is USINT 
 #
-			print '<tr><td align=center><b>';
-			print "$k";
-			print '</b></td><td>';
-
-			$twindow_constraint = 'WINDOW_CONSTRAINT'."$k";
-
-			if($sp_user eq'yes' || $dwindow_constraint[$k] =~ /CONSTRAINT/i){
-				print popup_menu(-name=>"$twindow_constraint", -value=>['NULL','NONE','CONSTRAINT','PREFERENCE'],
-				 	-default=>"$dwindow_constraint[$k]", -override=>100000);
-			}else{
-				print popup_menu(-name=>"$twindow_constraint", -value=>['NULL','NONE','PREFERENCE'],
-				 	-default=>"$dwindow_constraint[$k]", -override=>100000);
-			}
-			print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td>';
-
-			$tstart_month = 'START_MONTH'."$k";
-
-			print popup_menu(-name=>"$tstart_month",
-                 			-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-                 			-default=>"$start_month[$k]",-override=>100000);
-			print '</td><td>';
-			
-			$tstart_date = 'START_DATE'."$k";
-
-			print popup_menu(-name=>"$tstart_date",
-                 			-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
-                                 			'11','12','13','14','15','16','17','18','19','20',
-                                 			'21','22','23','24','25','26','27','28','29','30', '31'],
-                 			-default=>"$start_date[$k]", -override=>10000);
-			print '</td><td>';
-
-			$tstart_year = 'START_YEAR'."$k";
-
-			print popup_menu(-name=>"$tstart_year",
-                 			-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
-                                 		'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017', '2018', '2019', '2020'],
-                 			-default=>"$start_year[$k]",-override=>1000000);
-			print '</td><td>';
-
-			$tstart_time = 'START_TIME'."$k";
-
-			print textfield(-name=>"$tstart_time", -size=>'8', -default =>"$start_time[$k]", -override=>1000000);
-
-#			print '</td><td>',"$tstart[$k]";
-			print '</td></tr><tr><td></td><td></td>';
+				print '<tr><td align=center><b>';
+				print "$k";
+				print '</b></td><td>';
 	
-			print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td>';
-
-			$tend_month = 'END_MONTH'."$k";
-
-			print popup_menu(-name=>"$tend_month",
-                 			-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-                 			-default=>"$end_month[$k]",-override=>10000);
-			print '</td><td>';
-
-			$tend_date = 'END_DATE'."$k";
-
-			print popup_menu(-name=>"$tend_date",
-                 			-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
-                                 			'11','12','13','14','15','16','17','18','19','20',
-                                 			'21','22','23','24','25','26','27','28','29','30', '31'],
-                 			-default=>"$end_date[$k]",-override=>1000000);
-			print '</td><td>';
-
-			$tend_year = 'END_YEAR'."$k";
-
-			print popup_menu(-name=>"$tend_year",
-                 			-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
-                                 		'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017', '2018', '2019', '2020'],
-                 			-default=>"$end_year[$k]", -override=>100000);
-			print '</td><td>';
-
-			$tend_time = 'END_TIME'."$k";
-
-			print textfield(-name=>"$tend_time", -size=>'8', -default =>"$end_time[$k]", -override=>1000000);
-#			print '</td><td>',"$tstop[$k]";
-			print '</td></tr>';
+				$twindow_constraint = 'WINDOW_CONSTRAINT'."$k";
+	
+				if($sp_user eq'yes' || $dwindow_constraint[$k] =~ /CONSTRAINT/i){
+					print popup_menu(-name=>"$twindow_constraint", -value=>['CONSTRAINT','PREFERENCE'],
+				 		-default=>"$dwindow_constraint[$k]", -override=>100000);
+				}else{
+					print popup_menu(-name=>"$twindow_constraint", -value=>['PREFERENCE'],
+				 		-default=>"$dwindow_constraint[$k]", -override=>100000);
+				}
+				print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td>';
+	
+				$tstart_month = 'START_MONTH'."$k";
+	
+				print popup_menu(-name=>"$tstart_month",
+                 				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                 				-default=>"$start_month[$k]",-override=>100000);
+				print '</td><td>';
+				
+				$tstart_date = 'START_DATE'."$k";
+	
+				print popup_menu(-name=>"$tstart_date",
+                 				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
+                                 				'11','12','13','14','15','16','17','18','19','20',
+                                 				'21','22','23','24','25','26','27','28','29','30', '31'],
+                 				-default=>"$start_date[$k]", -override=>10000);
+				print '</td><td>';
+	
+				$tstart_year = 'START_YEAR'."$k";
+	
+				print popup_menu(-name=>"$tstart_year",
+                 				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
+                                 			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017', '2018', '2019', '2020'],
+                 				-default=>"$start_year[$k]",-override=>1000000);
+				print '</td><td>';
+	
+				$tstart_time = 'START_TIME'."$k";
+	
+				print textfield(-name=>"$tstart_time", -size=>'8', -default =>"$start_time[$k]", -override=>1000000);
+	
+#				print '</td><td>',"$tstart[$k]";
+				print '</td></tr><tr><td></td><td></td>';
+		
+				print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td>';
+	
+				$tend_month = 'END_MONTH'."$k";
+	
+				print popup_menu(-name=>"$tend_month",
+                 				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                 				-default=>"$end_month[$k]",-override=>10000);
+				print '</td><td>';
+	
+				$tend_date = 'END_DATE'."$k";
+	
+				print popup_menu(-name=>"$tend_date",
+                 				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
+                                 				'11','12','13','14','15','16','17','18','19','20',
+                                 				'21','22','23','24','25','26','27','28','29','30', '31'],
+                 				-default=>"$end_date[$k]",-override=>1000000);
+				print '</td><td>';
+	
+				$tend_year = 'END_YEAR'."$k";
+	
+				print popup_menu(-name=>"$tend_year",
+                 				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
+                                 			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017', '2018', '2019', '2020'],
+                 				-default=>"$end_year[$k]", -override=>100000);
+				print '</td><td>';
+	
+				$tend_time = 'END_TIME'."$k";
+	
+				print textfield(-name=>"$tend_time", -size=>'8', -default =>"$end_time[$k]", -override=>1000000);
+#				print '</td><td>',"$tstop[$k]";
+				print '</td></tr>';
+			}
 		}
+		print '</table>';
 	}
-	print '</table>';
 	
 	print '<hr />';
 
@@ -6725,98 +6776,106 @@ if($sp_user eq 'no'){
         print '<br />';
         print '<font size=+2><b>Roll Constraints </b></font>';
 
-        $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
-
         print "<br /><br />";
 
+        $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 
-#	print '<table><tr><th><a href="#" onClick="WindowOpen(roll_flag);return false;">Roll Constraint? </th><td>';
-#	if($sp_user eq 'no' && $droll_flag ne 'YES'){
-#		print popup_menu(-name=>"ROLL_FLAG", -value=>['NULL','NO','PREFERENCE'],-default=>"$droll_flag",-override=>1000000);
-#	}else{
-#		print popup_menu(-name=>"ROLL_FLAG", -value=>['NULL','YES','NO','PREFERENCE'],-default=>"$droll_flag",-override=>10000);
-#	}
-#	print '</td></tr></table>';
+        if($droll_flag =~ /N/i){
+                print '<h3 style="padding-bottom:40px">There Is No Roll Constraint.</h3>';
 
-	if($sp_user eq 'yes'){
-		print 'If you want to add a rank, press "Add Roll Rank."';
-		print 'If you want to remove null entries, press "Remove Null Roll Entry."';
-		print '<br />';
-#		print '<spacer type=horizontal size=30>';
-		print '<b><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></b>: ';
-		print '<spacer type=horizontal size=30>';
-#		print textfield(-name=>'ROLL_ORDR', -value=>"$roll_ordr", -size=>'3');
+                print "<input type=\"hidden\" name=\"ROLL_CONSTRAINT1\" value=\"$droll_constraint[1]\">";
+                print "<input type=\"hidden\" name=\"ROLL_1801\" value=\"$droll_180[1]\">";
+                print "<input type=\"hidden\" name=\"ROLL_TOLERANCE1\" value=\"$droll_tolerance[1]\">";
+        }else{
 
-		print '<spacer type=horizontal size=50>';
-		print submit(-name=>'Check',-value=>'     Add Roll Rank     ') ;
-		print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
-	}
-	print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
-	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
+#		print '<table><tr><th><a href="#" onClick="WindowOpen(roll_flag);return false;">Roll Constraint? </th><td>';
+#		if($sp_user eq 'no' && $droll_flag ne 'YES'){
+#			print popup_menu(-name=>"ROLL_FLAG", -value=>['NULL','NO','PREFERENCE'],-default=>"$droll_flag",-override=>1000000);
+#		}else{
+#			print popup_menu(-name=>"ROLL_FLAG", -value=>['NULL','YES','NO','PREFERENCE'],-default=>"$droll_flag",-override=>10000);
+#		}
+#		print '</td></tr></table>';
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_constraint);return false;">Type of Constraint</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_180);return false;">Roll180?</a></th>
-		<th><a href="#" onClick="WindowOpen(roll);return false;">Roll</a></th>
-		<th><a href="#" onClick="WindowOpen(roll_tolerance);return false;">Roll Tolerance</a></th></tr>';
+		if($sp_user eq 'yes'){
+			print 'If you want to add a rank, press "Add Roll Rank."';
+			print 'If you want to remove null entries, press "Remove Null Roll Entry."';
+			print '<br />';
+#			print '<spacer type=horizontal size=30>';
+			print '<b><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></b>: ';
+			print '<spacer type=horizontal size=30>';
+#			print textfield(-name=>'ROLL_ORDR', -value=>"$roll_ordr", -size=>'3');
 
-	if($sp_user eq 'no'){
-        	for($k = 1; $k <= $roll_ordr; $k++){
-                	print '<tr><td align=center><b>';
-                	print "$k";
-                	print '</b></td><td>';
-                	$troll_constraint = 'ROLL_CONSTRAINT'."$k";
-                	print "$droll_constraint[$k]";
-
-                	print '</td><td align=center>';
-                	$troll_180 = 'ROLL_180'."$k";
-                	print "$droll_180[$k]";
-                	print '</td><td align=center>';
-                	$troll = 'ROLL'."$k";
-                	print "$roll[$k]";
-                	print '</td><td align=center>';
-                	$troll_tolerance = 'ROLL_TOLERANCE'."$k";
-                	print "$roll_tolerance[$k]";
-                	print '</td></tr>';
-
-			$troll_constraint = 'ROLL_CONSTRAINT'."$k";
-			$troll_180 = 'ROLL_180'."$k";
-			$troll = 'ROLL'."$k";
-			$troll_tolerance = 'ROLL_TOLERANCE'."$k";
-
-			print "<input type=\"hidden\" name=\"$troll_constraint\" value=\"$droll_constraint[$k]\">";
-			print "<input type=\"hidden\" name=\"$troll_180\" value=\"$droll_180[$k]\">";
-			print "<input type=\"hidden\" name=\"$troll\" value=\"$roll[$k]\">";
-			print "<input type=\"hidden\" name=\"$troll_tolerance\" value=\"$roll_tolerance[$k]\">";
-        	}
-	}else{
-		for($k = 1; $k <= $roll_ordr; $k++){
-			print '<tr><td align=center><b>';
-			print "$k";	
-			print '</b></td><td>';
-			$troll_constraint = 'ROLL_CONSTRAINT'."$k";
-			if($sp_user eq 'yes' || $droll_constraint[$k] =~ /CONSTRAINT/i){
-				print popup_menu(-name=>"$troll_constraint", -value=>['NULL','NONE','CONSTRAINT','PREFERENCE'],
-						-default=>"$droll_constraint[$k]", -override=>100000);
-			}else{
-				print popup_menu(-name=>"$troll_constraint", -value=>['NULL','NONE','PREFERENCE'],
-						-default=>"$droll_constraint[$k]", -override=>100000);
-			}
-	
-			print '</td><td>';
-			$troll_180 = 'ROLL_180'."$k";
-			print popup_menu(-name=>"$troll_180", -value=>['NULL','YES','NO'],-default=>"$droll_180[$k]",-override=>100000);
-			print '</td><td>';
-			$troll = 'ROLL'."$k";
-			print textfield(-name=>"$troll", -value=>"$roll[$k]", -size=>'10', -override=>100000);
-			print '</td><td>';
-			$troll_tolerance = 'ROLL_TOLERANCE'."$k";
-			print textfield(-name=>"$troll_tolerance", -value=>"$roll_tolerance[$k]", -size=>'10', -override=>100000);
-			print '</td></tr>';
+			print '<spacer type=horizontal size=50>';
+			print submit(-name=>'Check',-value=>'     Add Roll Rank     ') ;
+			print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
 		}
+		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
+		print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
+
+		print '<table cellspacing="0" cellpadding="5">';
+		print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_constraint);return false;">Type of Constraint</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_180);return false;">Roll180?</a></th>
+			<th><a href="#" onClick="WindowOpen(roll);return false;">Roll</a></th>
+			<th><a href="#" onClick="WindowOpen(roll_tolerance);return false;">Roll Tolerance</a></th></tr>';
+
+		if($sp_user eq 'no'){
+        		for($k = 1; $k <= $roll_ordr; $k++){
+                		print '<tr><td align=center><b>';
+                		print "$k";
+                		print '</b></td><td>';
+                		$troll_constraint = 'ROLL_CONSTRAINT'."$k";
+                		print "$droll_constraint[$k]";
+	
+                		print '</td><td align=center>';
+                		$troll_180 = 'ROLL_180'."$k";
+                		print "$droll_180[$k]";
+                		print '</td><td align=center>';
+                		$troll = 'ROLL'."$k";
+                		print "$roll[$k]";
+                		print '</td><td align=center>';
+                		$troll_tolerance = 'ROLL_TOLERANCE'."$k";
+                		print "$roll_tolerance[$k]";
+                		print '</td></tr>';
+	
+				$troll_constraint = 'ROLL_CONSTRAINT'."$k";
+				$troll_180 = 'ROLL_180'."$k";
+				$troll = 'ROLL'."$k";
+				$troll_tolerance = 'ROLL_TOLERANCE'."$k";
+	
+				print "<input type=\"hidden\" name=\"$troll_constraint\" value=\"$droll_constraint[$k]\">";
+				print "<input type=\"hidden\" name=\"$troll_180\" value=\"$droll_180[$k]\">";
+				print "<input type=\"hidden\" name=\"$troll\" value=\"$roll[$k]\">";
+				print "<input type=\"hidden\" name=\"$troll_tolerance\" value=\"$roll_tolerance[$k]\">";
+        		}
+		}else{
+			for($k = 1; $k <= $roll_ordr; $k++){
+				print '<tr><td align=center><b>';
+				print "$k";	
+				print '</b></td><td>';
+				$troll_constraint = 'ROLL_CONSTRAINT'."$k";
+				if($sp_user eq 'yes' || $droll_constraint[$k] =~ /CONSTRAINT/i){
+					print popup_menu(-name=>"$troll_constraint", -value=>['CONSTRAINT','PREFERENCE'],
+							-default=>"$droll_constraint[$k]", -override=>100000);
+				}else{
+					print popup_menu(-name=>"$troll_constraint", -value=>['PREFERENCE'],
+							-default=>"$droll_constraint[$k]", -override=>100000);
+				}
+	
+				print '</td><td>';
+				$troll_180 = 'ROLL_180'."$k";
+				print popup_menu(-name=>"$troll_180", -value=>['NULL','YES','NO'],-default=>"$droll_180[$k]",-override=>100000);
+				print '</td><td>';
+				$troll = 'ROLL'."$k";
+				print textfield(-name=>"$troll", -value=>"$roll[$k]", -size=>'10', -override=>100000);
+				print '</td><td>';
+				$troll_tolerance = 'ROLL_TOLERANCE'."$k";
+				print textfield(-name=>"$troll_tolerance", -value=>"$roll_tolerance[$k]", -size=>'10', -override=>100000);
+				print '</td></tr>';
+			}
+		}
+		print '</table>';
 	}
-	print '</table>';
 
 #----------------------------------------
 #----- Other Constraint Case starts here
@@ -9054,12 +9113,12 @@ sub prep_submit{
 	elsif($proposal_joint eq 'YES') 	{$proposal_joint = 'Y'}
 	elsif($proposal_joint eq 'NO')  	{$proposal_joint = 'N'}
 	
-	if($roll_flag    eq 'NULL')      	{$roll_flag = 'NULL'}
+	if($roll_flag    eq 'NULL')      	{$roll_flag = 'N'}
 	elsif($roll_flag eq 'YES')       	{$roll_flag = 'Y'}
 	elsif($roll_flag eq 'NO')        	{$roll_flag = 'N'}
 	elsif($roll_flag eq 'PREFERENCE')	{$roll_flag = 'P'}
 	
-	if($window_flag    eq 'NULL')      	{$window_flag = 'NULL'}
+	if($window_flag    eq 'NULL')      	{$window_flag = 'N'}
 	elsif($window_flag eq 'YES')       	{$window_flag = 'Y'}
 	elsif($window_flag eq 'NO')        	{$window_flag = 'N'}
 	elsif($window_flag eq 'PREFERENCE')	{$window_flag = 'P'}
@@ -9068,12 +9127,12 @@ sub prep_submit{
 	elsif($dither_flag eq 'YES') 		{$dither_flag = 'Y'}
 	elsif($dither_flag eq 'NO')  		{$dither_flag = 'N'}
 	
-	if($uninterrupt    eq 'NULL')      	{$uninterrupt = 'NULL'}
+	if($uninterrupt    eq 'NULL')      	{$uninterrupt = 'N'}
 	elsif($uninterrupt eq 'NO')        	{$uninterrupt ='N'}
 	elsif($uninterrupt eq 'YES')       	{$uninterrupt ='Y'}
 	elsif($uninterrupt eq 'PREFERENCE')	{$uninterrupt = 'P'}
 	
-	if($photometry_flag    eq 'NULL')	{$photometry_flag = 'NULL'}
+	if($photometry_flag    eq 'NULL')	{$photometry_flag = 'N'}
 	elsif($photometry_flag eq 'YES') 	{$photometry_flag = 'Y'}
 	elsif($photometry_flag eq 'NO')  	{$photometry_flag = 'N'}
 

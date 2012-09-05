@@ -17,6 +17,7 @@
 # separated to acis and hrc. A different person gets email.
 #
 # Changing directry structure Mar 01, 2011
+# modify mailx option   Sep 05, 2012
 #
 #########################################################################
 
@@ -75,7 +76,7 @@ close(FH);
 #
 
 $na   = "NA";
-$date = `/usr/bin/date '+%a'`;
+$date = `/bin/date '+%a'`;
 $sun  = "Sun";
 chop $date;
 
@@ -105,7 +106,7 @@ foreach $line (@revisions){
 #
 #---- sending email to only obsids signed off less than 72 hrs
 #
-#	$ttemp = `/usr/bin/date '+%m/%d/%y'`;
+#	$ttemp = `/bin/date '+%m/%d/%y'`;
 #	conv_time();
 #	$ctime = $day2000;
 #
@@ -213,7 +214,7 @@ foreach $ruser (@smuser){
 #
 ##########		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs --- $ruser\" -r cus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
 
-		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs\" -r cus\@head.cfa.harvard.edu -c  cus\@head.cfa.harvard.edu  -b isobe\@head.cfa.harvard.edu  $ruser\@head.cfa.harvard.edu");
+		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs\" -c  cus\@head.cfa.harvard.edu  -b isobe\@head.cfa.harvard.edu  $ruser\@head.cfa.harvard.edu");
 		system("rm $temp_dir/$ruser.tmp");
     		`/usr/bin/sleep 5`;
 	}

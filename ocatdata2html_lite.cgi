@@ -13,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Feb  28, 2012
+#		last update: Aug  30, 2012
 #  
 ###############################################################################
 
