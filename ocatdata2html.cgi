@@ -185,6 +185,8 @@ use CGI qw/:standard :netscape /;
 # (Oct, 27, 2011)
 # roll_constraint and time_constraint now have only constraint and preference choice
 # (Spt. 05, 2012)
+# added roll_constraint and time_constraint option
+# (Spt. 10, 2012)
 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -6549,11 +6551,13 @@ if($sp_user eq 'no'){
 #	}
 #	print '</td></tr></table>';
 
-        print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
         print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
         if($dwindow_flag =~ /N/i){
-                print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. </h3>";
+		print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. Do You Need To Add? ";
+		print popup_menu(-name=>"WINDOW_FLAG", -value=>['NO', 'YES'], -default=>"$dwindow_flag", -override=>100000);
+		print '<input type="submit" name="Check" value="Update">';
+		print '</h3>';
 
                 print "<input type=\"hidden\" name=\"WINDOW_CONSTRAINT1\" value=\"$dwindow_constraint[1]\">";
                 print "<input type=\"hidden\" name=\"START_MONTH1\" value=\"$start_month[1]\">";
@@ -6567,6 +6571,7 @@ if($sp_user eq 'no'){
                 print "<input type=\"hidden\" name=\"END_TIME1\" value=\"$end_time[1]\">";
 
         }else{
+        	print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
 
 		if($sp_user eq 'yes'){
 			print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
@@ -6780,14 +6785,18 @@ if($sp_user eq 'no'){
 
         $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 
+	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
+
         if($droll_flag =~ /N/i){
-                print '<h3 style="padding-bottom:40px">There Is No Roll Constraint.</h3>';
+		print '<h3 style="padding-bottom:40px">There Is No Roll Constraint. Do You Need To Add? ';
+		print popup_menu(-name=>"ROLL_FLAG", -value=>['NO', 'YES'], -default=>"$droll_flag", -override=>100000);
+		print '<input type="submit" name="Check" value="Update">';
+		print '</h3>';
 
                 print "<input type=\"hidden\" name=\"ROLL_CONSTRAINT1\" value=\"$droll_constraint[1]\">";
                 print "<input type=\"hidden\" name=\"ROLL_1801\" value=\"$droll_180[1]\">";
                 print "<input type=\"hidden\" name=\"ROLL_TOLERANCE1\" value=\"$droll_tolerance[1]\">";
         }else{
-
 #		print '<table><tr><th><a href="#" onClick="WindowOpen(roll_flag);return false;">Roll Constraint? </th><td>';
 #		if($sp_user eq 'no' && $droll_flag ne 'YES'){
 #			print popup_menu(-name=>"ROLL_FLAG", -value=>['NULL','NO','PREFERENCE'],-default=>"$droll_flag",-override=>1000000);
@@ -6810,7 +6819,6 @@ if($sp_user eq 'no'){
 			print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
 		}
 		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
-		print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
 		print '<table cellspacing="0" cellpadding="5">';
 		print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>

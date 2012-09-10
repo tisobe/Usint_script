@@ -13,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Aug  30, 2012
+#		last update: Sep  10, 2012
 #  
 ###############################################################################
 
@@ -3344,12 +3344,13 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<h2>Time Constraints</h2>';
 
-	
-	print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
 	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
 	if($dwindow_flag =~ /N/i){
-		print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. </h3>";
+		print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. Do You Need To Add? ";
+		print popup_menu(-name=>"WINDOW_FLAG", -value=>['NO', 'YES'], -default=>"$dwindow_flag", -override=>100000);
+		print '<input type="submit" name="Check" value="Update">';
+		print '</h3>';
 
 		print "<input type=\"hidden\" name=\"WINDOW_CONSTRAINT1\" value=\"$dwindow_constraint[1]\">";
 		print "<input type=\"hidden\" name=\"START_MONTH1\" value=\"$start_month[1]\">";
@@ -3363,6 +3364,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print "<input type=\"hidden\" name=\"END_TIME1\" value=\"$end_time[1]\">";
 
 	}else{
+		print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
+
 		print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
 		print '<br />';
 		print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
@@ -3504,16 +3507,19 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
         $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 	
-	print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
 	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
 	if($droll_flag =~ /N/i){
-		print '<h3 style="padding-bottom:40px">There Is No Roll Constraint.</h3>';
+		print '<h3 style="padding-bottom:40px">There Is No Roll Constraint. Do You Need To Add? ';
+		print popup_menu(-name=>"ROLL_FLAG", -value=>['NO', 'YES'], -default=>"$droll_flag", -override=>100000);
+		print '<input type="submit" name="Check" value="Update">';
+		print '</h3>';
 
 		print "<input type=\"hidden\" name=\"ROLL_CONSTRAINT1\" value=\"$droll_constraint[1]\">";
 		print "<input type=\"hidden\" name=\"ROLL_1801\" value=\"$droll_180[1]\">";
 		print "<input type=\"hidden\" name=\"ROLL_TOLERANCE1\" value=\"$droll_tolerance[1]\">";
 	}else{
+		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
 		print 'If you want to add a rank, press "Add Roll Rank".';
 		print 'If you want to remove null entries, press "Remove Null Roll Entry."';
 		print '<br />';
