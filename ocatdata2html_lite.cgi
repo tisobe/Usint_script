@@ -13,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep  11, 2012
+#		last update: Sep  12, 2012
 #  
 ###############################################################################
 
@@ -3039,20 +3039,20 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(seq_nbr);return false;">Sequence Number</a>:';
+	print '<th>Sequence Number:';
 	print "</th><td>$seq_nbr</td>";
-	print '<th><a href="#" onClick="WindowOpen(status);return false;">Status</a>:';
+	print '<th>Status:';
 	print "</th><td>$status</td>";
-	print '<th><a href="#" onClick="WindowOpen(obsid);return false;">ObsID #</a>:';
+	print '<th>ObsID #:';
 	print "</th><td>$obsid</td>";
 	print '<input type="hidden" name="OBSID" value="$obsid">';
-	print '<th><a href="#" onClick="WindowOpen(proposal_number);return false;">Proposal Number</a>:</th>';
+	print '<th>Proposal Number:</th>';
 	print "<td>$proposal_number</td>";
 	print '</tr></table>';
 
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(proposal_title);return false;">Proposal Title</a>:</th>';
+	print '<th>Proposal Title:</th>';
 	print "<td>$proposal_title</td>";
 	print '</tr>';
 	print ' </table>';
@@ -3060,34 +3060,34 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr>';
 	print '<td></td>';
-	print '<th><a href="#" onClick="WindowOpen(obs_ao_str);return false;">Obs AO Status</a>:';
+	print '<th>Obs AO Status:';
 	print "</th><td>$obs_ao_str</td>";
 	print '</tr></table>';
 
 	print '<table cellspacing="3" cellpadding="10">';
 	print '<tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(targname);return false;">Target Name</a>:</th><td>';
+	print '<th>Target Name:</th><td>';
 	print "$targname",'</td>';
-	print '<th><a href="#" onClick="WindowOpen(si_mode);return false;">SI Mode</a>:</th>';
+	print '<th>SI Mode:</th>';
 
 	print '<td align="LEFT"><input type="text" name="SI_MODE" value="',"$si_mode",'" size="12"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(aca_mode);return false;">ACA Mode</a>:</th>';
+	print '<th>ACA Mode:</th>';
 	print '<td align="LEFT">',"$aca_mode",'</td>';
 	print '</tr></table>';
 
 	print '<table cellspacing="3" cellpadding="10">';
 	print '<tr><td></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(instrument);return false;">Instrument</a>:</th><td>';
+	print '<th>Instrument:</th><td>';
 	print popup_menu(-name=>'INSTRUMENT', -value=>['ACIS-I','ACIS-S','HRC-I','HRC-S'],
 		 	-default=>"$instrument",-override=>100000);
 	
-	print '</td><th><a href="#" onClick="WindowOpen(grating);return false;">Grating</a>:</th><td>';
+	print '</td><th>Grating:</th><td>';
 	print popup_menu(-name=>'GRATING', -value=>['NONE','HETG','LETG'],
 		 	-default=>"$grating",-override=>10000);
 	
-	print '</td><th><a href="#" onClick="WindowOpen(type);return false;">Type</a>:</th><td>';
+	print '</td><th>Type:</th><td>';
 	print popup_menu(-name=>'TYPE', -value=>['GO','TOO','GTO','CAL','DDT','CAL_ER', 'ARCHIVE', 'CDFS'],
 		 	-default=>"$type",-override=>10000);
 	
@@ -3095,45 +3095,45 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '<table cellspacing="15" cellpadding="5">';
 	print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(PI_name);return false;">PI Name</a>:';
+	print '<th>PI Name:';
 	print "</th><td>$PI_name</td>";
-	print '<th><a href="#" onClick="WindowOpen(coi_contact);return false;">Observer</a>:';
+	print '<th>Observer:';
 	print "</th><td> $Observer</td></tr>";
 
-	print '<th><a href="#" onClick="WindowOpen(approved_exposure_time);return false;">Exposure Time</a>:</TH>';
+	print '<th>Exposure Time:</TH>';
 	print '<td align="LEFT"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
 	print "$approved_exposure_time".'" size="8"> ks</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(rem_exp_time);return false;">Remaining Exposure Time</a>:</TH>';
+	print '<th>Remaining Exposure Time:</TH>';
 	print "<td>$rem_exp_time ks</td>";
 	print '</tr></table>';
 	
 	print '<table cellspacing="3" cellpadding="8">';
 
-	print '<tr><th><a href="#" onClick="WindowOpen(joint);return false;">Joint Proposal</a>:</th>';
+	print '<tr><th>Joint Proposal:</th>';
 	print "<td>$proposal_joint</td></tr>";
-	print '<tr><td></td><th><a href="#" onClick="WindowOpen(prop_hst);return false;">HST Approved Time</a>:</th>';
+	print '<tr><td></td><th>HST Approved Time:</th>';
 	print "<td>$proposal_hst</td>";
-	print '<th><a href="#" onClick="WindowOpen(prop_noao);return false;">NOAO Approved Time</a>:</th>';
+	print '<th>NOAO Approved Time:</th>';
 	print "<td>$proposal_noao</td>";
 	print '</tr><tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(prop_xmm);return false;">XMM Approved Time</a>:';
+	print '<th>XMM Approved Time:';
 	print "</th><td>$proposal_xmm</td>";
-	print '<th><a href="#" onClick="WindowOpen(prop_rxte);return false;">RXTE Approved Time</a>:';
+	print '<th>RXTE Approved Time:';
 	print "</th><td>$rxte_approved_time</td>";
 	print '</tr><tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(prop_vla);return false;">VLA Approved Time</a>:</th>';
+	print '<th>VLA Approved Time:</th>';
 	print "<td>$vla_approved_time</td>";
-	print '<th><a href="#" onClick="WindowOpen(prop_vlba);return false;">VLBA Approved Time</a>:</th>';
+	print '<th>VLBA Approved Time:</th>';
 	print "<td>$vlba_approved_time</td>";
 	print '</tr></table>';
 	
 	
 	print '<table cellspacing="8" cellpadding="10">';
 	print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(soe_st_sched_date);return false;">Schedule Date</a>:</TH>';
+	print '<th>Schedule Date:</TH>';
 	print "<td>$soe_st_sched_date</td>";
-	print '<th><a href="#" onClick="WindowOpen(lts_lt_plan);return false;">LTS Date</a>:';
+	print '<th>LTS Date:';
 	print "</TH><td>$lts_lt_plan</td>";
 	print '</tr></table>';
 
@@ -3189,26 +3189,26 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="8" cellpadding="5">';
 	print '<tr><td></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ra);return false;">RA (HMS)</a>:</th>';
+	print '<th>RA (HMS):</th>';
 
 	print '<td align="LEFT"><input type="text" name="RA" value="',"$tra",'" size="14"></td>';
 	
-	print '<th><a href="#" onClick="WindowOpen(dec);return false;">Dec (DMS)</a>:</th>';
+	print '<th>Dec (DMS):</th>';
 
 	print '<td align="LEFT"><input type="text" name="DEC" value="',"$tdec",'" size="14"></td>';
-	print '<th><a href="#" onClick="WindowOpen(planned_roll);return false;">Planned Roll</a>:</th><td>',"$scheduled_roll";
+	print '<th>Planned Roll:</th><td>',"$scheduled_roll";
 	print '</td></tr>';
 
 	print '<tr><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(dra);return false;">RA</a>:</TH><td>',"$dra",'</td>';
-	print '<th><a href="#" onClick="WindowOpen(ddec);return false;">Dec</a>:</TH><td>',"$ddec",'</td>';
+	print '<th>RA:</TH><td>',"$dra",'</td>';
+	print '<th>Dec:</TH><td>',"$ddec",'</td>';
 
 	if($status =~ /^OBSERVED/i || $status =~ /ARCHIVED/i){
 	}else{
 		$roll_obsr ='';
 	}
 
-        print '<th><a href="#" onClick="WindowOpen(roll_obsr);return false;">Roll Observed</a>:</th>';
+        print '<th>Roll Observed:</th>';
         print '<td align="LEFT">',"$roll_obsr",'</td></tr>';
 	print "<input type=\"hidden\" name=\"ROLL_OBSR\" value=\"$roll_obsr\">";
 	print '</tr></table>';
@@ -3216,76 +3216,76 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="3" cellpadding="5">';
 	print '<tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(y_det_offset);return false;">Offset: Y</a>:</th>';
+	print '<th>Offset: Y:</th>';
 
 	print '<td align="LEFT"><input type="text" name="Y_DET_OFFSET" value="';
 	print "$y_det_offset";
 	print '" size="12"> arcmin</td><td></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(z_det_offset);return false;">Z</a>:</th>';
+	print '<th>Z:</th>';
 
 	print '<td align="LEFT"><input type="text" name="Z_DET_OFFSET" value="';
 	print "$z_det_offset";
 	print '" size="12"> arcmin</td>';
 	print '</tr><tr>';
-	print '<th><a href="#" onClick="WindowOpen(trans_offset);return false;">Z-Sim</a>:</th>';
+	print '<th>Z-Sim:</th>';
 	print '<td align="LEFT"><input type="text" name="TRANS_OFFSET" value="';
 	print "$trans_offset";
 	print '" size="12"> mm<td>';
-	print '<th><a href="#" onClick="WindowOpen(focus_offset);return false;">Sim-Focus</a>:</th>';
+	print '<th>Sim-Focus:</th>';
 	print '<td align="LEFT"><input type="text" name="FOCUS_OFFSET" value="';
 	print "$focus_offset";
 	print '" size="12"> mm</td>';
 
 	print '<tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(defocus);return false;">Focus</a>:</th>';
+	print '<th>Focus:</th>';
 	print '<td align="LEFT"><input type="text" name="DEFOCUS" value="',"$defocus", '" size="12"></td>';
 	print '<td></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(raster_scan);return false;">Raster Scan</a>:</th>';
+	print '<th>Raster Scan:</th>';
 	print "<td align=\"LEFT\">$raster_scan</td>";
 	print '</tr></table>';
 
 	print '<table cellspacing="3" cellpadding="5">';
 
-	print '<tr><th><a href="#" onClick="WindowOpen(uninterrupt);return false;">Uninterrupted Obs</a>:</th><td>';
+	print '<tr><th>Uninterrupted Obs:</th><td>';
 	print popup_menu(-name=>'UNINTERRUPT', -value=>['NULL','NO','PREFERENCE','YES'], 
 			 	-default=>"$duninterrupt",-override=>1000);
 #
 #--- added 08/05/11
 #
         print '</td><td>&#160';
-        print '</td><th><a href="#"  onClick="WindowOpen(extended_src);return false;">Extended SRC</a>:</th><td>';
+        print '</td><th>Extended SRC:</th><td>';
         print popup_menu(-name=>'EXTENDED_SRC', -value=>['NO','YES'],
                         -default=>"$dextended_src",-override=>1000);
         print '</td></tr>';
 
 
-	print '<tr><th><a href="#" onClick="WindowOpen(obj_flag);return false;">Solar System Object</a>:</th><td>';
+	print '<tr><th>Solar System Object:</th><td>';
 	print popup_menu(-name=>'OBJ_FLAG',-value=>['NO','MT','SS'],-default=>"$obj_flag", -override=>10000);
 	print '</td><td>';
-	print '</td><th><a href="#" onClick="WindowOpen(object);return false;">Object</a>:</th><td>';
+	print '</td><th>Object:</th><td>';
 	print popup_menu(-name=>'OBJECT', 
 	 		-value=>['NONE','NEW','COMET','EARTH','JUPITER','MARS','MOON','NEPTUNE',
 	          		'PLUTO','SATURN','URANUS','VENUS'],
 	 		-default=>"$object", -override=>10000);
 	print '</tr><tr>';
 	
-	print '</td><th><a href="#" onClick="WindowOpen(photometry_flag);return false;">Photometry</a>:</th><td>';
+	print '</td><th>Photometry:</th><td>';
 	print popup_menu(-name=>'PHOTOMETRY_FLAG', -value=>['NULL','YES','NO'], 
 			 -default=>"$dphotometry_flag", -override=>100000);
 	print '</td>';
 
 	print '<td></td>';
-	print '<th><a href="#" onClick="WindowOpen(vmagnitude);return false;">V Mag</a>:';
+	print '<th>V Mag:';
 	print "</th><td align=\"LEFT\"><input type=\"text\" name=\"VMAGNITUDE\" value=\"$vmagnitude\" size=\"12\"></td>";
 	print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(est_cnt_rate);return false;">Count Rate</a>:</th>';
+	print '<th>Count Rate:</th>';
 	print '<td align="LEFT"><input type="text" name="EST_CNT_RATE"';
 	print " value=\"$est_cnt_rate\" size=\"12\"></td>";
 	print '<td></td>';
-	print '<th><a href="#" onClick="WindowOpen(forder_cnt_rate);return false;">1st Order Rate</a>:';
+	print '<th>1st Order Rate</a>:';
 	print '</th><td align="LEFT"><input type="text" name="FORDER_CNT_RATE"';
 	print " value=\"$forder_cnt_rate\" size=\"12\"></td>";
 	print '</tr></table>';
@@ -3294,18 +3294,18 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<h2>Dither</h2>';
 
 	print '<table cellspacing="3" cellpadding="5">';
-	print '<tr><th><a href="#" onClick="WindowOpen(dither_flag);return false;">Dither</a>:</th><td>';
+	print '<tr><th>Dither:</th><td>';
 	print popup_menu(-name=>'DITHER_FLAG', -value=>['NULL','YES','NO'], 
 		 	-default=>"$ddither_flag", -override=>100000);
 	print '</td><td></td><td></td><td></td><td></td></tr>';
 
-	print '<tr><td></td><th><a href="#" onClick="WindowOpen(y_amp);return false;">y_amp</a> (in arcsec):</th>';
+	print '<tr><td></td><th>y_amp (in arcsec):</th>';
 	print '<td align="LEFT"><input type="text" name="Y_AMP_ASEC" value="',"$y_amp_asec",'" size="8"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(y_freq);return false;">y_freq</a> (in arcsec/sec):</th>';
+	print '<th>y_freq (in arcsec/sec):</th>';
 	print '<td align="LEFT"><input type="text" name="Y_FREQ_ASEC" value="',"$y_freq_asec",'" size="8"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(y_phase);return false;">y_phase</a>:</th>';
+	print '<th>y_phase:</th>';
 	print '<td align="LEFT"><input type="text" name="Y_PHASE" value="',"$y_phase",'" size="8"></td>';
 	print '</tr>';
 #---
@@ -3320,13 +3320,13 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
         print '</tr>';
 #----
 	
-	print '<tr><td></td><th><a href="#" onClick="WindowOpen(z_amp);return false;">z_amp</a> (in arcsec):</th>';
+	print '<tr><td></td><th>z_amp (in arcsec):</th>';
 	print '<td align="LEFT"><input type="text" name="Z_AMP_ASEC" value="',"$z_amp_asec",'" size="8"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(z_freq);return false;">z_freq</a> (in arcsec/sec):</th>';
+	print '<th>z_freq (in arcsec/sec):</th>';
 	print '<td align="LEFT"><input type="text" name="Z_FREQ_ASEC" value="',"$z_freq_asec",'" size="8"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(z_phase);return false;">z_phase</a>:</th>';
+	print '<th>z_phase:</th>';
 	print '<td align="LEFT"><input type="text" name="Z_PHASE" value="',"$z_phase",'" size="8"></td>';
 	print '</tr>';
 
@@ -3380,7 +3380,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		if($time_ordr_add == 0){
 			print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
 			print '<br /><br />';
-			print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
+			print '<b>Rank</b>: ';
 			print '<spacer type=horizontal size=30>';
 	
 			print '<spacer type=horizontal size=50>';
@@ -3389,8 +3389,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		}
 
 		print '<table cellspacing="0" cellpadding="5">';
-		print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
-			<th><a href="#" onClick="WindowOpen(window_constraint);return false;">Window Constraint</a><th>
+		print '<tr><th>Rank</th>
+			<th>Window Constraint<th>
 			<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
 	
 	
@@ -3442,7 +3442,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 				print popup_menu(-name=>"$twindow_constraint", -value=>['PREFERENCE'],
 			 		-default=>"$dwindow_constraint[$k]", -override=>100000);
 			}
-			print '</td><th><a href="#" onClick="WindowOpen(tstart);return false;">Start</a></th><td>';
+			print '</td><th>Start</th><td>';
 	
 			$tstart_month = 'START_MONTH'."$k";
 	
@@ -3474,7 +3474,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 			print '</td></tr><tr><td></td><td></td>';
 	
-			print '</td><th><a href="#" onClick="WindowOpen(tstop);return false;">End</a></th><td>';
+			print '</td><th>End</th><td>';
 	
 			$tend_month = 'END_MONTH'."$k";
 	
@@ -3542,7 +3542,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			print 'If you want to remove null entries, press "Remove Null Roll Entry."';
 			print '<br /><br />';
 
-			print '<b><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></b>: ';
+			print '<b>Rank</b>: ';
 			print '<spacer type=horizontal size=30>';
 	
 			print '<spacer type=horizontal size=50>';
@@ -3551,11 +3551,11 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		}
 
 		print '<table cellspacing="0" cellpadding="5">';
-		print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
-			<th><a href="#" onClick="WindowOpen(roll_constraint);return false;">Type of Constraint</a></th>
-			<th><a href="#" onClick="WindowOpen(roll_180);return false;">Roll180?</a></th>
-			<th><a href="#" onClick="WindowOpen(roll);return false;">Roll</a></th>
-			<th><a href="#" onClick="WindowOpen(roll_tolerance);return false;">Roll Tolerance</a></th></tr>';
+		print '<tr><th>Rank</th>
+			<th>Type of Constraint</th>
+			<th>Roll180?</th>
+			<th>Roll</th>
+			<th>Roll Tolerance</th></tr>';
 	
 		for($k = 1; $k <= $roll_ordr; $k++){
 			print '<tr><td align=center><b>';
@@ -3594,7 +3594,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<tr>';
 	
 
-	print '<th><a href="#" onClick="WindowOpen(constr_in_remarks);return false;">Constraints in Remarks?</a>:</th><td>';
+	print '<th>Constraints in Remarks?:</th><td>';
 	print popup_menu(-name=>'CONSTR_IN_REMARKS', -value=>['YES','PREFERENCE','NO'],
 		 -default=>"$dconstr_in_remarks", -override=>100000);
 	print ' </td></tr>';
@@ -3602,7 +3602,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(phase_constraint_flag);return false;">Phase Constraint</a>:</th>
+	print '<th>Phase Constraint:</th>
 	<td align="LEFT">';
 	
 	print " $dphase_constraint_flag";
@@ -3626,27 +3626,27 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}else{
 		print '<table cellspacing="10" cellpadding="5">';
 		print '<tr><td></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_epoch);return false;">Phase Epoch</a>:</th>';
+		print '<th>Phase Epoch:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_EPOCH" value=';
 		print "\"$phase_epoch\"",' size="12"></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_period);return false;">Phase Period</a>:</th>';
+		print '<th>Phase Period:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_PERIOD" value=';
 		print "\"$phase_period\"", ' size="12"></td>';
 		print '<td></td><td></td></tr>';
 		
 		print '<tr><td></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_start);return false;">Phase Start</a>:</th>';
+		print '<th>Phase Start:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_START" value=';
 		print "\"$phase_start\"",' size="12"></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_start_margin);return false;">Phase Start Margin</a>:</th>';
+		print '<th>Phase Start Margin:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_START_MARGIN" value=';
 		print "\"$phase_start_margin\"",' size="12"></td>';
 		print '</tr><tr>';
 		print '<td></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_end);return false;">Phase End</a>:</th>';
+		print '<th>Phase End:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_END" value=';
 		print "\"$phase_end\"",' size="12"></td>';
-		print '<th><a href="#" onClick="WindowOpen(phase_end_margin);return false;">Phase End Margin</a>:</th>';
+		print '<th>Phase End Margin:</th>';
 		print '<td align="LEFT"><input type="text" name="PHASE_END_MARGIN" value=';
 		print "\"$phase_end_margin\"",' size="12"></td>';
 		print '</tr></table>';
@@ -3679,7 +3679,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="0" cellpadding="2">';
 	print '<tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(group_id);return false;">Group ID</a>:</th>';
+	print '<th>Group ID:</th>';
 	print '<td>';
 
 	if($group_id){
@@ -3690,7 +3690,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}
 	print '</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(monitor_flag);return false;">Monitoring Observation:  </th>';
+	print '<th>Monitoring Observation:  </th>';
 	print '<td>';
 
 	if($sp_user eq 'yes' && ($dmonitor_flag =~ /Y/i || $dmonitor_flag == '') 
@@ -3717,25 +3717,25 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	if($group_id =~ /No Group ID/ || $group_id !~ /\d/){
 		print '<table cellspacing="8" cellpadding="5">';
 
-		print '<th><a href="#" onClick="WindowOpen(pre_id);return false;">Follows ObsID#</a>:</th>';
+		print '<th>Follows ObsID#:</th>';
 		print '<td align="LEFT"><input type="text" name="PRE_ID" value="',"$pre_id",'" size="8"></td>';
 		
-		print '<th><a href="#" onClick="WindowOpen(pre_min_lead);return false;">Min Int<br />(pre_min_lead)</a>:</th>';
+		print '<th>Min Int<br />(pre_min_lead):</th>';
 		print '<td align="LEFT"><input type="text" name="PRE_MIN_LEAD" value="',"$pre_min_lead",'" size="8"></td>';
 	
-		print '<th><a href="#" onClick="WindowOpen(pre_max_lead);return false;">Max Int<br />(pre_max_lead)</a>:</th>';
+		print '<th>Max Int<br />(pre_max_lead):</th>';
 		print '<td align="LEFT"><input type="text" name="PRE_MAX_LEAD" value="',"$pre_max_lead",'" size="8"></td>';
 		print '</tr></table>';
 	}else{
       			print '<table cellspacing="8" cellpadding="5">';
 
-       		print '<th><a href="#" onClick="WindowOpen(pre_id);return false;">Follows ObsID#</a>:</th>';
+       		print '<th>Follows ObsID#:</th>';
        		print '<td align="LEFT">',"$pre_id",'</td>';
 	
-       		print '<th><a href="#" onClick="WindowOpen(pre_min_lead);return false;">Min Int<br />(pre_min_lead)</a>:</th>';
+       		print '<th>Min Int<br />(pre_min_lead):</th>';
        		print '<td align="LEFT">',"$pre_min_lead",'</td>';
 	
-       		print '<th><a href="#" onClick="WindowOpen(pre_max_lead);return false;">Max Int<br />(pre_max_lead)</a>:</th>';
+       		print '<th>Max Int<br />(pre_max_lead):</th>';
        		print '<td align="LEFT">',"$pre_max_lead",'</td>';
        		print '</tr></table>';
 
@@ -3747,7 +3747,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<table cellspacing=6 cellpadding=5>';
 	print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(multitelescope);return false;">Coordinated Observation</a>:</th><td>';
+	print '<th>Coordinated Observation:</th><td>';
 
 
 	print popup_menu(-name=>'MULTITELESCOPE', -value=>['NO','YES','PREFERENCE'],
@@ -3755,13 +3755,13 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '</td>';
 	print '<td></td>';
-	print '<th><a href="#" onClick="WindowOpen(observatories);return false;">Observatories</a>:</th>';
+	print '<th>Observatories:</th>';
 	print '<td align="LEFT"><input type="text" name="OBSERVATORIES" value=';
 	print "\"$observatories\"",' size="12"></td>';
                print '</tr>';
 
                print '<tr>';
-	print '<th><a href="#" onClick="WindowOpen(multitelescope_interval);return false;">Max Coordination Offset</a>:</th>';
+	print '<th>Max Coordination Offset:</th>';
 	print '<td align="LEFT"><input type="text" name="MULTITELESCOPE_INTERVAL" value=';
 	print "\"$multitelescope_interval\"",' size="12"></td>';
 
@@ -3778,24 +3778,24 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr><td></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(hrc_timing_mode);return false;">HRC Timing Mode</a>:</th><td>';
+	print '<th>HRC Timing Mode:</th><td>';
 	print popup_menu(-name=>'HRC_TIMING_MODE', -value=>['NO','YES'], 
 		 	-default=>"$dhrc_timing_mode", -override=>100000);
 	print '</td>';
 	
-	print '<th><a href="#" onClick="WindowOpen(hrc_zero_block);return false;">Zero Block</a>:</th><td>';
+	print '<th>Zero Block:</th><td>';
 	print popup_menu(-name=>'HRC_ZERO_BLOCK', -value=>['NO','YES'], 
 		 	-default=>"$dhrc_zero_block", -override=>1000000);
 	print '</td><td>';
 
 	if($sp_user eq 'no'){
-		print '<th><a href="#" onClick="WindowOpen(hrc_si_mode);return false;">SI Mode</a>:</th>
+		print '<th>SI Mode:</th>
 			<td align="LEFT">';
 		print "$hrc_si_mode";
 		print '</td></tr>';
 		print "<input type=\"hidden\" name=\"HRC_SI_MODE\" value=\"$hrc_si_mode\">";
 	}else{
-		print '<th><a href="#" onClick="WindowOpen(hrc_si_mode);return false;">SI Mode</a>:</th>
+		print '<th>SI Mode:</th>
 			<td align="LEFT"><input type="text" name="HRC_SI_MODE" value="';
 		print "$hrc_si_mode";
 		print '" size="8"></td></tr>';
@@ -3813,18 +3813,18 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr>';
 	
-	print '<th><a href="#" onClick="WindowOpen(exp_mode);return false;">ACIS Exposure Mode</a>:</th><td>';
+	print '<th>ACIS Exposure Mode:</th><td>';
 	
 	print popup_menu(-name=>'EXP_MODE', -value=>['NULL','TE','CC'], -default=>"$exp_mode", -override=>100000);
 	
-	print '</td><th><a href="#" onClick="WindowOpen(bep_pack);return false;">Event TM Format</a>:</th><td>';
+	print '</td><th>Event TM Format:</th><td>';
 	
 	print popup_menu(-name=>'BEP_PACK', -value=>['NULL','VF','F','F+B','G'], 
 		 	-default=>"$bep_pack", -override=>100000);
 	print '</td>';
 
 
-	print '<th><a href="#" onClick="WindowOpen(frame_time);return false;">Frame Time</a>:</th>';
+	print '<th>Frame Time:</th>';
 
 	print "<td align='LEFT'>";
 	print textfield(-name=>'FRAME_TIME', -value=>"$frame_time",-size=>12, -override=>1000);
@@ -3832,7 +3832,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<tr>';
 	print '<td></td><td></td><td></td><td></td>
-		<th><a href="#" onClick="WindowOpen(most_efficient);return false;">Most Efficient</a>:</th><td>';
+		<th>Most Efficient:</th><td>';
 
 	print popup_menu(-name=>'MOST_EFFICIENT', -value=>['NULL','YES','NO'],
 		 	-default=>"$dmost_efficient", -override=>10000);
@@ -3843,10 +3843,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<tr><td></td>';
 
 
-	print '<th><a href="#" onClick="WindowOpen(fep);return false;">FEP</a>:</th><td>';
+	print '<th>FEP:</th><td>';
                       print "$fep";
 	print '</td><td></td><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(dropped_chip_count);return false;">Dropped Chip Count</a>:</th><td>';
+	print '<th>Dropped Chip Count:</th><td>';
 	print "$dropped_chip_count";
 
 	print '</td>';
@@ -3859,12 +3859,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 	
 
-	print '<th><a href="#" onClick="WindowOpen(ccdi0_on);return false;">I0</a>:</th>';
+	print '<th>I0:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDI0_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccdi0_on",-override=>100000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccdi1_on);return false;">I1</a>:</th>';
+	print '<th>I1:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDI1_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccdi1_on",-override=>1000000),'</td>';
@@ -3872,12 +3872,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 	print '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 	
-	print '<th><a href="#" onClick="WindowOpen(ccdi2_on);return false;">I2</a>:</th>';
+	print '<th>I2:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDI2_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccdi2_on",-override=>100000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccdi3_on);return false;">I3</a>:</th>';
+	print '<th>I3:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDI3_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccdi3_on",-override=>100000),'</td>';
@@ -3886,32 +3886,32 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '<tr>';
 	
-	print '<th><a href="#" onClick="WindowOpen(ccds0_on);return false;">S0</a>:</th>';
+	print '<th>S0:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDS0_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccds0_on",-override=>100000),'</td>';
 	
-	print '<th><a href="#" onClick="WindowOpen(ccds1_on);return false;">S1</a>:</th>';
+	print '<th>S1:</th>';
 
 	print '<td>',popup_menu(-name=>'CCDS1_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 					-default=>"$dccds1_on",-override=>100000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccds2_on);return false;">S2</a>:</th>';
+	print '<th>S2:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDS2_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccds2_on",-override=>10000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccds3_on);return false;">S3</a>:</th>';
+	print '<th>S3:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDS3_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccds3_on",-override=>1000000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccds4_on);return false;">S4</a>:</th>';
+	print '<th>S4:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDS4_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccds4_on",-override=>100000),'</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(ccds5_on);return false;">S5</a>:</th>';
+	print '<th>S5:</th>';
 	
 	print '<td>',popup_menu(-name=>'CCDS5_ON', -value=>['NULL','YES','OPT1','OPT2','OPT3','OPT4','OPT5','NO'],
 						-default=>"$dccds5_on",-override=>100000),'</td>';
@@ -3921,21 +3921,20 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr>';
 
-	print '<Th><a href="#" onClick="WindowOpen(subarray);return false;">Use Subarray</a>:</Th>';
+	print '<Th>Use Subarray:</Th>';
 	
 	print '<td>';
 	print popup_menu(-name=>'SUBARRAY', -value=>['NO', 'YES'],
 		 	-default=>"$dsubarray", -override=>100000);
 
-	print '</td><td colspan=4><b>Please fill the next two entries, if you select YES.<br /> You can find the old default 
-		subarrays at <a href="#" onClick="WindowOpen(subarray);return false;">Subarray Setting</a>.</b>
+	print '</td><td colspan=4><b>Please fill the next two entries, if you select YES.
 		</td></tr><tr>';
 	
-	print '<th><a href="#" onClick="WindowOpen(subarray_start_row);return false;">Start</a>:</th>';
+	print '<th>Start:</th>';
 	
 	print '<td align="LEFT"><input type="text" name="SUBARRAY_START_ROW" value="',"$subarray_start_row",'" size="12"></td>';
 	
-	print '<th><a href="#" onClick="WindowOpen(subarray_row_count);return false;">Rows</a>:</th>';
+	print '<th>Rows:</th>';
 	
 	print '<td align="LEFT"><input type="text" name="SUBARRAY_ROW_COUNT" value="',"$subarray_row_count",'" size="12"></td>';
 	
@@ -3943,62 +3942,62 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '</td></tr>';
 	print '<tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(duty_cycle);return false;">Duty Cycle</a>:</th><td>';
+	print '<th>Duty Cycle:</th><td>';
 	print popup_menu(-name=>'DUTY_CYCLE', -value=>['NULL','YES','NO'], 
 		 	-default=>"$dduty_cycle", -override=>100000);
 	print '</td>';
 	print '<th colspan=4><b>If you selected YES, please fill the next two entries</b></th>';
 	print '</tr><tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(secondary_exp_count);return false;">Number</a>:</th>';
+	print '<th>Number:</th>';
 	print '<td align="LEFT"><input type="text" name="SECONDARY_EXP_COUNT" value=';
 	print "\"$secondary_exp_count\"", ' size="12"></td>';
-	print '<th><a href="#" onClick="WindowOpen(primary_exp_time);return false;">Tprimary</a>:</th>';
+	print '<th>Tprimary:</th>';
 	print '<td align="LEFT"><input type="text" name="PRIMARY_EXP_TIME" value=';
 	print "\"$primary_exp_time\"", ' size="12"></td>';
 	print '</tr> <tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(onchip_sum);return false;">Onchip Summing</a>:</th><td>';
+	print '<th>Onchip Summing:</th><td>';
 	print popup_menu(-name=>'ONCHIP_SUM', -value=>['NULL','YES','NO'], 
 		 	-default=>"$donchip_sum", -override=>100000);
 	print '</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(onchip_row_count);return false;">Rows</a>:';
+	print '<th>Rows:';
 	print '</th><td align="LEFT"><input type="text" name="ONCHIP_ROW_COUNT" value=';
 	print "\"$onchip_row_count\"", ' size="12"></td>';
-	print '<th><a href="#" onClick="WindowOpen(onchip_column_count);return false;">Columns</a>:';
+	print '<th>Columns:';
 	print '</th><td align="LEFT"><input type="text" name="ONCHIP_COLUMN_COUNT" value=';
 	print "\"$onchip_column_count\"", ' size="12"></td>';
 	print '</tr>';
 	print '<tr>';
 
-	print '<th><a href="#" onClick="WindowOpen(eventfilter);return false;">Energy Filter</a>:</th><td>';
+	print '<th>Energy Filter:</th><td>';
 	
 	print popup_menu(-name=>'EVENTFILTER', -value=>['NULL','YES','NO'], 
 		 	-default=>"$deventfilter", -override=>100000);
 	print '</td>';
 
 
-	print '<th><a href="#" onClick="WindowOpen(eventfilter_lower);return false;">Lowest Energy</a>:</th>';
+	print '<th>Lowest Energy:</th>';
 	
 	print '<td align="LEFT"><input type="text" name="EVENTFILTER_LOWER" value="';
 	print "$eventfilter_lower";
 	print '" size="12"></td>';
 
-	print '<th><a href="#" onClick="WindowOpen(eventfilter_higher);return false;">Energy Range</a>:</th>';
+	print '<th>Energy Range:</th>';
 	
 	print '<td align="LEFT"><input type="text" name="EVENTFILTER_HIGHER" value="';
 	print "$eventfilter_higher";
 	print '" size="12"></td>';
 	print '</tr><tr> ';
 
-	print '<th><a href="#" onClick="WindowOpen(multiple_spectral_lines);return false;">Multiple Spectral Lines</a>:</th>';
+	print '<th>Multiple Spectral Lines:</th>';
 
 	print '<td align="LEFT">';
 	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NULL','NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
 	print '</td>';
 
-	print '<th><a href="#" onClick="WindowOpen(spectra_max_count);return false;">Spectra Max Count</a>:</th>';
+	print '<th>Spectra Max Count:</th>';
 	print '<td align="LEFT"><input type="text" name="SPECTRA_MAX_COUNT" value="';
 	print "$spectra_max_count";
 	print '" size="12"></td>';
@@ -4019,7 +4018,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<hr/>';
 	print '<h2> ACIS Window Constraints</H2>';
 	print '<table><tr><th>';
-	print '<a href="#" onClick="WindowOpen(spwindow);return false;">Window Filter</a>:';
+	print 'Window Filter:';
 	print '</th><td>';
 
 #
@@ -4113,7 +4112,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print 'If you want to modify the number of ranks, change Window Filter above to "YES", ';
 		print 'then change the rank entry below, and press "Add Window Rank"';
 		print '<br /><br />';
-		print '<b><a href="#" onClick="WindowOpen(ordr);return false;">Rank</a></b>: ';
+		print '<b>Rank</b>: ';
 		print '<spacer type=horizontal size=30>';
 	
 		print '<spacer type=horizontal size=50>';
@@ -4201,17 +4200,17 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 
 #
-#----this line was removed: <th><a href="#" onClick="WindowOpen(include_flag);return false;">Photon Inclusion</a></th>
+#----this line was removed: <th>Photon Inclusion</th>
 #
-		print '<tr><th><a href="#" onClick="WindowOpen(ordr);return false;">Ordr</a></th>
-		<th><a href="#" onClick="WindowOpen(chip);return false;">Chip</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_start_row);return false;">Start Row</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_start_column);return false;">Start Column</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_height);return false;">Height</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_width);return false;">Width</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_lower_threshold);return false;">Lowest Energy</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_pha_range);return false;">Energy Range</a></th>
-		<th><a href="#" onClick="WindowOpen(spwindow_sample);return false;">Sample Rate</a></th>
+		print '<tr><th>Ordr</th>
+		<th>Chip</th>
+		<th>Start Row</th>
+		<th>Start Column</th>
+		<th>Height</th>
+		<th>Width</th>
+		<th>Lowest Energy</th>
+		<th>Energy Range</th>
+		<th>Sample Rate</th>
 		<th></th></tr>';
 
 		if($aciswin_no == 0){
@@ -4442,33 +4441,33 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '<table cellspacing=3 cellpadding=5>';
 	print '<tr>';
-	print '<th valign=top><a href="#" onClick="WindowOpen(too_id);return false;">TOO ID</a>:';
+	print '<th valign=top>TOO ID:';
 	print '</th><td>';
 	print "$too_id",'</td>';
 	print '</tr><tr>';
-	print '<th valign=top nowrap><a href="#" onClick="WindowOpen(too_trig);return false;">TOO Trigger</a>:';
+	print '<th valign=top nowrap>TOO Trigger:';
 	print '</th><td>',"$too_trig",'</td>';
 	print '</tr><tr>';
-	print '<th><a href="#" onClick="WindowOpen(too_type);return false;">TOO Type</a>:</th><td>';
+	print '<th>TOO Type:</th><td>';
 	print "$too_type";
 	print '</td></tr></table>';
 	print '<table cellspacing=3 cellpadding=5>';
 	print '<tr>';
 	print '<th>Exact response window (days):</th>';
 	print '</tr><tr>';
-	print '<th><a href="#" onClick="WindowOpen(too_start);return false;">Start</a>:</th><td>';
+	print '<th>Start:</th><td>';
 	print "$too_start";
 	print '</td><td></td>';
-	print '<th><a href="#" onClick="WindowOpen(too_stop);return false;">Stop</a>:</th><td>';
+	print '<th>Stop:</th><td>';
 	print "$too_stop";
 	print '</td><tr>';
-	print '<th><a href="#" onClick="WindowOpen(too_followup);return false;">';
-	print '# of Follow-up Observations</a>:</th><td>';
+	print '<th>';
+	print '# of Follow-up Observations:</th><td>';
 	print "$too_followup";
 	print '</td></tr></table>';
 	print '<table cellspacing=0 cellpadding=5>';
 	print '<tr><td></td>';
-	print '<th valign=top><a href="#" onClick="WindowOpen(too_remarks);return false;">';
+	print '<th valign=top>';
 	print 'TOO Remarks</a>:</th><td>';
 	print "$too_remarks";
 	print '</td></tr></table>';
@@ -4529,7 +4528,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<table cellspacing="0" cellpadding="5">';
 
-	print '<th valign=top><a href="#" onClick="WindowOpen(remarks);return false;">Remarks</a>:</th>';
+	print '<th valign=top>Remarks:</th>';
 	print '<td><textarea name="REMARKS" ROWS="10" COLS="60"  WRAP=virtual >';
 	print "$remarks";
 	print '</textarea></td></tr>';
@@ -4545,7 +4544,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print "add the comment in this area.<br />";
 	print "</td></tr>";
 	print "<tr>";
-	print "<th  valign=top><a href='#' onClick='WindowOpen(comments);return false;'> Comments</a>:</th><td>";
+	print "<th  valign=top>Comments:</th><td>";
 	print "<textarea name='COMMENTS' ROWS='3' COLS='60' WRAP=virtual>$comments</textarea>";
 	print "</td></tr>";
 
@@ -6140,7 +6139,7 @@ sub print_clone_page{
         print '<tr><td colspan=3>';
         print '<b> Please write why you want to make a clone of this observation in the comment area.<br /> </td></tr>';
         print '<tr>';
-        print '<th  valign=top><a href="#" onClick="WindowOpen(comments);return false;"> Comments</a>:</th><td>';
+        print '<th  valign=top> Comments:</th><td>';
         print '<textarea name="COMMENTS" ROWS="3" COLS="60" WRAP=virtual>',"$comments",'</textarea>';
         print '</td></tr>';
         print '</table>';
