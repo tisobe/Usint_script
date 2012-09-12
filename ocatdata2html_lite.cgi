@@ -13,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep  10, 2012
+#		last update: Sep  11, 2012
 #  
 ###############################################################################
 
@@ -728,6 +728,8 @@ sub pass_param {
 #-------- (also roll and window constraints)
 #-------------------------------------------------------------------------------------------------------
 
+	$time_ordr_add = param("TIME_ORDR_ADD");		#--- if window constraint is addred later, this will be 1
+
 	for($j = 1; $j <= $time_ordr; $j++){
 #
 #---- if window constraint is set to Null, set tstart and stop to Null, too
@@ -924,6 +926,8 @@ sub pass_param {
 #------------------------------
 #-------- roll constraint case
 #------------------------------
+
+	$roll_ordr_add = param("ROLL_ORDR_ADD");		#--- if roll constraint add is requested later, this will be 1
 
 	for($j = 1; $j <= $roll_ordr; $j++){
 		foreach $ent ('ROLL_CONSTRAINT','ROLL_180','ROLL','ROLL_TOLERANCE'){
@@ -2781,7 +2785,7 @@ sub read_databases{
 		PROPOSAL_JOINT,PROPOSAL_HST,PROPOSAL_NOAO,PROPOSAL_XMM,PROPOSAL_RXTE,PROPOSAL_VLA,
 		PROPOSAL_VLBA,SOE_ST_SCHED_DATE,LTS_LT_PLAN,
 		TOO_ID,TOO_TRIG,TOO_TYPE,TOO_START,TOO_STOP,TOO_FOLLOWUP,TOO_REMARKS,
-		FEP,DROPPED_CHIP_COUNT
+		FEP,DROPPED_CHIP_COUNT,
 		);
 
 #--------------------------------------
@@ -2872,6 +2876,8 @@ sub read_databases{
 		$orig_window_constraint[$j] = $window_constraint[$j];
 	}
 
+	$time_ordr_add = 0;			 # added 09/10/12
+
 #----------------------------------------------
 #------ special treatment for roll requirements
 #----------------------------------------------
@@ -2896,6 +2902,8 @@ sub read_databases{
 		$orig_roll[$j]            = $roll[$j];
 		$orig_roll_tolerance[$j]  = $roll_tolerance[$j];
 	}
+
+	$roll_ordr_add = 0;			 # added 09/10/12
 
 #--------------------------------------------
 #----- special treatment for acis window data
@@ -3363,17 +3371,22 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print "<input type=\"hidden\" name=\"END_YEAR1\" value=\"$end_year[1]\">";
 		print "<input type=\"hidden\" name=\"END_TIME1\" value=\"$end_time[1]\">";
 
+		print "<input type=\"hidden\" name=\"TIME_ORDR_ADD\" value=\"1\">";
+
 	}else{
 		print "<input type=\"hidden\" name=\"WINDOW_FLAG\" value=\"$dwindow_flag\">";
+		print "<input type=\"hidden\" name=\"TIME_ORDR_ADD\" value=\"$time_ordr_add\">";
 
-		print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
-		print '<br />';
-		print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
-		print '<spacer type=horizontal size=30>';
+		if($time_ordr_add == 0){
+			print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
+			print '<br /><br />';
+			print '<b><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></b>: ';
+			print '<spacer type=horizontal size=30>';
 	
-		print '<spacer type=horizontal size=50>';
-		print submit(-name=>'Check',-value=>'     Add Time Rank     ')	;
-		print submit(-name=>'Check',-value=>'Remove Null Time Entry ')	;
+			print '<spacer type=horizontal size=50>';
+			print submit(-name=>'Check',-value=>'     Add Time Rank     ')	;
+			print submit(-name=>'Check',-value=>'Remove Null Time Entry ')	;
+		}
 
 		print '<table cellspacing="0" cellpadding="5">';
 		print '<tr><th><a href="#" onClick="WindowOpen(time_ordr);return false;">Rank</a></th>
@@ -3518,17 +3531,24 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print "<input type=\"hidden\" name=\"ROLL_CONSTRAINT1\" value=\"$droll_constraint[1]\">";
 		print "<input type=\"hidden\" name=\"ROLL_1801\" value=\"$droll_180[1]\">";
 		print "<input type=\"hidden\" name=\"ROLL_TOLERANCE1\" value=\"$droll_tolerance[1]\">";
-	}else{
-		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
-		print 'If you want to add a rank, press "Add Roll Rank".';
-		print 'If you want to remove null entries, press "Remove Null Roll Entry."';
-		print '<br />';
-		print '<b><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></b>: ';
-		print '<spacer type=horizontal size=30>';
 
-		print '<spacer type=horizontal size=50>';
-		print submit(-name=>'Check',-value=>'     Add Roll Rank     ') ;
-		print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
+		print "<input type=\"hidden\" name=\"ROLL_ORDR_ADD\" value=\"1\">";
+	}else{
+		print "<input type=\"hidden\" name=\"ROLL_ORDR_ADD\" value=\"$roll_ordr_add\">";
+		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
+
+		if($roll_ordr_add == 0){
+			print 'If you want to add a rank, press "Add Roll Rank".';
+			print 'If you want to remove null entries, press "Remove Null Roll Entry."';
+			print '<br /><br />';
+
+			print '<b><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></b>: ';
+			print '<spacer type=horizontal size=30>';
+	
+			print '<spacer type=horizontal size=50>';
+			print submit(-name=>'Check',-value=>'     Add Roll Rank     ') ;
+			print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
+		}
 
 		print '<table cellspacing="0" cellpadding="5">';
 		print '<tr><th><a href="#" onClick="WindowOpen(roll_ordr);return false;">Rank</a></th>
@@ -6302,6 +6322,7 @@ sub submit_entry{
 #----------------------------
 
 	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
+	print "<input type=\"hidden\" name=\"TIME_ORDR_ADD\" value=\"$time_ordr_add\">";
 
 	for($j = 1; $j <= $time_ordr; $j++){
 		foreach $ent ('START_DATE', 'START_MONTH', 'START_YEAR', 'START_TIME',
@@ -6319,6 +6340,7 @@ sub submit_entry{
 #-----------------------------
 
 	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
+	print "<input type=\"hidden\" name=\"ROLL_ORDR_ADD\" value=\"$roll_ordr_add\">";
 
 	for($j = 1; $j <= $roll_ordr; $j++){
 		foreach $ent('ROLL_CONSTRAINT','ROLL_180','ROLL','ROLL_TOLERANCE'){
