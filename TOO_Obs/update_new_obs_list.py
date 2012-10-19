@@ -6,7 +6,7 @@
 #                                                                                                               #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                               #
 #                                                                                                               #
-#       last update: Aug 29, 2012                                                                               #
+#       last update: Oct 19, 2012                                                                               #
 #                                                                                                               #
 #################################################################################################################
 
@@ -21,7 +21,8 @@ import getpass
 #
 
 #path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
-path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list'                                #---- live directory list path
+#path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list';
+path = '/data/udoc1/ocat/Info_save/too_dir_list_py'                                #---- live directory list path
 
 f    = open(path, 'r')
 data = [line.strip() for line in f.readlines()]
@@ -87,6 +88,20 @@ def update_new_obs_list():
     obsid_poc_dict = tdfnc.find_current_poc()
 
 #
+#--- read special obsid --- poc list
+#
+    line = too_dir + 'special_obsid_poc_list'
+    f    = open(line, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+    sp_obsid = []
+    sp_user  = []
+    for ent in data:
+        atemp = re.split('\s+', ent)
+        sp_obsid.append(atemp[0])
+        sp_user.append(atemp[1])
+
+#
 #--- read database
 #
     line = obs_ss + 'sot_ocat.out'
@@ -144,6 +159,15 @@ def update_new_obs_list():
             chk   = 0
             obsid = atemp[1].strip()
 #
+#--- check this obsid is listed on a special_obsid_poc_list
+#
+            sp_poc = 'na'
+	    for sval in range(0, len(sp_obsid)):
+		if obsid == sp_obsid[sval]:
+		    sp_poc = sp_user[sval]
+		    break
+
+#
 #--- extract basic information
 #
             monitor = []
@@ -193,7 +217,13 @@ def update_new_obs_list():
                 if chk == 1:
     
                     pchk = 1
-                    if type.lower() == 'ddt' or type.lower() == 'too':
+		    if sp_poc != 'na':
+#
+#-- for the case the obsid is given a specific poc
+#
+			person = sp_poc
+
+                    elif type.lower() == 'ddt' or type.lower() == 'too':
 #
 #-- too/ddt case: assign poc
 #
