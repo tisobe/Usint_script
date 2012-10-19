@@ -18,6 +18,7 @@
 #
 # Changing directry structure Mar 01, 2011
 # modify mailx option   Sep 05, 2012
+# modify mailx option   Oct 08, 2012 (same as above)
 #
 #########################################################################
 
@@ -212,7 +213,7 @@ foreach $ruser (@smuser){
 #
 #--- give the people what they want
 #
-##########		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs --- $ruser\" -r cus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
+##########		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs --- $ruser\" isobe\@head.cfa.harvard.edu");
 
 		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs\" -c  cus\@head.cfa.harvard.edu  -b isobe\@head.cfa.harvard.edu  $ruser\@head.cfa.harvard.edu");
 		system("rm $temp_dir/$ruser.tmp");
@@ -296,7 +297,7 @@ sub nag_updaters {
 #
 #--- send the general nag email
 #
-		system("cat $temp_dir/gennag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -r cus\@head.cfa.harvard.edu  -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  wink\@head.cfa.harvard.edu,arots\@head.cfa.harvard.edu,mccolml\@head.cfa.harvard.edu");
+		system("cat $temp_dir/gennag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  wink\@head.cfa.harvard.edu,arots\@head.cfa.harvard.edu,mccolml\@head.cfa.harvard.edu");
 		system("rm $temp_dir/gennag.tmp");
 	}
 
@@ -317,7 +318,7 @@ sub nag_updaters {
 #
 #--- send the acis nag email
 #
-		system("cat $temp_dir/acisnag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -r cus\@head.cfa.harvard.edu   -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  arots\@head.cfa.harvard.edu");
+		system("cat $temp_dir/acisnag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  arots\@head.cfa.harvard.edu");
 		system("rm $temp_dir/acisnag.tmp");
 	}
 
@@ -339,7 +340,7 @@ sub nag_updaters {
 #
 #--- send the si nag email
 #
-#		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -r cus\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu,juda\@head.cfa.harvard.edu");
+#		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" acisdude\@head.cfa.harvard.edu,juda\@head.cfa.harvard.edu");
 
 		system("rm $temp_dir/sinag.tmp");
 	}
@@ -361,7 +362,7 @@ sub nag_updaters {
 #
 #--- send the acis si nag email
 #
-		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -r cus\@head.cfa.harvard.edu -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu");
+		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu");
 
 		system("rm $temp_dir/sinag.tmp");
 	}
@@ -383,7 +384,7 @@ sub nag_updaters {
 #
 #--- send the  hrc si nag email
 #
-		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -r cus\@head.cfa.harvard.edu -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
+		system("cat $temp_dir/sinag.tmp|mailx -s \"Subject: Updates needed for obsid.revs\n\" -c cus\@head.cfa.harvard.edu -b isobe\@head.cfa.harvard.edu brad\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
 
 		system("rm $temp_dir/sinag.tmp");
 	}

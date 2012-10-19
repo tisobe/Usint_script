@@ -4,6 +4,8 @@ use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
 
+use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
+
 #################################################################################
 #										#
 #	express_signoff.cgi: This script let a user to sign off multiple obsids	#
@@ -11,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: 06/20/2011							#
+#	last update: Oct 01, 2012					#
 #										#
 #################################################################################
 
@@ -2818,57 +2820,58 @@ sub oredit{
 #----  get master log file for editing
 #-------------------------------------
 
-	chdir "$ocat_dir";
-	system("chmod 777 $ocat_dir/SCCS/*");
-	$wtest = 0;
-	OUTER:
-	while($wtest == 0){
-		$status = `/usr/ccs/bin/sccs   info $ocat_dir`;
+        $lpass = 0;
+        $wtest = 0;
+        my $efile = "$ocat_dir/updates_table.list";
+        OUTER:
+        while($lpass == 0){
+                open(my $update, '>>', $efile) or die "Locked";
+                if($@){
+#
+#--- wait 2 cpu seconds before attempt to check in another round
+#
+                        print "Database access is not available... wating a permission<br />";
+
+                        $diff  = 0;
+                        $start = (times)[0];
+                        while($diff < 2){
+                                $end  = (times)[0];
+                                $diff = $end - $start;
+                        }
 
 
-		if ($status =~ /Nothing being edited/ig){
-			$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
-
+                        $wtest++;
+                        if($wtest > 5){
+                                print "Something is wrong in the submission. Terminating the process.<br />";
+                                exit();
+                        }
+                }else{
+                        $lpass = 1;
 #--------------------------------------------------------------------------------------------------
 #----  if it is not being edited, write update updates_table.list---data for the verificaiton page
 #--------------------------------------------------------------------------------------------------
 
-			open (UPDATE, ">>$ocat_dir/updates_table.list");
-
-			print UPDATE "$obsid.$rev\tNULL\tNULL\tNULL\t$dutysci_status\t$seq_nbr\t$dutysci\n";
-    			close UPDATE;
+                        flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";
+                        print $update "$obsid.$rev\tNULL\tNULL\tNULL\t$dutysci_status\t$seq_nbr\t$dutysci\n";
+                        close $update;
 
 #---------------------
 #----  checkin update
 #---------------------
 
-			$checkin    = `/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
-			$chk        = "$obsid.$rev";
-			$in_test    = `cat $ocat_dir/updates_table.list`;
-			if($in_test =~ /$chk/i){
+
+                        $chk = "$obsid.$rev";
+                        $in_test = `cat $ocat_dir/updates_table.list`;
+                        if($in_test =~ /$chk/i){
 
 #-----------------------------------------------------
 #----  copy the revision file to the appropriate place
 #-----------------------------------------------------
 
-				system("cp $temp_dir/$obsid.tmp $ocat_dir/updates/$obsid.$rev");
+                                system("cp  $temp_dir/$obsid.tmp $ocat_dir/updates/$obsid.$rev");
 
                                 last OUTER;
                         }
-                }
-#
-#--- wait 5 cpu seconds before attempt to check in another round
-#
-                $diff  = 0;
-                $start = (times)[0];
-                while($diff < 5){
-                        $end  = (times)[0];
-                        $diff = $end - $start;
-                }
-
-                $wtest++;
-                if($wtest > 300){
-                        exit();
                 }
         }
 

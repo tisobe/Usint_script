@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Feb 28, 2011									#
+#		last update: Oct 02, 2012									#
 #														#
 #################################################################################################################
 
@@ -19,7 +19,7 @@ $temp_dir = '/data/mta4/www/CUS/Usint/Temp/';            #--- a temporary file i
 #$test_run  = 0;                                                                # live run
 $test_run  = 1;                                                                 # tst run case  
 
-if($test_run = 1){
+if($test_run == 1){
         $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
 }else{  
         $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
@@ -136,10 +136,10 @@ if($new > 0){
 	print OUT2 "Scott Wolk (swolk\@head.cfa.harvard.edu) as soon as possible.\n";
 	close(OUT2);
 
-        system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification:$too_poc\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
+        system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification:$too_poc\n\" isobe\@head.cfa.harvard.edu");
 
 	if($test_run == 0){
-        	system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $too_poc");
+        	system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification\n\" -ccus\@head.cfa.harvard.edu $too_poc");
 	}
 	system("rm $temp_dir/temp_email2");
 }

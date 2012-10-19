@@ -4,6 +4,7 @@ use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
 
+use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 
 #########################################################################################
 #											#
@@ -69,6 +70,9 @@ use CGI qw/:standard :netscape /;
 #											#
 # T. Isobe Nov 17, 2011									#
 #    sign off problem fixed (line1441)							#
+#											#
+# T. Isobe Oct 01, 2012									#
+#    sccs is replaced by flock								#
 #											#
 #########################################################################################
 
@@ -1933,109 +1937,125 @@ sub update_info {
 
 
 	if($jmod >= 0){
-		if($usint_on =~ /test/){
-			$status = 'Nothing being edited';
-		}else{
-			chdir "$ocat_dir";
-			$status=`/usr/ccs/bin/sccs info $ocat_dir`;
-		}
+	        $lpass = 0;
+	        $wtest = 0;
+	        my $efile = "$ocat_dir/updates_table.list";
 
-		if ($status=~/Nothing being edited/ig){
-	    		$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
-
-			open (INFILE, "<$ocat_dir/updates_table.list");
-			@all_list   = <INFILE>;
-			close (INFILE);
-			@all_list_reversed = reverse(@all_list);
-
+	        OUTER:
+	        while($lpass == 0){
+	                open(my $update, '>', $efile) or die "Locked";
+	                if($@){
 #
-#--- count a modified entries
+#--- wait 2 cpu seconds before attempt to check in another round
 #
-			@temp_head = ();
-			$tcnt      = 0;
-			foreach $ent (@newoutput){
-				@atemp = split(/\s+/, $ent);
-				push(@temp_head, $atemp[0]);
-				$tcnt++;
-			}
+	                        print "Database access is not available... wating a permission<br />";
 
-	    		open (OUTFILE, ">$ocat_dir/updates_table.list");
-			
-			@new_list = ();
-			$chk = 0;
-			FOUTER:
-			foreach $line (@all_list_reversed){
-
-				if($chk < $tcnt){
-					for($m = 0; $m < $tcnt; $m++){
-						if($line =~ /$temp_head[$m]/){
-							push(@new_list, $newoutput[$m]);
-							$chk++;
-							next  FOUTER;
-						}
-					}
-				}
-				push(@new_list, $line);
-			}
-
-			@new_list_reversed = reverse(@new_list);
-			foreach $ent (@new_list_reversed){
-				print OUTFILE "$ent";
-			}
-
-	    		close (OUTFILE);
-
-	    		$checkin = `/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
-			@newoutput = ();
+	                        $diff  = 0;
+	                        $start = (times)[0];
+	                        while($diff < 2){
+	                                $end  = (times)[0];
+	                                $diff = $end - $start;
+	                        }
 
 
-#-------------------
-#--- sending si mail
-#-------------------
-			for $e_id (@temp_head){
-				if(${si_sign.$e_id} > 0){
-					if($usint_on =~ /test/){
-######						system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  $test_email");
-#						system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
-					}else{
-						if($acis_status =~ /NULL/){
-                                  			system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
-						}else{
-#                                  			system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu");
-						}
-					}
-					system("rm $temp_dir/si_mail.$e_id.tmp");
-				}
-#---------------------------
-#--- sending  sign off mail
-#---------------------------
-                        	if(${last_sign.$e_id} > 0 ){
-					if($usint_on =~ /test/){
-#####                                 		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  $test_email");
-                                       		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
-					}else{
-                                       		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -c  cus\@head.cfa.harvard.edu  $email_address");
-                                       		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
-					}
-                                	system("rm $temp_dir/dutysci_mail.$e_id.tmp");
-                        	}
-			}
-
-		} else {
+	                        $wtest++;
+	                        if($wtest > 5){
 
 #------------------------------------------------------
 #--- else, if the file is being updated, print an error
 #------------------------------------------------------
 
-    			print "<b><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<br />";
-    			print "Please use the back button to return to the previous page, and resubmit.</font></b>";
-    			print "</body>";
-    			print "</html>";
+    					print "<b><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<br />";
+    					print "Please use the back button to return to the previous page, and resubmit.</font></b>";
+    					print "</body>";
+    					print "</html>";
 
 #-----------------------------------------------------------------------
 #----- if there is an error, exit now so no mail or file writing happens
 #-----------------------------------------------------------------------
-    			exit();
+    					exit();
+	                        }
+	                }else{
+#--------------------------------------------------------------------------------------------------
+#----  if it is not being edited, write update updates_table.list---data for the verificaiton page
+#--------------------------------------------------------------------------------------------------
+
+				open (INFILE, "<$efile");
+				@all_list   = <INFILE>;
+				close (INFILE);
+				@all_list_reversed = reverse(@all_list);
+
+	                        $lpass = 1;
+
+	                        flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";
+
+#
+#--- count a modified entries
+#
+				@temp_head = ();
+				$tcnt      = 0;
+				foreach $ent (@newoutput){
+					@atemp = split(/\s+/, $ent);
+					push(@temp_head, $atemp[0]);
+					$tcnt++;
+				}
+
+				@new_list = ();
+				$chk = 0;
+				FOUTER:
+				foreach $line (@all_list_reversed){
+
+					if($chk < $tcnt){
+						for($m = 0; $m < $tcnt; $m++){
+							if($line =~ /$temp_head[$m]/){
+								push(@new_list, $newoutput[$m]);
+								$chk++;
+								next  FOUTER;
+							}
+						}
+					}
+					push(@new_list, $line);
+				}
+	
+				@new_list_reversed = reverse(@new_list);
+				foreach $ent (@new_list_reversed){
+					print $update "$ent";
+				}
+
+	                        close $update;
+
+#-------------------
+#--- sending si mail
+#-------------------
+				for $e_id (@temp_head){
+					if(${si_sign.$e_id} > 0){
+						if($usint_on =~ /test/){
+######							system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#							system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
+						}else{
+							if($acis_status =~ /NULL/){
+                                  				system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
+								}else{
+#                                  			system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu");
+							}
+						}
+						system("rm $temp_dir/si_mail.$e_id.tmp");
+					}
+#---------------------------
+#--- sending  sign off mail
+#---------------------------
+                        		if(${last_sign.$e_id} > 0 ){
+						if($usint_on =~ /test/){
+##### 	                                		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
+						}else{
+                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -c  cus\@head.cfa.harvard.edu  $email_address");
+                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
+						}
+                                		system("rm $temp_dir/dutysci_mail.$e_id.tmp");
+                        		}
+				}
+			}
     		}
 	}
 }

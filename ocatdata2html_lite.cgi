@@ -4,6 +4,7 @@ use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
 
+use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 
 ###############################################################################
 #
@@ -13,7 +14,7 @@ use CGI qw/:standard :netscape /;
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep  12, 2012
+#		last update: Oct 01, 2012
 #  
 ###############################################################################
 
@@ -1399,8 +1400,8 @@ sub pass_param {
 	elsif($eventfilter eq 'N')	{$deventfilter = 'NO'}
 	elsif($eventfilter eq 'NO')	{$deventfilter = 'NO'}
 
-        if($multiple_spectral_lines    eq 'NULL')       {$dmultiple_spectral_lines = 'NULL'}
-        elsif($multiple_spectral_lines eq 'Y')          {$dmultiple_spectral_lines = 'YES'}
+#        if($multiple_spectral_lines    eq 'NULL')       {$dmultiple_spectral_lines = 'NULL'}
+        if($multiple_spectral_lines eq 'Y')          {$dmultiple_spectral_lines = 'YES'}
         elsif($multiple_spectral_lines eq 'YES')        {$dmultiple_spectral_lines = 'YES'}
         elsif($multiple_spectral_lines eq 'N')          {$dmultiple_spectral_lines = 'NO'}
         elsif($multiple_spectral_lines eq 'NO')         {$dmultiple_spectral_lines = 'NO'}
@@ -1985,7 +1986,7 @@ sub read_databases{
     		$spwindow            	= "NULL";
     		$most_efficient      	= "NULL";
 		$dropped_chip_count     = "NULL";
-		$multiple_spectral_lines = "NULL";
+		$multiple_spectral_lines = "N";
 		$spectra_max_count       = "NULL";
 	}
 
@@ -2656,8 +2657,8 @@ sub read_databases{
 	elsif($eventfilter eq 'Y') {$deventfilter = 'YES'}
 	elsif($eventfilter eq 'N') {$deventfilter = 'NO'}
 
-        if($multiple_spectral_lines eq 'NULL') {$dmultiple_spectral_lines = 'NULL'}
-        elsif($multiple_spectral_lines eq '')  {$dmultiple_spectral_lines = 'NULL'; $multiple_spectral_lines = 'NULL'}
+#        if($multiple_spectral_lines eq 'NULL') {$dmultiple_spectral_lines = 'NULL'}
+        if($multiple_spectral_lines eq '')  {$dmultiple_spectral_lines = 'NO'; $multiple_spectral_lines = 'NO'}
         elsif($multiple_spectral_lines eq 'Y') {$dmultiple_spectral_lines = 'YES'}
         elsif($multiple_spectral_lines eq 'N') {$dmultiple_spectral_lines = 'NO'}
 
@@ -3039,8 +3040,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<table cellspacing="0" cellpadding="5">';
 	print '<tr><td></td>';
-	print '<th>Sequence Number:';
-	print "</th><td>$seq_nbr</td>";
+	print "<th>Sequence Number:";
+	print "</th><td><a href='https://icxc.harvard.edu/cgi-bin/mp/target.cgi?$seq_nbr' target='blank'>$seq_nbr</a></td>";
 	print '<th>Status:';
 	print "</th><td>$status</td>";
 	print '<th>ObsID #:';
@@ -3180,10 +3181,14 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print ' degree values are provided below the update boxes .';
 
         $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
-	print 'If you want to experiment with viewing orientation, open: ';
+	print 'If you like to see the current viewing orientation, open: ';
 
- 	print "<a href = $view_http target='blank'border=0 WIDTH=692 HEIGHT=1000>Viewing Orientation Page</a> (it may take several seconds).";
-	
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='blank'>RASS</a>, ";
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.pspc.gif' target='blank'>ROSAT</a>, or  ";
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.dss.gif'  target='blank'>DSS</a>. ";
+	print "(Note: These figures do not always exist.)";
+
+
 	print '<br />';
 
 	print '<table cellspacing="8" cellpadding="5">';
@@ -3994,7 +3999,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<th>Multiple Spectral Lines:</th>';
 
 	print '<td align="LEFT">';
-	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NULL','NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
+	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
 	print '</td>';
 
 	print '<th>Spectra Max Count:</th>';
@@ -4888,8 +4893,8 @@ sub prep_submit{
 	elsif($eventfilter eq 'YES')		{$eventfilter = 'Y'}
 	elsif($eventfilter eq 'NO')		{$eventfilter  = 'N'}
 
-       	if($multiple_spectral_lines    eq 'NULL')       {$multiple_spectral_lines = 'NULL'}
-        elsif($multiple_spectral_lines eq 'YES')        {$multiple_spectral_lines = 'Y'}
+#       	if($multiple_spectral_lines    eq 'NULL')       {$multiple_spectral_lines = 'NULL'}
+        if($multiple_spectral_lines eq 'YES')        {$multiple_spectral_lines = 'Y'}
         elsif($multiple_spectral_lines eq 'NO')         {$multiple_spectral_lines = 'N'}
 
 	if($spwindow    eq 'NULL')		{$spwindow = 'NULL'}
@@ -7907,7 +7912,7 @@ sub oredit{
 	if($usint_on =~ /test/){
 		print "<A HREF=\"$obs_ss_http/search.html\">Go Back to the Search Page</A>";
 	}else{
-		print "<A HREF=\"$chandra_http\">Chandra Observatory Page</a>";
+		print "<A HREF=\"https://icxc.harvard.edu/cgi-bin/target_search/search.html\">Go Back to Search  Page</a>";
 	}
 
 	print "</body>";
@@ -8744,32 +8749,45 @@ sub oredit_sub{
 #----  get master log file for editing
 #-------------------------------------
 
-	chdir "$ocat_dir";
-	system("chmod 777 $ocat_dir/SCCS/*");
+	$lpass = 0;
 	$wtest = 0;
+	my $efile = "$ocat_dir/updates_table.list";
 	OUTER:
-	while($wtest == 0){
-		$status = `/usr/ccs/bin/sccs   info $ocat_dir`;
+	while($lpass == 0){
+		open(my $update, '>>', $efile) or die "Locked";
+		if($@){
+#
+#--- wait 2 cpu seconds before attempt to check in another round
+#
+			print "Database access is not available... wating a permission<br />";
 
-
-		if ($status =~ /Nothing being edited/ig){
-			$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
-
+			$diff  = 0;
+			$start = (times)[0];
+			while($diff < 2){
+				$end  = (times)[0];
+				$diff = $end - $start;
+			}
+	
+	
+			$wtest++;
+			if($wtest > 5){
+				print "Something is wrong in the submission. Terminating the process.<br />";
+				exit();
+			}
+		}else{
+			$lpass = 1;
 #--------------------------------------------------------------------------------------------------
 #----  if it is not being edited, write update updates_table.list---data for the verificaiton page
 #--------------------------------------------------------------------------------------------------
 
-	
-			open (UPDATE, ">>$ocat_dir/updates_table.list");
-
-			print UPDATE "$obsid.$rev\t$general_status\t$acis_status\t$si_mode_status\t$dutysci_status\t$seq_nbr\t$dutysci\n";
-    			close UPDATE;
+			flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";	
+			print $update "$obsid.$rev\t$general_status\t$acis_status\t$si_mode_status\t$dutysci_status\t$seq_nbr\t$dutysci\n";
+ 			close $update;
 
 #---------------------
 #----  checkin update
 #---------------------
 
-			$checkin = `/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
 
 			$chk = "$obsid.$rev";
 			$in_test = `cat $ocat_dir/updates_table.list`;
@@ -8780,26 +8798,9 @@ sub oredit_sub{
 #-----------------------------------------------------
 
 				system("cp $temp_dir/$obsid.$sf  $ocat_dir/updates/$obsid.$rev");
-
+	
 				last OUTER;
 			}
-		}
-#
-#--- wait 1 cpu seconds before attempt to check in another round
-#
-		$diff  = 0;
-		$start = (times)[0];
-		while($diff < 1){
-			$end  = (times)[0];
-			$diff = $end - $start;
-		}
-
-		print "Database access is not available... wating a permission<br />";
-
-		$wtest++;
-		if($wtest > 10){
-			print "Something is wrong in the submission. Terminating the process.<br />";
-			exit();
 		}
 	}
 

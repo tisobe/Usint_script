@@ -1,6 +1,8 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 use CGI qw/:standard :netscape /;
 
+use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
+
 #########################################################################################
 #											#
 # rm_submission.cgi: remove an accidental submission from database			#
@@ -502,31 +504,70 @@ sub update_info {
 #---- start updating the updates_table.list, if there are any changes.
 #----------------------------------------------------------------------
     	if ($j == 1){
-#####
-		chdir "$ocat_dir";
-#####
-		$status=`/usr/ccs/bin/sccs info $ocat_dir`;
-		if ($status=~/Nothing being edited/ig){
-	    		$checkout = `/usr/ccs/bin/sccs edit $ocat_dir/updates_table.list`;
+#-------------------------------------
+#----  get master log file for editing
+#-------------------------------------
 
-	    		open (OUTFILE, "+> $ocat_dir/updates_table.list");
-	    		foreach $outline (@newoutput){
+	        $lpass = 0;
+	        $wtest = 0;
+	        my $efile = "$ocat_dir/updates_table.list";
+	        OUTER:
+	        while($lpass == 0){
+	                open(my $update, '+>', $efile) or die "Locked";
+	                if($@){
+#
+#--- wait 2 cpu seconds before attempt to check in another round
+#
+	                        print "Database access is not available... wating a permission<br />";
 
-				print OUTFILE "$outline";
-	    		}
-	    		close (OUTFILE);
-	    		$checkin=`/usr/ccs/bin/sccs delget -y $ocat_dir/updates_table.list`;
+	                        $diff  = 0;
+	                        $start = (times)[0];
+	                        while($diff < 2){
+	                                $end  = (times)[0];
+	                                $diff = $end - $start;
+	                        }
 
-# else, if the file is being updated, print an error
-		} else {
-    			print "<B><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<BR>";
-    			print "Please use the back button to return to the previous page, and resubmit.</font></B>";
-    			print "</BODY>";
-    			print "</HTML>";
-#-----------------------------------------------------------------------
-#----- if there is an error, exit now so no mail or file writing happens
-#-----------------------------------------------------------------------
-    			exit();
-    		}
+
+	                        $wtest++;
+	                        if($wtest > 5){
+    					print "<B><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<BR>";
+    					print "Please use the back button to return to the previous page, and resubmit.</font></B>";
+    					print "</BODY>";
+    					print "</HTML>";
+	                                exit();
+	                        }
+	                }else{
+	                        $lpass = 1;
+#--------------------------------------------------------------------------------------------------
+#----  if it is not being edited, write update updates_table.list---data for the verificaiton page
+#--------------------------------------------------------------------------------------------------
+
+	                        flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";
+
+	    			foreach $outline (@newoutput){
+
+					print $update "$outline";
+	    			}
+	                        close $update;
+
+#---------------------
+#----  checkin update
+#---------------------
+
+
+	                        $chk = "$obsid.$rev";
+	                        $in_test = `cat $ocat_dir/updates_table.list`;
+	                        if($in_test =~ /$chk/i){
+
+#-----------------------------------------------------
+#----  copy the revision file to the appropriate place
+#-----------------------------------------------------
+
+	                                system("cp $temp_dir/$obsid.$sf  $ocat_dir/updates/$obsid.$rev");
+
+	                                last OUTER;
+	                        }
+	                }
+	        }
 	}
 }

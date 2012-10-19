@@ -1,5 +1,7 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 
+use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
+
 #################################################################################################	
 #												#
 #	send_sign_off_req.perl: sending out sign off request to a user				#
@@ -9,7 +11,7 @@
 #												#
 #	author: T. Isobe (tisobe@cfa.harvard.edu)						#
 #	Oct 1, 2003   --- first version								#
-#	Last Update: Aug 28, 2012								#
+#	Last Update: Oct 01, 2012								#
 #												#
 #################################################################################################	
 
@@ -17,9 +19,9 @@
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-$usint_on = 'yes';                      ##### USINT Version
+#$usint_on = 'yes';                      ##### USINT Version
 #$usint_on = 'no';                      ##### USER Version
-#$usint_on = 'test_yes';                        ##### Test Version USINT
+$usint_on = 'test_yes';                        ##### Test Version USINT
 #$usint_on = 'test_no';                 ##### Test Version USER
 
 
@@ -213,27 +215,61 @@ sub update_info {
 #####
 		chdir "$ocat_dir";
 #####
-		$status=`/usr/bin/sccs info $ocat_dir`;
-		if ($status=~/Nothing being edited/ig){
-	    		$checkout = `/usr/bin/sccs edit $ocat_dir/updates_table.list`;
+		$lpass = 0;
+		$wtest = 0;
+		my $efile = "$ocat_dir/updates_table.list";
+		OUTER:
+		while($lpass == 0){
+			open(my $update, '+>', $efile) or die "Locked";
+			if($@){
+#
+#--- wait 2 cpu seconds before attempt to check in another round
+#
+				print "Database access is not available... wating a permission<br />";
+	
+				$diff  = 0;
+				$start = (times)[0];
+				while($diff < 2){
+					$end  = (times)[0];
+					$diff = $end - $start;
+				}
+	
+	
+				$wtest++;
+				if($wtest > 5){
+    					print "Please use the back button to return to the previous page, and resubmit.\n";
+					exit();
+				}
+			}else{
+				$lpass = 1;
+#--------------------------------------------------------------------------------------------------
+#----  if it is not being edited, write update updates_table.list---data for the verificaiton page
+#--------------------------------------------------------------------------------------------------
 
-	    		open (OUTFILE, "+>$ocat_dir/updates_table.list");
-	    		foreach $outline (@newoutput){
+				flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";
 
-				print OUTFILE "$outline";
-	    		}
-	    		close (OUTFILE);
-	    		$checkin=`/usr/bin/sccs delget -y $ocat_dir/updates_table.list`;
-	    		@newoutput=();
+	    			foreach $outline (@newoutput){
+					print $update "$outline";
+	    			}
+				close $update;
 
-# else, if the file is being updated, print an error
-		} else {
-    			print "Please use the back button to return to the previous page, and resubmit.\n";
-#-----------------------------------------------------------------------
-#----- if there is an error, exit now so no mail or file writing happens
-#-----------------------------------------------------------------------
-    			exit();
-    		}
+#---------------------
+#----  checkin update
+#---------------------
+				$chk = "$obsid.$rev";
+				$in_test = `cat $ocat_dir/updates_table.list`;
+				if($in_test =~ /$chk/i){
+
+#-----------------------------------------------------
+#----  copy the revision file to the appropriate place
+#-----------------------------------------------------
+
+					system("cp $temp_dir/$obsid.$sf  $ocat_dir/updates/$obsid.$rev");
+	
+					last OUTER;
+				}
+			}
+		}
 	}
 }
 

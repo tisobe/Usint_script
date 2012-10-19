@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: May 08, 2012									#
+#		last update: Oct 05, 2012									#
 #														#
 #################################################################################################################
 
@@ -14,17 +14,7 @@
 #---- set directory paths : updated to read from a file (02/25/2011): this is user cus version
 #
 
-#$test_run  = 0;                                                                # live run
-$test_run  = 1;                                                                 # tst run case  
-
-if($test_run == 1){
-        $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
-}else{  
-        $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
-}
-
-open(IN, "$d_path/dir_list");
-
+open(IN, '/data/udoc1/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -319,7 +309,14 @@ print OUT "\tHome   Phone:\t$home[$info_current]\n";
 print OUT "\tMail   Phone:\t$mail[$info_current]\n\n";
 
 $next      = $current + 1;
-$info_next = $info_current + 1;
+
+OUTER:
+for($j = 0; $j < $pcnt; $j++){
+	if($charge[$next] eq $name[$j]){
+		$info_next = $j;
+		last OUTER;
+	}
+}
 
 print OUT "From Midnight $mstart[$next] $dstart[$next] to $mend[$next] $dend[$next]  ";
 print OUT "the TOO-POC will be $charge[$next]:\n";
@@ -334,7 +331,10 @@ close(OUT);
 
 
 if($wday == 5){
-	system("cat $temp_dir/temp_email | mailx -s\"Subject: USINT TOO Point of Contact Updated\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
+	system("cat $temp_dir/temp_email | mailx -s\"Subject: USINT TOO Point of Contact Updated\n\" isobe\@head.cfa.harvard.edu");
+	system("cat $temp_dir/temp_email | mailx -s\"Subject: USINT TOO Point of Contact Updated\n\" swolk\@head.cfa.harvard.edu");
+	system("cat $temp_dir/temp_email | mailx -s\"Subject: USINT TOO Point of Contact Updated\n\" $mail[$info_next]");
+
 }
 system("rm $temp_dir/temp_email");
 
@@ -386,11 +386,8 @@ if($alert > 1 && $send_alert > 0){
 	print OUT "as soon as possible.\n";
 	close(OUT);
 
-	system("cat $temp_dir/temp_email_alert |mailx -s\"Subject: USINT TOO Point of Contact Needs an Assignment\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu ");
-	if($test_run == 0){
-		system("cat $temp_dir/temp_email_alert |mailx -s\"Subject: USINT TOO Point of Contact Needs an Assignment\n\" -rcus\@head.cfa.harvard.edu -cswolk\@head.cfa.harvard.edu cus\@head.cfa.harvard.edu");
-	}
-
+	system("cat $temp_dir/temp_email_alert |mailx -s\"Subject: USINT TOO Point of Contact Needs an Assignment\n\" isobe\@head.cfa.harvard.edu ");
+	system("cat $temp_dir/temp_email_alert |mailx -s\"Subject: USINT TOO Point of Contact Needs an Assignment\n\" -cisobe\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu cus\@head.cfa.harvard.edu");
 	system("rm $temp_dir/temp_email_alert");
 }
 
@@ -434,12 +431,10 @@ if($cemail !~ /$too_poc/){
 	print OUT2 "If you have any questions, please contact: Scott Wolk (swolk\@head.cfa.harvard.edu) as soon as possible.\n";
 	close(OUT2);
 
-        system("cat $temp_dir/temp_email2 | mailx -s\"Subject: TOO Point of Contact Duty: Second  Notification to: $too_poc\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
+        system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty: Second  Notification to:$too_poc\n\" isobe\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu");
 
-	if($test_run == 0){
-        	system("cat $temp_dir/temp_email2 | mailx -s\"Subject: $too_poc:  TOO Point of Contact Duty: Second  Notification to: $too_poc\n\" -rcus\@head.cfa.harvard.edu  swolk\@head.cfa.harvard.edu");
-        	system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty: Second  Notification\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $too_poc");
-	}
+        system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty: Second  Notification\n\" -ccus\@head.cfa.harvard.edu $too_poc");
+
 	system("rm $temp_dir/temp_email2");
 }
 	
