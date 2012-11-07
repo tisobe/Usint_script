@@ -8,7 +8,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # rm_submission.cgi: remove an accidental submission from database			#
 #											#
 # 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
-#		Last Update: Mar. 01, 2011 						#
+#		Last Update: Oct. 31, 2012 						#
 # This script removes an obsid from database.    	                            	#
 #											#
 #########################################################################################
@@ -17,9 +17,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-$usint_on = 'yes';                     ##### USINT Version
+#$usint_on = 'yes';                     ##### USINT Version
 #$usint_on = 'no';                      ##### USER Version
-#$usint_on = 'test_yes';                 ##### Test Version USINT
+$usint_on = 'test_yes';                 ##### Test Version USINT
 #$usint_on = 'test_no';                 ##### Test Version USER
 
 
@@ -58,8 +58,22 @@ if($usint_on =~ /test/i){
         $ocat_dir = $real_dir;
 }
 
-print "Content-type: text/html\n\n";	# start html setting
-print start_html(-bgcolor=>"white"); 
+print header(-type => 'text/html; charset=utf-8');
+
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Obscat Submission Cancellation  Form</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
+
+
+print "<body style='color:#000000;background-color:#FFFFE0'>";
+
 
 print start_form();			# starting a form
 
@@ -104,9 +118,6 @@ while(<FH>) {
 }
 close(FH);
 
-print "<HEAD><TITLE>Obscat Submission Cancellation  Form</TITLE></HEAD>";
-print "<BODY BGCOLOR=\"#FFFFFF\">";
-
 
 #------------------------------------
 #---- check inputed user and password
@@ -120,8 +131,8 @@ match_user();			# this sub match a user to a password
 
 if($pass eq '' || $pass eq 'no'){
 	if(($pass eq 'no') && ($ac_user  ne ''|| $pass_word ne '')){
-		print "<font color='red'>Name and/or Password are not valid.";
-		print " Please try again.</font><br>";
+		print "<h2 style='color:red;padding-bottom:10px'>Name and/or Password are not valid.";
+		print " Please try again.</hr>";
 	}
 	password_check();	# this one create password input page
 
@@ -154,11 +165,13 @@ if($pass eq '' || $pass eq 'no'){
 	remve_submission();		# this sub creates a html page
 
 }else{
-	print 'Something wrong. Exit<br>';
+	print '<h2 style="color:red">Something wrong. Exiting</h2>';
 	exit(1);
 }
 
-print end_html();
+print end_form();
+print "</body>";
+print "</html>";
 
 
 #########################################################################
@@ -277,20 +290,20 @@ sub remve_submission{
 #------------------------------------------------------------------------------------------
 	@pass_list = ();
 
-	print "<h1><U>Obs Data Submission Cancellation Page</U></h1>";
+	print "<h2 style='text-decoration:underline'>Obs Data Submission Cancellation Page</h2>";
 
 	print "<h3>If you need to remove an accidental submission, please choose the obsid and";
 	print " and click a button from \"Remove\" side. If it says \"NO ACCESS\", it means that someone already";
 	print " made parameter changes, and cannot remove that submission.</h3>";
-	print "<h3><font color=red>If it is once removed, the change is permanent; be careful to select a correct one</h3>";
-	print "<br>";
+
+	print "<h3 style='color:red;padding-bottom:10px'>If it is once removed, the change is permanent; be careful to select a correct one</h3>";
 ########
 #	print "<B><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/index.html\">Verification Page ";
 #
 #	print "Support Observation Search Form</A></B><BR>";
 #	print "<B><A HREF=\"http://asc.harvard.edu/~mta/CUS/\">Chandra Uplink Support Organizational Page";
 	print '<p>';
-	print "<B><A HREF=\"https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form";
+	print "<strong><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form</a></strong>";
 	print '</p>';
 ########
 
@@ -298,15 +311,15 @@ sub remve_submission{
 	open (FILE, "< $ocat_dir/updates_table.list");
 	@revisions = <FILE>;
 	close (FILE);
-	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"http://asc.harvard.edu/~mta/CUS/Usint/rm_submission.cgi\">";
+	print "<form name=\"update\" Method=\"post\" action=\"https://icxc.harvard.edu/mta/CUS/Usint/rm_submission.cgi\">";
 #	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"http://asc.harvard.edu/cgi-gen/mta/Obscat/rm_submission.cgi\">";
 #	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"https://icxc.harvard.edu/cgi-bin/obs_ss/rm_submission.cgi\">";
 #####
 
-	print "<center>";
-	print "<TABLE BORDER=\"1\" CELLPADDING=\"5\">";
-	print "<TR><TH>OBSID.revision</TH></TH>";
-	print "<TH>Remove?</TH></TR>";
+	print "<div style='text-align:center;margin-left:auto;margin-right;auto;'>";
+	print "<table border=1>";
+	print "<tr><th>OBSID.revision</th>";
+	print "<th>Remove?</th></tr>";
 
 #---------------------------------------------------------
 #----- because log is appended to, rather than added to...
@@ -326,8 +339,8 @@ sub remve_submission{
     		@atemp = split(/\./,$obsrev);
     		$tempid = $atemp[0];
 
-		print "<TD>$obsrev</A><BR>$seqnum<BR>$ftime<BR>$user</TD>";
-		print "</TD><TD><font color=red>Cancelled</font></td></tr> ";
+		print "<td>$obsrev<br />$seqnum<br />$ftime<br />$user</td>";
+		print "</td><td style='color:red'>Cancelled</td></tr> ";
 	}
 
 	@revisions= reverse(@revisions);
@@ -405,9 +418,9 @@ sub remve_submission{
 			}
 ##########
 #			print "<TD><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/chkupdata.cgi";
-			print "<TD><A HREF=\"http://asc.harvard.edu/~mta/CUS/Usint/chkupdata.cgi";
+			print "<td><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/chkupdata.cgi";
 ##########
-			print "\?$obsrev\">$obsrev</A><BR>$seqnum<BR>$ftime<BR>$user</TD>";
+			print "\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 
 			$rm_permission = 'yes';
 #--------------------
@@ -430,9 +443,9 @@ sub remve_submission{
 			}
 
 			if($rm_permission eq 'yes'){
-				print "</TD><TD><INPUT TYPE=\"submit\" NAME=\"Remove\" VALUE=\"$obsrev\"></td></tr>";
+				print "<td><input type=\"submit\" name=\"Remove\" value=\"$obsrev\"></td></tr>";
 			}else{
-				print "</TD><TD><font color=red>NO ACCESS</font></td></tr> ";
+				print "<td style='color:red'>NO ACCESS</td></tr> ";
 			}
 		}
 	}
@@ -448,8 +461,8 @@ sub remve_submission{
 	}
 	print hidden(-name=>'ap_cnt', -value=>"$ap_cnt");
 	
-	print "</TABLE></FORM></BODY></HTML>";
-	print "</center>";
+	print "</table>";
+	print "</div>";
 }  
 
 ###################################################################################
@@ -530,11 +543,10 @@ sub update_info {
 
 	                        $wtest++;
 	                        if($wtest > 5){
-    					print "<B><font color=\"#FF0000\">ERROR: The update file is currently being edited by someone else.<BR>";
-    					print "Please use the back button to return to the previous page, and resubmit.</font></B>";
-    					print "</BODY>";
-    					print "</HTML>";
-	                                exit();
+    					print "<p><strong><span style='color:#FF0000'>ERROR: The update file is currently being edited by someone else.<br />";
+    					print "Please use the back button to return to the previous page, and resubmit.<br /><br />Exiting....</span></strong></p>";
+
+	                                exit(1);
 	                        }
 	                }else{
 	                        $lpass = 1;

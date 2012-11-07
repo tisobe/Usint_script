@@ -13,7 +13,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: Oct 01, 2012					#
+#	last update: Oct 31, 2012	           				#
 #										#
 #################################################################################
 
@@ -91,7 +91,7 @@ $usint_home   = 'https://icxc.harvard.edu/cus/';                #--- USINT page
 $usint_http   = 'https://icxc.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
 $obs_ss_http  = 'https://icxc.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
 $test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';  #--- web site for test
-#$test_http    = 'https://icxc.harvard.edu/mta/CUS/Usint/Test/'; #--- web site for test
+$test_http    = 'https://icxc.harvard.edu/mta/CUS/Usint/Linux_test/'; #--- web site for test
 
 $mp_http      = 'http://asc.harvard.edu/';                      #--- web site for mission planning related
 $chandra_http = 'http://cxc.harvard.edu/';                      #--- chandra main web site
@@ -234,7 +234,8 @@ $pass_cookie = cookie(-name    =>'pass_word',
 #---- new cookies wrote in
 #-------------------------
 
-print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html');
+print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html;charset=utf-8');
+
 
 #----------------------------------------------------------------------------------
 #------- start printing a html page here.
@@ -242,11 +243,23 @@ print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html');
 #------- second is Submit page (prep_submit), and the lastly, Oredit page (oredit).
 #----------------------------------------------------------------------------------
 
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Express Sign Off Page</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
+print "<body style='color:#000000;background-color:#FFFFE0'>";
+
+
+print start_form();
+
 $no_access  = 0;                                 # this indicator used for special user previledge
 $send_email = 'yes';
-
-print start_html(-bgcolor=>"white",-title=>"Ocat Data Page");   # this says that we are starting w html page
-print start_form();
 
 if($usint_on =~ /test/){
 #	system("chmod 777 $test_dir/ocat/approved");
@@ -295,15 +308,14 @@ if($change =~ /Change/){
                 print "On this page, you can approve more than one observations ";
                 print " consequently. To use this page, however,  your name must be registered. ";
                 print " If you are not, please contact Dr. Wolk ";
-#               print " as a USINT user. If you are not, please contact Dr. Wolk ";
                 print ' at <a href="mailto:swolk@head.cfa.harvard.edu">swolk@head.cfa.harvard.edu</a>';
                 print "</h3>";
 
                 if(($submitter ne '' || $password ne '') && $pass =~ /no/){
-                        print "<br><font color='red'><b>";
-                        print 'your user name and/or password were entered incorrectly. ';
+                        print "<p style='color:red;padding-top:20px;padding-bottom:20px'><strong>";
+                        print 'Your user name and/or password were entered incorrectly. ';
                         print 'please try again.';
-                        print "</font></b><br>";
+                        print "</p>";
                 }
 
                 password_check();
@@ -346,8 +358,8 @@ if($change =~ /Change/){
 	}
 	close(IN);
 
-	print "<br><h2>Are you sure to approve the observations of:</h2><br>";
-	print '<table border=1 cellspacing=2 cellpadding=3>';
+	print "<h2 style='padding-top:20px;padding-bottom:10px'>Are you sure to approve the observations of:</h2>";
+	print '<table border=1>';
 	print '<tr><th>OBSID</th>';
 	print '<th>ID</th>';
 	print '<th>Seq #</th>';
@@ -387,55 +399,55 @@ if($change =~ /Change/){
 		}
 
 		if($usint_on =~ /test/){
-			print "<tr><td bgcolor=$bgcolor><a href=\"$test_http/ocatdata2html.cgi?$obsid\" target=blank>$obsid</td>";
+			print "<tr><td style='background-color:$bgcolor'><a href=\"$test_http/ocatdata2html.cgi?$obsid\" target='_blank'>$obsid</td>";
 		}elsif($usint_on =~ /yes/){
-			print "<tr><td bgcolor=$bgcolor><a href=\"$usint_http/ocatdata2html.cgi?$obsid\" target=blank>$obsid</td>";
+			print "<tr><td style='background-color:$bgcolor'><a href=\"$usint_http/ocatdata2html.cgi?$obsid\" target='_blank'>$obsid</td>";
 		}else{
-			print "<tr><td bgcolor=$bgcolor><a href=\"$obs_ss_http/ocatdata2html.cgi?$obsid\" target=blank>$obsid</td>";
+			print "<tr><td style='background-color:$bgcolor'><a href=\"$obs_ss_http/ocatdata2html.cgi?$obsid\" target='_blank'>$obsid</td>";
 		}
-		print "<td bgcolor=$bgcolor>$targid</td>";
-		print "<td bgcolor=$bgcolor>$seq_nbr</td>";
-		print "<td bgcolor=$bgcolor>$proposal_title</td>";
-		print "<td bgcolor=$bgcolor>$targname</td>";
-		print "<td bgcolor=$bgcolor>$PI_name</td>";
+		print "<td style='background-color:$bgcolor'>$targid</td>";
+		print "<td style='background-color:$bgcolor'>$seq_nbr</td>";
+		print "<td style='background-color:$bgcolor'>$proposal_title</td>";
+		print "<td style='background-color:$bgcolor'>$targname</td>";
+		print "<td style='background-color:$bgcolor'>$PI_name</td>";
 		if($chk_app  > 0){
-			print "<td bgcolor=$bgcolor>Already Approved </td></tr>";
+			print "<td style='background-color:$bgcolor'>Already Approved </td></tr>";
 			$chk_app     = 0;
 			$app_warning = 1;
 		}elsif($chk_app2 > 0){
-			print "<td bgcolor=$bgcolor2>in Active OR List</td></tr>";
+			print "<td style='background-color:$bgcolor2'>in Active OR List</td></tr>";
 			$mp_warn_list = "$mp_warn_list:"."$obsid";
 			$chk_app2     = 0;
 		}elsif($chk_app3 > 0){
-			print "<td bgcolor=$bgcolor>SI Mode Is Not Set</td></tr>";
+			print "<td style='background-color:$bgcolor'>SI Mode Is Not Set</td></tr>";
 			$chk_app     = 0;
 			$app_warning3= 3;
 		}else{
-			print "<td>&#160</td></tr>";
+			print "<td>&#160;</td></tr>";
 		}
 		$bgcolor  = 'white';
 		$bgcolor2 = 'white';
 	}
-	print "</table><BR>";
+	print "</table>";
 	
 	print hidden(-name=>'obsid_list',   -value=>"$temp");
 	print hidden(-name=>'mp_warn_list', -value=>"$mp_warn_list");
 
-	print '<br><br>';
+	print "<div style='padding-bottom:30px;'></div>";
 
 	if($app_warning > 0){
-		print "<h3>The observation marked by<font color=red> red </font>is already in the approved list. ";
-		print "Please go back and remove it from the list</h3>";
+		print "<h3>The observation marked by<span style='color:red'> red </span>is already in the approved list. ";
+		print "Please go back and remove it from the list.</h3>";
 	}
 	if($app_warning3 > 0){
-		print "<h3>The observation marked by<font color=orange> orange </font>is missing SI mode. ";
-		print "Please go back and remove it from the list</h3>";
+		print "<h3>The observation marked by<span style='color:orange'> orange </span>is missing SI mode. ";
+		print "Please go back and remove it from the list.</h3>";
 	}
 	if($chk_app == 0 && $chk_app2 == 0 && $chk_app3 == 0){	
 		print '<input type="submit" name="Final" value="Finalize">';
 	}
 
-	print '<br><br>';
+	print '<br /><br />';
 	print '<input type="submit" name="Back" value="Back to the Previous Page">';
 	
 }elsif($final =~ /Finalize/){
@@ -461,7 +473,7 @@ if($change =~ /Change/){
 		@obsid_list = split(/\s+/, $temp);
 	}
 
-	print "<br><h3>Approving.....  (it may take a few minutes)<h3>";
+	print "<br /><h3>Approving.....  (it may take a few minutes)</h3>";
 
 	foreach $obsid(@obsid_list){
 
@@ -494,8 +506,8 @@ if($change =~ /Change/){
 	}
 
         print "";
-        print "<H2>ALL DONE!!</h2><BR>";
-        print "<h3>You should receive confirmation email shortly</h3>";
+        print "<h2 style='padding-bottom:15px'>ALL DONE!!</h2>";
+        print "<h3 style='padding-bottom:30px'>You should receive confirmation email shortly.</h3>";
 
 	if($usint_on =~ /test/){
 
@@ -524,14 +536,15 @@ if($change =~ /Change/){
 }
 
 print end_form();
-print end_html();                               # closing html page
+print "</body>";
+print "</html>";
 
 #########################################################################
 ### password_check: open a user - a password input page               ###
 #########################################################################
 
 sub password_check{
-        print '<h3>Please type your user name and password<h3>';
+        print '<h3>Please type your user name and password</h3>';
         print '<table><tr><th>Name</th><td>';
         print textfield(-name=>'submitter', -value=>'', -size=>20);
         print '</td></tr><tr><th>Password</th><td>';
@@ -582,18 +595,19 @@ sub match_user{
 
 sub input_obsid{
 
-        print "<h2>Welcome to Express Approval Page.</h2><br>";
+        print "<h2 style='padding-bottom:20px'>Welcome to Express Approval Page.</h2>";
         print '<h3>Please type all obsids which you want to approve (separated by ",", ";", "/" or white spaces)</h3>';
 	print '<h3>If the entires are sequential without  any breaks, put the first and the last obsids with "-" <br /> ';
 	print 'between two obsids. (e.g., 12507-12533). The values are <em>INCLUSIVE</em>.</h3>';
+
         print textfield(-name=>'obsid_list', -value=>'', -size=>100);
-        print '<br><br>';
-        print '<br>';
+
+        print "<div style='padding-top:20px;padding-botom:20px'>";
         print '<input type="submit" name="Approve" value="Approve">';
-        print '<br>';
-        print '<br>';
-        print '<hr><br>';
-        print "<h3>If you are not a user  <font color='blue'>$submitter</font>, please change a user name: ";
+        print '</div>';
+
+        print '<hr />';
+        print "<h3 style='padding-top:20px'>If you are not a user  <span style='color:blue'>$submitter</span>, please change a user name: ";
         print '<input type="submit" name="Change" value="Change"> </h3>';
 
         print hidden(-name=>'submitter',-override=>"$submitter", -value=>"$submitter");
@@ -2912,11 +2926,11 @@ $send_email = 'yes';
 
 			if($unint_on =~ /test/){
 
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\" -rcus\@head-cfa.harvard.edu $email_address");
+				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
 
 			}else{
 
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\" -rcus\@head-cfa.harvard.edu $email_address cus\@head-cfa.harvard.edu");
+				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address cus\@head-cfa.harvard.edu");
 
 			}
 
@@ -2926,12 +2940,12 @@ $send_email = 'yes';
 
 			if($unint_on =~ /test/){
 
-				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\" -rcus\@head.cfa.harvard.edu  $email_address");
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\" -rcus\@head-cfa.harvard.edu $email_address");
+				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address");
+				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
 
 			}else{
 
-				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\" -rcus\@head.cfa.harvard.edu  $email_address  cus\@head.cfa.harvard.edu");
+				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address  cus\@head.cfa.harvard.edu");
 
 			}
 		}
@@ -3379,9 +3393,9 @@ sub send_email_to_mp{
         $mp_email = "$mp_contact".'@head.cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
-        	system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\" -rcus\@head.cfa.harvard.edu $test_email");
+        	system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\"  $test_email");
 	}else{
-		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\" -rcus\@head.cfa.harvard.edu $mp_email cus\@head.cfa.harvard.edu");
+		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
 	}
 
         system("rm $temp_file");

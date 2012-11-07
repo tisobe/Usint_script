@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 use DBI;
 use CGI qw/:standard :netscape /;
 
@@ -8,7 +8,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: June  25, 2012							#
+#		last update: Oct 30, 2012   	 						#
 #												#
 #################################################################################################
 
@@ -16,7 +16,8 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+open(IN, '/data/udoc1/ocat/Test/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -39,15 +40,24 @@ while(<IN>){
 }
 close(IN);
 
+print header(-type => 'text/html; charset=utf-8');
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>A List Of Observations For A Given POC ID</title>";
+print "<style  type='text/css'>";
+print "table{border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
 
-print header(-type => 'text/html');
-print start_html(-bgcolor=>"white", -title=>'A List Of Observations For A Given POC ID');
+
 print '<body style="background-color:#FAEBD7; font-family:serif, sans-serif;font-size:12pt; color:black;" >';
 
 
-print "<h2 class='center' style='background:blue;color:#FAEBD7; margin-right:10em'>Input New Contact Information</h2>";
+print "<h2 style='background:blue;color:#FAEBD7; margin-right:10em'>Input New Contact Information</h2>";
 
-print '<p> ';
 print "<ul style='font-size:90%; margin-right:10em'>";
 print '<li>';
 print "If you want to <em class='blue'>submit</em> a new contact, please put all information in the fields.";
@@ -67,7 +77,6 @@ print '"Load" button just reloads the contact table below, and "Clear" button cl
 print 'the new contact inputs.';
 print '</li>';
 print '</ul>';
-print '</p>';
 
 #
 #--- Input part starts here
@@ -132,7 +141,7 @@ if($submit =~ /Clear/){
 
 #------------------------------------------------
 
-print ' <table border=0 cellpadding=4>';
+print ' <table style="text-align:left;padding-left:20px;border-width:0px">';
 print ' <tr>';
 print ' <td>';
 print ' <strong>Name</strong>';
@@ -188,12 +197,10 @@ print ' </td>';
 print ' </tr>';
 print ' </table>';
 
-print '<br />';
+print '<p style="padding-top:10px;padding-bottom:20px">';
 print '* Responsibility includes sequence numbers (bottom inclusive, top exclusive), instruments, and targets.';
-print '<br />';
-print '<br />';
+print '</p>';
 
-print ' <br />';
 print "<input type='submit' value='Load'                name='submit' />";
 print "<input type='submit' value='Submit Contact Info' name='submit' />";
 print "<input type='submit' value='Modify Data'         name='submit' />";
@@ -374,7 +381,7 @@ print '<hr />';
 
 print '<h2>Current Contact Information</h2>';
 
-print '<table border=1 cellpadding=3 cellspacing=3>';
+print '<table border=1>';
 
 print '<tr>';
 print '<th>Contact</th>';
@@ -385,7 +392,6 @@ print '<th>Email</th>';
 print '<th>Responsibility</th>';
 print '</tr>';
 
-print '<tr>';
 
 #-----------------------------
 
@@ -424,26 +430,26 @@ close(FH);
 
 print '</table>';
 
-print '<br />';
+print '<p style="padding-top:20px;padding-bottom:10px">';
 print "<a href='https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html'>";
 print "<strong><em style='background-color:red;color:yellow;'>Back to USINT TOO Point of Contact</em></strong></a>";
-print '<br />';
+print '</p>';
 
 print '<hr />';
 
-print '<br />';
+print '<p style="padding-top:10px">';
 print "<em style='font-size:90%'>";
 print 'If you have any questions about this page, please contact: ';
 print "<a href='mailto:swolk@head.cfa.harvard.edu'>swolk@head.cfa.harvard.edu</a>.";
 print '</em>';
-print '<br /><br />';
-print "<div style='text-align:right'>";
+print '</p>';
+print "<p style='text-align:right'>";
 print "<em style='font-size:85%;'>";
 print '<strong>';
-print 'This Script Was Last Modified on Mar 03, 2011';
+print 'This Script Was Last Modified on Oct 30, 2012';
 print '</strong>';
 print '</em>';
-print '</div>';
+print '</p>';
 
 print '</body>';
 print '</html>';

@@ -1,34 +1,46 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 # R. Kilgard, Jan 30/31 2000
 # This script generates a dynamic webpage for keeping track of updates to
 # target parameters.  
 #
-# last udpated Mar. 28, 2011 (t. isobe: tisobe@cfa.harvard.edu)
+# last udpated Oct. 31, 2012 (t. isobe: tisobe@cfa.harvard.edu)
 #
 #
 
 use CGI;
 
-print "Content-type: text/html\n\n";
+print "Content-type: text/html; charset=utf-8\n\n";
+
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Updated Target List</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
+
+print "<body style='color:#000000;background-color:#FFFFE0'>";
 
 read(STDIN,$newinfo,$ENV{'CONTENT_LENGTH'});
 
 
-print "<HEAD><TITLE>Updated Targets List</TITLE></HEAD>";
-print "<BODY BGCOLOR=\"#FFFFFF\">";
-
-print "<H1>Updated Targets List</H1>";
-print "<P>This list contains all targets which have been verified as updated.";
-print "<P><B><A HREF=\"https://icxc.harvard.edu/cgi-bin/usg/search.html\">Chandra Uplink Support Observation Search Form</A></B><BR>";
-print "<B><A HREF=\"https://icxc.harvard.edu/cus/\">Chandra Uplink Support Organizational Page</A></B><P>";
+print "<h1>Updated Targets List</h1>";
+print "<p>This list contains all targets which have been verified as updated.</p>";
+print "<p><strong><a href=\"https://icxc.harvard.edu/cgi-bin/usg/search.html\">Chandra Uplink Support Observation Search Form</a></strong></p>";
+print "<p><strong><a href=\"https://icxc.harvard.edu/cus/\">Chandra Uplink Support Organizational Page</a></strong></p>";
 #####
 open (FILE, "</data/udoc1/ocat/updates_table.list");
 @revisions = <FILE>;
 close (FILE);
 #####
-print "<TABLE BORDER=\"1\" CELLPADDING=\"5\">";
-print "<TR><TH>OBSID.revision</TH><TH>general obscat edits by</TH><TH>ACIS obscat edits by</TH><TH>SI MODE edits by</TH><TH>Verified by</TH></TR>";
-# because log is appended to, rather than added to...
+print "<table border=1>";
+print "<tr><th>OBSID.revision</th><th>general obscat edits by</th><th>ACIS obscat edits by</th><th>SI MODE edits by</th><th>Verified by</th></tr>";
+
+#--- because log is appended to, rather than added to...
+
 @revisions= reverse(@revisions);
 
 foreach $line (@revisions){
@@ -48,10 +60,11 @@ foreach $line (@revisions){
     $year = $t5 + 1900;
     $ftime ="$month/$day/$year";
     unless ($dutysci_status =~/NA/){
-	print "<TR>";
-	print "<TD><A HREF=\"http://icxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</A><BR>$seqnum<BR>$ftime<BR>$user</TD>";
-	print "<TD>$general_status</TD><TD>$acis_status</TD><TD>$si_mode_status</TD><TD><FONT COLOR=\"#005C00\">$dutysci_status</FONT></TD></TR>";
+	print "<tr>";
+#	print "<td><a href=\"http://icxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+	print "<td><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/chkupdata.cgi\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+	print "<td>$general_status</td><td>$acis_status</td><td>$si_mode_status</td><td><span style='color:#005C00'>$dutysci_status</span></td></tr>";
 
     }
 }
-print "</TABLE></FORM></BODY></HTML>";
+print "</table></body></html>";

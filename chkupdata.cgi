@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 
 use DBI;
 use DBD::Sybase;
@@ -13,7 +13,7 @@ use CGI qw/:standard :netscape /;
 #											#
 #	10/31/01:	first version							#
 #	07/22/02:	uninterrupt added						#
-#	last update	Aug 17, 2012							#
+#	last update	Nov 01, 2012							#
 #											#
 #########################################################################################
 
@@ -65,7 +65,6 @@ if($dtest == 1){
 
 check_update_datebase();
 
-print "Content-type: text/html\n\n";
 
 #
 #--- if the data exists, extract data from the database
@@ -80,12 +79,20 @@ $dat   = $obsid;
 #
 #--- start html 
 #
+print "Content-type: text/html; charset=utf-8\n\n";
 
-print '<html>';
-print '<head>';
-print '<meta http-equiv="Content-Script-Type" content="text/javascript">';
-print '<title>Obscat Data Check Page</title>';
-print '<body bgcolor="#FFFFFF">';
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Ocat Data Check Page</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
+
+print "<body style='color:#000000;background-color:#FFFFE0'>";
 
 #
 #--- if the given version # does not exist, warn the user and exit.
@@ -93,10 +100,9 @@ print '<body bgcolor="#FFFFFF">';
 
 if($version_warning > 0){
 
-	print '<br><br><br>';
-	print '<h2><font color=red>Warning!!</font></h2>';
-	print '<h2>The last updated version of Obsid '."$obsid_base is<font color=red> $latest_version</font>,";
-	print ' but you requested version: ',"<font color=red>$c_version</font>. ";
+	print '<h2 style="padding-top:25px;color:red">Warning!!</h2>';
+	print "<h2>The last updated version of Obsid $obsid_base is <span style='color:red'> $latest_version</span>,";
+	print " but you requested version: <span style='color:red'>$c_version</span>. ";
 	print ' Please enter a correct version number.</h2>';
 	print '</body>';
 	print '</html>';
@@ -191,25 +197,28 @@ while(<PRE>){
 close(PRE);
 		
 
-print '<table width=100%>';
-print '<tr><th><h1><font size+><b>OBSERVATION: ',"$dat",'</font></b></h1></th>';
+#print '<table style="border-width:0px;width:100%">';
+#print '<tr><th style="font-size:120%"><strong>OBSERVATION: ',"$dat",'</strong></th>';
+#
+#print '<td><a href="./orupdate.cgi">Back to Target Parameter Update Status Form</a></td></tr>';
+#
+#print "</table>";
+print '<a href="./orupdate.cgi" style="float:right">Back to Target Parameter Update Status Form</a>';
+print "<h1>OBSERVATION: $dat</h1>";
 
-print '<td><a href=orupdate.cgi>Back to Target Parameter Update Status Form</a></td></tr>';
-
-print "</table>";
-print "<p align=right><b>(submitted:  $latest_upate)</b></p>";
+print "<p style='text-align:right'><strong>(submitted:  $latest_upate)</strong></p>";
 
 print '<hr />';
 
 print '<h2>Observation Information</h2>';
-print '<table cellpadding=3>';
+print '<table style="border-width:0px">';
 print '<tr><th>OBSID</th><td>',"$obsid",'</td><th>Sequence #</th><td>',"$seq_nbr",'</td>';
 print '<th>Proposal #</th><td>',"$proposal_number",'</td></tr>';
 
 print '<tr><th>Target Name</th><td>',"$targname",'</td><th>Group ID</th><td>',"$group_id",'</td>';
 print '<th>Obs AO Str</th><td>',"$obs_ao_str",'</td></tr>';
 
-print '<tr><th>PI Name</th><td>',"$PI_name",'</td></tr>';
+print '<tr><th>PI Name</th><td>',"$PI_name",'</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>';
 print '</table>';
 print '<hr />';
  
@@ -233,6 +242,7 @@ $dent     = 0;
 $aent     = 0;
 $awent    = 0;
 $awentf   = 0;
+$tcls     = 0;
 $fnum     = 0;
 $dra_chk  = 0;
 $ddec_chk = 0;
@@ -265,31 +275,27 @@ while(<FH>){
 	if(($achk > 0 || $after > 0) && $pass_rmk == 0){
 		if($past_comments =~ /\w/){
 		print '<h3><u>PAST COMMENTS</u></h3>';
-		$past_comments =~ s/\r/<br>/g;
-			print "$past_comments<br>";
+		$past_comments =~ s/\r/<br \/>/g;
+			print "$past_comments<br />";
 		}
-		print "<br>";
 
 		if($new_comments =~ /\w/){
-		$new_comments =~ s/\r/<br>/g;
+		$new_comments =~ s/\r/<br \/>/g;
 		print '<h3><u>NEW COMMENTS</u></h3>';
-			print "$new_comments<br>";
+			print "$new_comments<br />";
 		}
-		print "<br>";
 
 		if($past_remarks =~ /\w/){
-		$past_remarks =~ s/\r/<br>/g;
+		$past_remarks =~ s/\r/<br \/>/g;
 		print '<h3><u>PAST REMARKS</u></h3>';
-			print "$past_remarks<br>";
+			print "$past_remarks<br />";
 		}
-		print "<br>";
 
 		if($new_remarks =~ /\w/){
 		print '<h3><u>NEW REMARKS</u></h3>';
-		$new_remarks =~ s/\r/<br>/g;
-			print "$new_remarks<br>";
+		$new_remarks =~ s/\r/<br \/>/g;
+			print "$new_remarks<br />";
 		}
-		print "<br>";
 		$pass_rmk++;
 	}
 	if($after < 1){
@@ -360,47 +366,17 @@ while(<FH>){
 			|| ($btemp[0] eq 'GROUP_ID') || ($btemp[0] eq 'OBS_AO_STR')){
 			########## DO NOTHING ########
 		}elsif($gch == 0){
-#			if($ncnt == 0){
-#				@temp = split(/S /, $_);
-#				if($temp[1] =~/=/){
-#					print "<B><u>$temp[0]",'</U></B><br>';
-#				}else{
-#					print "$temp[0]<br>";
-#				}
-#			}
-#			if($ncnt > 0 && $prmk == 0){
-#				@temp = split(/S /, $_);
-#				if($temp[1] =~ /=/){
-#					print "<B><U>$temp[0]",'</U></B><br>';
-#				}else{
-#					print "$temp[0]<br>";
-#				}
-#			}
-#			if($prmk > 0 && $nrmk == 0){
-#				@temp = split(/S /, $_);
-#				if($temp[1] =~ /=/){
-#					print "<B><U>$temp[0]",'</U></B><br>';
-#				}else{
-#					print "$temp[0]<br>";
-#				}
-#			}
-#			if($nrmk > 0){
-#				@temp = split(/S /, $_);
-#				if($temp[1] =~ /=/){
-#					print "<B><U>$temp[0]",'</U></B><br>';
-#				}else{
-#					print "$temp[0]<br>";
-#				}
-#			}
+			########## DO NOTHING ########
 		}else {
 			if($ach == 0){
 				@temp = split(/S:/,$_);
 				if($temp[0] =~ /^GENERAL/){
-					print '<table cellpadding = 1 border = 1 width=80%>';
-					print "<tr><td colspan = 3><B><font size=+1 color=green><br>$temp[0]<br>",'</font></B><td></tr>';
-					print '<tr><th align=left>Name</th>';
-					print '<th align=left width=30%>Original</th>';
-					print '<th align=lef width=30%t>New</th></tr>';
+					print '<table border=1 style="width:80%">';
+					print "<tr><td colspan = 3><strong><span style='font-size:110%;color:green'><br />$temp[0]<br />",'</span></strong></td></tr>';
+					print '<tr><th style="text-align:left">Name</th>';
+					print '<th style="text-align:left;width:30%">Original</th>';
+					print '<th style="text-align:left;width:30%">New</th></tr>';
+					$tcls++;
 				}else{
 					@ctemp = split(/ changed from/,$_);
 					@dtemp = split(/ to /,$ctemp[1]);
@@ -480,16 +456,16 @@ while(<FH>){
 								}
 							}
 							if($p_yes == 1){
-								print "<tr><th align=left>$gname[$gent]</th>";
+								print "<tr><th style='text-align:left'>$gname[$gent]</th>";
 								if($gorg[$gent] =~ /\w/){
 									print "<td>$gorg[$gent]</td>";
 								}else{
-									print "<td>&#160</td>";
+									print "<td>&#160;</td>";
 								}
 								if($gnew[$gent] =~/\w/){
 									print "<td>$gnew[$gent]</td></tr>";
 								}else{
-									print "<td>&#160</td>";
+									print "<td>&#160;</td></tr>";
 								}
 							}
 						}
@@ -498,7 +474,7 @@ while(<FH>){
 				}
 			}elsif($ach > 0 && $achf == 0){
 				if($gent == 0){
-					print '<tr><td colspan = 3> No Entry </td><td></td><td></td><tr>';
+					print '<tr><td colspan = 3> No Entry </td></tr>';
 				}
 				$achf++;
 			}
@@ -508,37 +484,38 @@ while(<FH>){
 				if($temp[0] =~ /^ACIS CHANGE/){
 
 					if($dent > 0){
-						print "<tr><td colspan = 3><B><font size=+1 color=green><br>DITHER CHANGE<br>",'</font></B><td></tr>';
-						print '<tr><th align=left>Name</th>';
-						print '<th align=left width=30%t>Original</th>';
-						print '<th align=left width=30%t>New</th></tr>';
+						print "<tr><td colspan=3><strong><span style='font-size:110%;color:green'><br />DITHER CHANGE<br />",'</span></strong></td></tr>';
+						print '<tr><th style="text-align:left">Name</th>';
+						print '<th style="text-align:left;width:30%">Original</th>';
+						print '<th style="text-align:left;width:30%">New</th></tr>';
 						for($di = 0; $di < $dent; $di++){
 
 							if($dname[$di] eq 'Y_AMP' || $dname[$di] eq 'Y_FREQ' || $dname[$di] eq 'Y_PHASE'
 								|| $dname[$di] eq 'Z_AMP' || $dname[$di] eq 'Z_FREQ' 
 								|| $dname[$di] eq 'Z_PHASE'){
-								print "<tr><th align=left>$dname[$di]</th>";
+								print "<tr><th style='text-align:left'>$dname[$di]</th>";
 								if($dorg[$di] =~ /\w/){
 									print "<td>$dorg[$di]</td>";
 								}else{
-									print "<td>&#160</td>";
+									print "<td>&#160;</td>";
 								}
 								if($dnew[$di] =~ /\w/){
 									print "<td>$dnew[$di]</td></tr>";
 								}else{
-									print "<td>&#160</td></td>";
+									print "<td>&#160;</td></tr>";
 								}
 							}
 						}
 					}
-					print "<tr><td colspan = 3><B><font size=+1 color=green><br>$temp[0]<br>",'</font></B><td></tr>';
-					print '<tr><th align=left>Name</th>';
-					print '<th align=lef width=30%t>Original</th>';
-					print '<th align=lef width=30%t>New</th></tr>';
+					print "<tr><td colspan = 3><strong><span style='font-size:110%;color:green'><br />$temp[0]<br />",'</span></strong></td></tr>';
+					print '<tr><th style="text-align:left">Name</th>';
+					print '<th style="text-align:left;width:30%">Original</th>';
+					print '<th style="text-align:left;width=30%">New</th></tr>';
+					$tcls++;
 				}else{
 					if($acisid eq 'none' && $acisid_wrote ne 'yes'){
-						print "<tr><th align=left>ACISID</th>";
-						print "<td>&#160</td><td>NONE</td></tr>";
+						print "<tr><th style='align:left'>ACISID</th>";
+						print "<td>&#160;</td><td>NONE</td></tr>";
 						$acisid_wrote = 'yes';
 					}elsif($acisid ne 'none'){
 						@ctemp = split(/ changed from/,$_);
@@ -547,11 +524,11 @@ while(<FH>){
 						$aorg[$aent] = $dtemp[0];
 						$anew[$aent] = $dtemp[1];
 						if($aname[$aent] =~ /\w/){
-							print "<tr><th align=left>$aname[$aent]</th>";
+							print "<tr><th style='text-align:left'>$aname[$aent]</th>";
 							if($aorg[$aent] =~ /\w/){
 								print "<td>$aorg[$aent]</td>";
 							}else{
-								print "<td>&#160</td>";
+								print "<td>&#160;</td>";
 							}
 							print "<td>$anew[$aent]</td></tr>";
 	
@@ -563,7 +540,7 @@ while(<FH>){
 				}
 			}elsif($ach > 0 && $awch > 0 && $awchf == 0){
 				if($aent == 0){
-					print '<tr><td colspan = 3> No Entry </td><td></td><td></td><tr>';
+					print '<tr><td colspan = 3> No Entry </td></tr>';
 				}
 				$awchf++;
 			}
@@ -574,10 +551,11 @@ while(<FH>){
 					$awent++;
 				}else{
 					if($temp[0] =~ /^ACIS WINDOW/){
-						print "<tr><td colspan = 3><B><font size=+1 color=green><br>$temp[0]<br>",'</font></B><td></tr>';
-						print '<tr><th align=left>Name</th>';
-						print '<th align=lef width=30%t>Original</th>';
-						print '<th align=lef width=30%t>New</th></tr>';
+						print "<tr><td colspan = 3><strong><span style='font-size:110%;color:green'><br />$temp[0]<br />",'</span></strong></td></tr>';
+						print '<tr><th style="text-align:left">Name</th>';
+						print '<th style="text-align:left;width:30%">Original</th>';
+						print '<th style="text-align:left;width:30%">New</th></tr>';
+						$tcls++;
 					}else{
 						@ctemp = split(/ changed from/,$_);
 						@dtemp = split(/ to /,$ctemp[1]);
@@ -585,11 +563,11 @@ while(<FH>){
 						$aworg[$awent] = $dtemp[0];
 						$awnew[$awent] = $dtemp[1];
 						if($awname[$awent] =~ /\w/){
-							print "<tr><th align=left>$awname[$awent]</th>";
+							print "<tr><th style='text-align:left'>$awname[$awent]</th>";
 							if($aworg[$awent] =~ /\w/){
 								print "<td>$aworg[$awent]</td>";
 							}else{
-								print "<td>&#160</td>";
+								print "<td>&#160;</td>";
 							}
 							print "<td>$awnew[$awent]</td></tr>";
 	
@@ -600,11 +578,17 @@ while(<FH>){
 			}
 		}
 	}elsif($after >= 2){
-		if($awent == 0 && $awentf == 0){
-			print '<tr><td colspan = 3> No Entry </td><td></td><td></td><tr>';
+		if($tcls == 0){
+			print "<p style='font-size:120%;padding-top:25px;padding-bottom:25px'><strong>No Update </strong></p>";
+			$tcls++;
 			$awentf++;
+		}else{
+			if($awent == 0 && $awentf == 0){
+				print '<tr><td colspan = 3> No Entry </td></tr>';
+				$awentf++;
+			print "</table>";
+			}
 		}
-		print "</table>";
 
 #
 #---	this part is totally input format dependent. if the input formant change it does not work.
@@ -868,10 +852,10 @@ foreach $ent (@paramarray2){
 
 html_print();
 
-print "<p align=right><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/orupdate.cgi\">Back to Target Parameter Update Status Form</A></p>";
+print "<p  style='text-align:right'><a href=\"https://icxc.harvard.edu/cgi-bin/obs_ss/orupdate.cgi\">Back to Target Parameter Update Status Form</a></p>";
 
-print "</BODY>";
-print "</HTML>";
+print "</body>";
+print "</html>";
 
 ###########################################################
 ### check_update_database: find a newest entry for obsid ##
@@ -951,35 +935,36 @@ sub html_print{
 	print "<hr />";
 	print "<h2>All Entries</h2>";
 
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>General Parameters</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>General Parameters</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 	foreach $entry (@gen_paramarray){
 		match_param();
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
-
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>Dither Parameters</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>Dither Parameters</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 	foreach $entry (@dither_paramarray){
 		match_param();
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>Time Constraint Parameters</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>Time Constraint Parameters</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 
 	$entry = 'TIME_ORDR';
 	match_param();
@@ -1000,13 +985,15 @@ sub html_print{
 		}
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>Roll Constraint Parameters</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>Roll Constraint Parameters</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
+
 
 	$entry = 'ROLL_ORDR';
 	match_param();
@@ -1024,49 +1011,53 @@ sub html_print{
 		}
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>Constraints</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>Constraints</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span>></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 	foreach $entry (@const_paramarray){
 		match_param();
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
 	if($instrument =~ /HRC/i){
-		print "<table cellspacing=6 border>\n";
-		print "<tr><th colspan=4><font size+>HRC  Parameters</font></th></tr>";
-		print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-		print "<font color=green>ORIGINAL VALUE</font></th>";
-		print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-		print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+		print "<table border=1>\n";
+		print "<tr><th colspan=4><span style='font-size110%'>HRC  Parameters</span></th></tr>";
+		print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+		print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 		foreach $entry (@hrc_paramarray){
 			match_param();
 		}
 		print "</table>\n";
+		print "<div style='padding-bottom:20px'></div>";
 	}
 
 	if($instrument =~ /ACIS/i){
-		print "<table cellspacing=6 border>\n";
-		print "<tr><th colspan=4><font size+>ACIS Parameters</font></th></tr>";
-		print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-		print "<font color=green>ORIGINAL VALUE</font></th>";
-		print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-		print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+		print "<table border=1>\n";
+		print "<tr><th colspan=4><span style='font-size:110%'>ACIS Parameters</span></th></tr>";
+		print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+		print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 		foreach $entry (@acis_gen_paramarray){
 			match_param();
 		}
 		print "</table>\n";
+		print "<div style='padding-bottom:20px'></div>";
 	
-		print "<table cellspacing=6 border>\n";
-		print "<tr><th colspan=4><font size+>ACIS Window Constraint Parameters</font></th></tr>";
-		print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-		print "<font color=green>ORIGINAL VALUE</font></th>";
-		print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-		print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+		print "<table border=1>\n";
+		print "<tr><th colspan=4><span style='font-size:110%'>ACIS Window Constraint Parameters</span></th></tr>";
+		print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+		print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+		print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 
 #
 #------ ACIS WINDOW CONSTRATINTS
@@ -1144,22 +1135,24 @@ sub html_print{
 		}
 
 		print "</table>\n";
+		print "<div style='padding-bottom:20px'></div>";
 	}
 
 #
 #--- TOO
 #
 
-	print "<table cellspacing=6 border>\n";
-	print "<tr><th colspan=4><font size+>TOO Parameters</font></th></tr>";
-	print "<tr align=left><th width=40%><font color=green>PARAM NAME</font></th><th width=20%>";
-	print "<font color=green>ORIGINAL VALUE</font></th>";
-	print "<th width=20%><font color=green>REQUESTED VALUE</font></font></th>";
-	print "<th width=20%><font color=green>UPDATED VALUE</font></th></tr>\n";
+	print "<table border=1>\n";
+	print "<tr><th colspan=4><span style='font-size:110%'>TOO Parameters</span></th></tr>";
+	print "<tr style='text-align:left'><th style='width:40%'><span style='color:green'>PARAM NAME</span></th><th style='width:20%'>";
+	print "<span style='color:green'>ORIGINAL VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>REQUESTED VALUE</span></th>";
+	print "<th style='width:20%'><span style='color:green'>UPDATED VALUE</span></th></tr>\n";
 	foreach $entry (@too_paramarray){
 		match_param();
 	}
 	print "</table>\n";
+	print "<div style='padding-bottom:20px'></div>";
 
 	print "<h2>REMARKS</h2>";
 	
@@ -1184,37 +1177,38 @@ sub html_print{
 	$ddat = $remarks;
 	$ddat =~ s/\s+//g;
 
-	print "<table border=1 cellspacing=3 width=80%>";
-	print '<tr><th width=10%>ORIGINAL</th>';
+	print "<table border=1>";
+	print '<tr><th style="width:10%">ORIGINAL</th>';
 	if($sorg eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}else{
 		print "<td>$past_remarks</td></tr>";
 	}
 
-	print '<th width=10%>REQUESTED</th>';
+	print '<tr><th style="width:10%">REQUESTED</th>';
 	if($snew eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}else{
 		print "<td>$new_remarks</td></tr>";
 	}
 
-	print '<th width=10%>UPDATED</th>';
+	print '<tr><th style="width:10%">UPDATED</th>';
 	if($snew eq '' &&  $ddat eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}elsif($snew ne $ddat){
 		if($ddat eq ''){
-			print "<td bgcolor=red>&#160</td></tr>";
+			print "<td style='background-color:red'>&#160;</td></tr>";
 		}elsif($ddat eq $sorg && $snew eq ''){
 			print "<td>$remarks</td></tr>";
 		}else{
-			print "<td bgcolor=red>$remarks</td></tr>";
+			print "<td style='background-color:red'>$remarks</td></tr>";
 		}
 	}else{
 		print "<td>$remarks</td></tr>";
 	}
 
 	print "</table>";
+	print "<div style='padding-bottom:20px'></div>";
 
 #
 #--- Comment
@@ -1243,27 +1237,27 @@ sub html_print{
 	$ddat = $comments;
 	$ddat =~ s/\s+//g;
 
-	print "<table border=1 cellspacing=3 width=80%>";
-	print '<tr><th width=10%>ORIGINAL</th>';
+	print "<table border=1 style='width:80%'>";
+	print '<tr><th style="width:10%">ORIGINAL</th>';
 	if($sorg eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}else{
 		print "<td>$past_comments</td></tr>";
 	}
 
-	print '<th width=10%>REQUESTED</th>';
+	print '<tr><th style="width:10%">REQUESTED</th>';
 	if($snew eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}else{
 		print "<td>$new_comments</td></tr>";
 	}
 
-	print '<th width=10%>UPDATED</th>';
+	print '<tr><th style="idth:10%">UPDATED</th>';
 	if($snew eq '' && $ddat eq ''){
-		print '<td>&#160</td></tr>';
+		print '<td>&#160;</td></tr>';
 	}elsif($snew ne $ddat){
 		if($ddat eq ''){
-			print "<td>&#160</td></tr>";
+			print "<td>&#160;</td></tr>";
 		}elsif($ddat eq $sorg && $snew eq ''){
 			print "<td>$comments</td></tr>";
 		}else{
@@ -1274,6 +1268,7 @@ sub html_print{
 	}
 
 	print "</table>";
+	print "<div style='padding-bottom:20px'></div>";
 }
 
 ########################################################################################################
@@ -1496,14 +1491,14 @@ sub match_param{
 			$enum = int($enum)-1;
 			
 			if($aw_cls == 1){
-				print "<tr align=left><th>$entry</th><td>&#160</td><td>&#160</td><td>&#160</td></tr>";
+				print "<tr style='text-align:left'><th>$entry</th><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>";
 			}elsif($ordr[$enum] =~ /\d/){
-				print "<tr align=left><th>$entry</th><td>$end</td><td>$end</td><td>$ordr[$enum]</td></tr>";
+				print "<tr style='text-align:left'><th>$entry</th><td>$end</td><td>$end</td><td>$ordr[$enum]</td></tr>";
 			}else{
-				print "<tr align=left><th>$entry</th><td>$end</td><td>$end</td><td>&#160</td></tr>";
+				print "<tr style='text-align:left'><th>$entry</th><td>$end</td><td>$end</td><td>&#160;</td></tr>";
 			}
 		}else{
-			print "<tr align=left><th>$entry</th><td>&#160</td><td>&#160</td><td>&#160</td></tr>";
+			print "<tr style='text-align:left'><th>$entry</th><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>";
 		}
 		$snew = 1;
 	}
@@ -1569,38 +1564,38 @@ sub color_coding{
 #----black
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($snew =~ /\w/){
                         	print "<td>$snew</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if($ddat =~ /\w/){
 				print "<td>$ddat</td>\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
                 }elsif(($sorg == $ddat) && ($snew eq '')){
 #
 #----black
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($snew =~ /\w/){
                         	print "<td>$snew</td>\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if($ddat =~ /\w/){
                         	print "<td>$ddat</td>\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			
                 }elsif($snew == $ddat){
@@ -1608,88 +1603,88 @@ sub color_coding{
 #----green
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($snew =~/\w/){
                         	print "<td>$snew</td>\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if($ddat =~/\w/){
-                        	print "<td bgcolor='00AA00'>$ddat<br>\n";
+                        	print "<td style='background-color:#00AA00'>$ddat<br />\n";
 			}else{
-                        	print "<td bgcolor='00AA00'>&#160<br>\n";
+                        	print "<td style='background-color:#00AA00'>&#160;<br />\n";
 			}
                 }elsif(($snew != $ddat) && ($snew =~ /\w/)){
 #
 #----red
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($lname eq 'acisid'){
 				if($snew =~ /\w/){
 					print "<td>$snew</td>";
 				}else{
-					print "<td>&#160</td>";
+					print "<td>&#160;</td>";
 				}
 				if($ddat =~ /\w/){
-					print "<td bgcolor=magenda>$ddat<br>\n";
+					print "<td style='background-color:magenda'>$ddat<br />\n";
 				}else{
-					print "<td bgcolor=magenda>&#160<br>\n";
+					print "<td style='background-color:magenda'>&#160;<br />\n";
 				}
 			}elsif($spcl_color == 0){
                         		print "<td>$snew</td>";
-					print "<td bgcolor=red>$ddat<br>\n";
+					print "<td style='background-color:red'>$ddat<br />\n";
 			}else{
                         		print "<td>$snew</td>";
-					print "<td bgcolor=blue>$ddat<br>\n";
+					print "<td style='background-color:blue'>$ddat<br />\n";
 			}
                 }elsif(($snew eq '') && ($ddat eq '')){
 #
 #----red
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($lname eq 'acisid'){
 				if($snew =~ /\w/){
 					print "<td>$snew</td>";
 				}else{
-					print "<td>&#160</td>";
+					print "<td>&#160;</td>";
 				}
 				if($ddat =~ /\w/){
-					print "<td bgcolor=magenda>$ddat<br>\n";
+					print "<td style='background-color:magenda'>$ddat<br />\n";
 				}else{
-					print "<td bgcolor=magenda>&#160<br>\n";
+					print "<td style='background-color:magenda'>&#160;<br />\n";
 				}
 			}elsif($spcl_color == 0){
 				if($snew =~ /\w/){
                         		print "<td>$snew</td>";
 				}else{
-					print "<td>&#160</td>";
+					print "<td>&#160;</td>";
 				}
 				if($ddat =~ /\w/){
-					print "<td bgcolor=red>$ddat<br>\n";
+					print "<td style='background-color:red'>$ddat<br />\n";
 				}else{
-					print "<td bgcolor=red>&#160<br>\n";
+					print "<td style='background-clolr:red'>&#160;<br />\n";
 				}
 			}else{
 				if($snew =~/\w/){
                         		print "<td>$snew</td>";
 				}else{
-					print "<td>&#160</td>";
+					print "<td>&#160;</td>";
 				}
 				if($ddat =~ /\d/){
-					print "<td bgcolor=blue>$ddat<br>\n";
+					print "<td style='background-color:blue'>$ddat<br />\n";
 				}else{
-					print "<th align=left>$name[$i]</th><td>&#160</td>";
+					print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 				}
 			}
                 }elsif(($sorg != $ddat) && ($snew eq '')){
@@ -1697,38 +1692,38 @@ sub color_coding{
 #----fuchsia
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($snew =~ /\w/){
                         	print "<td>$snew</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if($ddat =~ /\w/){
-				print "<td bgcolor=fuchsia>$ddat<br>\n";
+				print "<td style='background-color:fuchsia'>$ddat<br />\n";
 			}else{
-				print "<td bgcolor=fuchsia>&#160<br>\n";
+				print "<td style='background-color:fuchsia'>&#160;<br />\n";
 			}
                 }else{
 #
 #----black
 #
 			if($sorg =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$sorg</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$sorg</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($snew =~ /\w/){	
                         	print "<td>$snew</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if($ddat =~ /\w/){
-				print "<td>$ddat<br>\n";
+				print "<td>$ddat<br />\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
                 }
 #
@@ -1740,147 +1735,147 @@ sub color_coding{
 #----black
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td>${$lname}<br>\n";
+#				print "<td>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td>$ddat<br>\n";
+				print "<td>$ddat<br />\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
                 }elsif(($sorg eq $ddat) && ($snew eq '')){
 #
 #----black
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td>${$lname}<br>\n";
+#				print "<td>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td>$ddat<br>\n";
+				print "<td>$ddat<br />\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
                 }elsif($snew eq $ddat){
 #
 #----green
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td bgcolor='00AA00'>${$lname}<br>\n";
+#				print "<td style='background-color:'00AA00'>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td bgcolor='00AA00'>$ddat<br>\n";
+				print "<td style='background-color:#00AA00'>$ddat<br />\n";
 			}else{
-				print "<td bgcolor='00AA00'>&#160<br>\n";
+				print "<td style='background-color:#00AA00'>&#160;<br />\n";
 			}
                 }elsif(($snew ne $ddat) && ($snew =~ /\w/)){
 #
 #----red
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 			if(${$lname} =~ /\w/){
-				print "<td bgcolor=red>${$lname}<br>\n";
+				print "<td style='background-color:red'>${$lname}<br />\n";
 			}elsif($snew eq 'NULL' && $ddat eq ''){
 				print "<td>NULL</td>";
 			}else{
-				print "<td bgcolor=red>&#160<br>\n";
+				print "<td style='background-color:red'>&#160;<br />\n";
 			}
                 }elsif(($snew eq '') && ($ddat eq '')){
 #
 #----red
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td bgcolor=red>${$lname}<br>\n";
+#				print "<td style='background-color:red>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td bgcolor=red>$ddat<br>\n";
+				print "<td style='background-color:red'>$ddat<br />\n";
 			}else{
-				print "<td bgcolor=red>&#160<br>\n";
+				print "<td style='background-color:red'>&#160;<br />\n";
 			}
                 }elsif(($sorg ne $ddat) && ($snew eq '')){
 #
 #----fuchsia
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td bgcolor=fuchsia>${$lname}<br>\n";
+#				print "<td style='background-color:fuchsia>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td bgcolor=fuchsia>$ddat<br>\n";
+				print "<td style='background-color:fuchsia'>$ddat<br />\n";
 			}else{
-				print "<td bgcolor=fuchsia>&#160<br>\n";
+				print "<td style='background-color:fuchsia'>&#160;<br />\n";
 			}
                 }else{
 #
 #----black
 #
 			if($org[$i] =~ /\w/){
-                        	print "<th align=left>$name[$i]</th><td>$org[$i]</td>";
+                        	print "<th style='text-align:left'>$name[$i]</th><td>$org[$i]</td>";
 			}else{
-				print "<th align=left>$name[$i]</th><td>&#160</td>";
+				print "<th style='text-align:left'>$name[$i]</th><td>&#160;</td>";
 			}
 			if($new[$i] =~ /\w/){
                         	print "<td>$new[$i]</td>";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
 #			if(${$lname} =~ /\w/){
-#				print "<td>${$lname}<br>\n";
+#				print "<td>${$lname}<br />\n";
 			if($ddat =~ /\w/){
-				print "<td>$ddat<br>\n";
+				print "<td>$ddat<br />\n";
 			}else{
-				print "<td>&#160</td>";
+				print "<td>&#160;</td>";
 			}
                 }
         }

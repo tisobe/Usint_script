@@ -14,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Oct 01, 2012
+#		last update: Nov 07, 2012
 #  
 ###############################################################################
 
@@ -242,9 +242,20 @@ $pass_cookie = cookie(-name    => 'pass_word',
 #---- new cookies worte in
 #-------------------------
 
-print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html');
+print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html;  charset=utf-8');
 
-print start_html(-bgcolor=>"white", -title=>"Ocat Data Page");     # this says that we are starting a html page
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Ocat Data Page</title>";
+print "<style  type='text/css'>";
+print "table{border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
+
+print "<body style='color:#000000;background-color:#FFFFE0'>";
 
 #---------------------------------------
 #------ read database to get the values
@@ -266,7 +277,6 @@ while(<SIN>){
        	}
 }
 close(SIN);
-
 
 #------------------------------------------
 #------ read MP scheduled observation list
@@ -304,7 +314,6 @@ foreach $check (@mp_scheduled_list){
 $no_access  = 0;					# this indicator used for special user previledge
 $send_email = 'yes';
 
-print start_html(-bgcolor=>"white",-title=>"Ocat Data Page");	# this says that we are starting a html page
 
 print start_form();
 
@@ -332,7 +341,7 @@ if($check eq ''){
 	}elsif($pass eq '' || $pass eq 'no'){
         	if(($pass eq 'no') && ($submitter  ne ''|| $pass_word ne '')){
 
-                	print "<h3><font color='red'>Name and/or Password are not valid.</h3>";
+                	print "<h3 style='color:red'>Name and/or Password are not valid.</h3>";
 
         	}
 
@@ -544,7 +553,13 @@ if($access_ok eq 'yes'){
 	}
 }							#---- the end of access_ok loop
 
-print end_html();					# closing html page
+#
+#--- end of the html document
+#
+print end_form();
+print "</body>";
+print "</html>";
+
 
 #################################################################################################
 #---- the main script finishes here. sub-scripts start here.
@@ -557,8 +572,8 @@ print end_html();					# closing html page
 #########################################################################
 
 sub password_check{
-	print '<h3>Please type your user name and password<h3>';
-        print '<table><tr><th>Name</th><td>';
+	print '<h3>Please type your user name and password</h3>';
+        print '<table style="border-width:0px"><tr><th>Name</th><td>';
         print textfield(-name=>'submitter', -value=>'', -size=>20);
         print '</td></tr><tr><th>Password</th><td>';
         print password_field( -name=>'password', -value=>'', -size=>20);
@@ -2968,26 +2983,28 @@ sub data_input_page{
 print <<endofhtml;
 
 endofhtml
+
 print '	<h1>Obscat Data Page Lite</h1>';
-print ' <h4>This version does not support parameter explanations and ';
-print ' a few other things may behave differently from the full version. If you like to use ';
-print ' a full version, please go to https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?xxxx ';
-print ' where xxxx is obsid. If you like to see explanations of parameters, please click "here" in the line below. </h3>';
 
 if($mp_check > 0){
-	print "<h2><b><font color='red'>";
-
+	print "<h2><strong style='color:red'>";
 	print "This observation is currently under review in an active OR list. ";
 	print "You must get a permission from MP to modify entries.";
-	print "</font></b><br /></h2>";
+	print "</strong></h2>";
 }
 
 if($status !~ /scheduled/i && $status !~ /unobserved/i){
 	$cap_status = uc($status);
-	print "<h2>This observation was <font color='red'>$cap_status</font>.</h2> ";
+	print "<h2>This observation was <span style='color:red'>$cap_status</span>.</h2> ";
 }
 
-print 'A brief description of the listed parameters is given ';
+print ' <p><strong>This version does not support parameter explanations and ';
+print ' a few other things may behave differently from the full version. If you like to use ';
+print " a full version, please go to <a href='https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid'>";
+print "https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid</a>. ";
+print 'If you like to see explanations of parameters, please click "here" in the line below.</strong> </p>';
+
+print '<p>A brief description of the listed parameters is given ';
 
 #----------------------------------------------------------------------
 #---- if the observation is alrady in an active OR list, print warning
@@ -2998,11 +3015,12 @@ if($usint_on =~ /no/){
 }elsif($usint_on =~ /yes/){
 	print a({-href=>"$usint_http/user_help.html",-target=>'_blank'},"here");
 }
+print "</p>";
 
 
 if($eventfilter_lower > 0.5 || $awc_l_th == 1){
-	print '<br /><br />';
-        print '<font color=red><b>';
+        print '<p style="color:red;padding-top:20px;padding-bottom:10px">';
+	print '<strong>';
 	if($eventfilter_lower > 0.5 && $awc_l_th == 0){
         	print 'Energy Filter Lowest Energy is larger than 0.5 keV. ';
 	}elsif($eventfilter_lower > 0.5 && $awc_l_th == 1){
@@ -3010,9 +3028,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}elsif($eventfilter_lower <= 0.5 && $awc_l_th == 1){
         	print 'ACIS Window Costraint Lowest Energy is larger than 0.5 keV. ';
 	}
-        print 'Please check all Spatial Window parameters of each CCD.<br />';
-	print '</b></font>';
-	print '<br />';
+        print 'Please check all Spatial Window parameters of each CCD.';
+	print '</strong>';
+	print '</p>';
 }
 
 	@ntest = split(//, $obsid);
@@ -3030,55 +3048,54 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		$tobsid = $obsid;
 	}
 
-	print '<p>';
-
 	print '<h2>General Parameters</h2>';
 
 #------------------------------------------------>
 #----- General Parameter dispaly starts here----->
 #------------------------------------------------>
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><td></td>';
+	print '<table style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
 	print "<th>Sequence Number:";
-	print "</th><td><a href='https://icxc.harvard.edu/cgi-bin/mp/target.cgi?$seq_nbr' target='blank'>$seq_nbr</a></td>";
+	print "</th><td><a href='https://icxc.harvard.edu/cgi-bin/mp/target.cgi?$seq_nbr' target='_blank'>$seq_nbr</a></td>";
 	print '<th>Status:';
 	print "</th><td>$status</td>";
 	print '<th>ObsID #:';
-	print "</th><td>$obsid</td>";
+	print "</th><td>$obsid";
 	print '<input type="hidden" name="OBSID" value="$obsid">';
+	print "</td>";
 	print '<th>Proposal Number:</th>';
 	print "<td>$proposal_number</td>";
 	print '</tr></table>';
 
-	print '<table cellspacing="0" cellpadding="5">';
-	print '<tr><td></td>';
+	print '<table  style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
 	print '<th>Proposal Title:</th>';
 	print "<td>$proposal_title</td>";
 	print '</tr>';
 	print ' </table>';
 	
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table  style="border-width:0px">';
 	print '<tr>';
-	print '<td></td>';
+	print '<td>&#160;</td>';
 	print '<th>Obs AO Status:';
 	print "</th><td>$obs_ao_str</td>";
 	print '</tr></table>';
 
-	print '<table cellspacing="3" cellpadding="10">';
-	print '<tr><td></td>';
+	print '<table  style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
 	print '<th>Target Name:</th><td>';
 	print "$targname",'</td>';
 	print '<th>SI Mode:</th>';
 
-	print '<td align="LEFT"><input type="text" name="SI_MODE" value="',"$si_mode",'" size="12"></td>';
+	print '<td style="text-align:left"><input type="text" name="SI_MODE" value="',"$si_mode",'" size="12"></td>';
 
 	print '<th>ACA Mode:</th>';
-	print '<td align="LEFT">',"$aca_mode",'</td>';
+	print '<td style="text-align:left">',"$aca_mode",'</td>';
 	print '</tr></table>';
 
-	print '<table cellspacing="3" cellpadding="10">';
-	print '<tr><td></td>';
+	print '<table style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
 
 	print '<th>Instrument:</th><td>';
 	print popup_menu(-name=>'INSTRUMENT', -value=>['ACIS-I','ACIS-S','HRC-I','HRC-S'],
@@ -3094,43 +3111,39 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '</td></tr></table>';
 	
-	print '<table cellspacing="15" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	print '<th>PI Name:';
 	print "</th><td>$PI_name</td>";
 	print '<th>Observer:';
 	print "</th><td> $Observer</td></tr>";
 
-	print '<th>Exposure Time:</TH>';
-	print '<td align="LEFT"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
+	print '<tr><th>Exposure Time:</TH>';
+	print '<td style="text-align:left"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
 	print "$approved_exposure_time".'" size="8"> ks</td>';
 
 	print '<th>Remaining Exposure Time:</TH>';
 	print "<td>$rem_exp_time ks</td>";
 	print '</tr></table>';
 	
-	print '<table cellspacing="3" cellpadding="8">';
+	print '<table style="border-width:0px">';
 
 	print '<tr><th>Joint Proposal:</th>';
-	print "<td>$proposal_joint</td></tr>";
-	print '<tr><td></td><th>HST Approved Time:</th>';
-	print "<td>$proposal_hst</td>";
-	print '<th>NOAO Approved Time:</th>';
-	print "<td>$proposal_noao</td>";
-	print '</tr><tr><td></td>';
-	print '<th>XMM Approved Time:';
-	print "</th><td>$proposal_xmm</td>";
-	print '<th>RXTE Approved Time:';
-	print "</th><td>$rxte_approved_time</td>";
-	print '</tr><tr><td></td>';
-	print '<th>VLA Approved Time:</th>';
-	print "<td>$vla_approved_time</td>";
-	print '<th>VLBA Approved Time:</th>';
-	print "<td>$vlba_approved_time</td>";
-	print '</tr></table>';
+	print "<td>$proposal_joint</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>";
+
+	print "<tr><td>&#160;</td><th>HST Approved Time:</th><td>$proposal_hst</td>";
+	print "<th>NOAO Approved Time:</th><td>$proposal_noao</td>";
+	print '</tr>';
+	print "<tr><td>&#160;</td><th>XMM Approved Time:</th><td>$proposal_xmm</td>";
+	print "<th>RXTE Approved Time:</th><td>$rxte_approved_time</td>";
+	print '</tr>';
+	print "<tr><td>&#160;</td><th>VLA Approved Time:</th><td>$vla_approved_time</td>";
+	print "<th>VLBA Approved Time:</th><td>$vlba_approved_time</td>";
+	print '</tr>';
+	print '</table>';
 	
 	
-	print '<table cellspacing="8" cellpadding="10">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	print '<th>Schedule Date:</TH>';
 	print "<td>$soe_st_sched_date</td>";
@@ -3176,35 +3189,32 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
        	}
   	$tdec = sprintf("%.1s%02d:%02d:%06.4f", $sign, $dd, $mm, $ss);
 
-	print 'You may enter RA and Dec in either HMS/DMS format (separated by colons, e.g. ';
+	print '<p style="padding-bottom:10px">You may enter RA and Dec in either HMS/DMS format (separated by colons, e.g. ';
 	print '16:22:04.8  -27:43:04.0), or as decimal degrees.  The original OBSCAT decimal ';
 	print ' degree values are provided below the update boxes .';
 
         $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
 	print 'If you like to see the current viewing orientation, open: ';
 
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='blank'>RASS</a>, ";
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.pspc.gif' target='blank'>ROSAT</a>, or  ";
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.dss.gif'  target='blank'>DSS</a>. ";
-	print "(Note: These figures do not always exist.)";
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='_blank'>RASS</a>, ";
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.pspc.gif' target='_blank'>ROSAT</a>, or  ";
+	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.dss.gif'  target='_blank'>DSS</a>. ";
+	print "(Note: These figures do not always exist.)</p>";
 
-
-	print '<br />';
-
-	print '<table cellspacing="8" cellpadding="5">';
-	print '<tr><td></td>';
+	print '<table style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
 
 	print '<th>RA (HMS):</th>';
 
-	print '<td align="LEFT"><input type="text" name="RA" value="',"$tra",'" size="14"></td>';
+	print '<td style="text-align:left"><input type="text" name="RA" value="',"$tra",'" size="14"></td>';
 	
 	print '<th>Dec (DMS):</th>';
 
-	print '<td align="LEFT"><input type="text" name="DEC" value="',"$tdec",'" size="14"></td>';
+	print '<td style="text-align:left"><input type="text" name="DEC" value="',"$tdec",'" size="14"></td>';
 	print '<th>Planned Roll:</th><td>',"$scheduled_roll";
 	print '</td></tr>';
 
-	print '<tr><td></td>';
+	print '<tr><td>&#160;</td>';
 	print '<th>RA:</TH><td>',"$dra",'</td>';
 	print '<th>Dec:</TH><td>',"$ddec",'</td>';
 
@@ -3214,45 +3224,46 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}
 
         print '<th>Roll Observed:</th>';
-        print '<td align="LEFT">',"$roll_obsr",'</td></tr>';
+        print '<td style="text-align:left">',"$roll_obsr";
 	print "<input type=\"hidden\" name=\"ROLL_OBSR\" value=\"$roll_obsr\">";
+	print '</td>';
 	print '</tr></table>';
 
-	print '<table cellspacing="3" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 
 	print '<th>Offset: Y:</th>';
 
-	print '<td align="LEFT"><input type="text" name="Y_DET_OFFSET" value="';
+	print '<td style="text-align:left"><input type="text" name="Y_DET_OFFSET" value="';
 	print "$y_det_offset";
 	print '" size="12"> arcmin</td><td></td>';
 
 	print '<th>Z:</th>';
 
-	print '<td align="LEFT"><input type="text" name="Z_DET_OFFSET" value="';
+	print '<td style="text-align:left"><input type="text" name="Z_DET_OFFSET" value="';
 	print "$z_det_offset";
 	print '" size="12"> arcmin</td>';
 	print '</tr><tr>';
 	print '<th>Z-Sim:</th>';
-	print '<td align="LEFT"><input type="text" name="TRANS_OFFSET" value="';
+	print '<td style="text-align:left"><input type="text" name="TRANS_OFFSET" value="';
 	print "$trans_offset";
 	print '" size="12"> mm<td>';
 	print '<th>Sim-Focus:</th>';
-	print '<td align="LEFT"><input type="text" name="FOCUS_OFFSET" value="';
+	print '<td style="text-align:left"><input type="text" name="FOCUS_OFFSET" value="';
 	print "$focus_offset";
 	print '" size="12"> mm</td>';
 
 	print '<tr>';
 
 	print '<th>Focus:</th>';
-	print '<td align="LEFT"><input type="text" name="DEFOCUS" value="',"$defocus", '" size="12"></td>';
+	print '<td style="text-align:left"><input type="text" name="DEFOCUS" value="',"$defocus", '" size="12"></td>';
 	print '<td></td>';
 
 	print '<th>Raster Scan:</th>';
-	print "<td align=\"LEFT\">$raster_scan</td>";
+	print "<td style='text-align:left'>$raster_scan</td>";
 	print '</tr></table>';
 
-	print '<table cellspacing="3" cellpadding="5">';
+	print '<table style="border-width:0px">';
 
 	print '<tr><th>Uninterrupted Obs:</th><td>';
 	print popup_menu(-name=>'UNINTERRUPT', -value=>['NULL','NO','PREFERENCE','YES'], 
@@ -3260,8 +3271,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #
 #--- added 08/05/11
 #
-        print '</td><td>&#160';
-        print '</td><th>Extended SRC:</th><td>';
+        print '</td><td>&#160;</td>';
+        print '<th>Extended SRC:</th><td>';
         print popup_menu(-name=>'EXTENDED_SRC', -value=>['NO','YES'],
                         -default=>"$dextended_src",-override=>1000);
         print '</td></tr>';
@@ -3269,7 +3280,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<tr><th>Solar System Object:</th><td>';
 	print popup_menu(-name=>'OBJ_FLAG',-value=>['NO','MT','SS'],-default=>"$obj_flag", -override=>10000);
-	print '</td><td>';
+	print '</td><td>&#160;';
 	print '</td><th>Object:</th><td>';
 	print popup_menu(-name=>'OBJECT', 
 	 		-value=>['NONE','NEW','COMET','EARTH','JUPITER','MARS','MOON','NEPTUNE',
@@ -3277,79 +3288,80 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	 		-default=>"$object", -override=>10000);
 	print '</tr><tr>';
 	
-	print '</td><th>Photometry:</th><td>';
+	print '<th>Photometry:</th><td>';
 	print popup_menu(-name=>'PHOTOMETRY_FLAG', -value=>['NULL','YES','NO'], 
 			 -default=>"$dphotometry_flag", -override=>100000);
 	print '</td>';
 
-	print '<td></td>';
+	print '<td>&#160;</td>';
 	print '<th>V Mag:';
-	print "</th><td align=\"LEFT\"><input type=\"text\" name=\"VMAGNITUDE\" value=\"$vmagnitude\" size=\"12\"></td>";
+	print "</th><td style='text-align:left'><input type=\"text\" name=\"VMAGNITUDE\" value=\"$vmagnitude\" size=\"12\"></td>";
 	print '<tr>';
 	print '<th>Count Rate:</th>';
-	print '<td align="LEFT"><input type="text" name="EST_CNT_RATE"';
+	print '<td style="text-align:left"><input type="text" name="EST_CNT_RATE"';
 	print " value=\"$est_cnt_rate\" size=\"12\"></td>";
-	print '<td></td>';
-	print '<th>1st Order Rate</a>:';
-	print '</th><td align="LEFT"><input type="text" name="FORDER_CNT_RATE"';
+	print '<td>&#160;</td>';
+	print '<th>1st Order Rate:';
+	print '</th><td style="text-align:left"><input type="text" name="FORDER_CNT_RATE"';
 	print " value=\"$forder_cnt_rate\" size=\"12\"></td>";
 	print '</tr></table>';
-	print '<hr/>';
+
+	print '<hr />';
 
 	print '<h2>Dither</h2>';
 
-	print '<table cellspacing="3" cellpadding="5">';
+	print '<table  style="border-width:0px">';
 	print '<tr><th>Dither:</th><td>';
 	print popup_menu(-name=>'DITHER_FLAG', -value=>['NULL','YES','NO'], 
 		 	-default=>"$ddither_flag", -override=>100000);
-	print '</td><td></td><td></td><td></td><td></td></tr>';
+	print '</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>';
 
-	print '<tr><td></td><th>y_amp (in arcsec):</th>';
-	print '<td align="LEFT"><input type="text" name="Y_AMP_ASEC" value="',"$y_amp_asec",'" size="8"></td>';
+	print '<tr><td>&#160;</td><th>y_amp (in arcsec):</th>';
+	print '<td style="text-align:left"><input type="text" name="Y_AMP_ASEC" value="',"$y_amp_asec",'" size="8"></td>';
 
 	print '<th>y_freq (in arcsec/sec):</th>';
-	print '<td align="LEFT"><input type="text" name="Y_FREQ_ASEC" value="',"$y_freq_asec",'" size="8"></td>';
+	print '<td style="text-align:left"><input type="text" name="Y_FREQ_ASEC" value="',"$y_freq_asec",'" size="8"></td>';
 
 	print '<th>y_phase:</th>';
-	print '<td align="LEFT"><input type="text" name="Y_PHASE" value="',"$y_phase",'" size="8"></td>';
+	print '<td style="text-align:left"><input type="text" name="Y_PHASE" value="',"$y_phase",'" size="8"></td>';
 	print '</tr>';
 #---
-        print '<tr><td></td><th>y_amp (in degrees):</th>';
-        print '<td align="LEFT">',"$y_amp",'</td>';
+        print '<tr><td>&#160;</td><th>y_amp (in degrees):</th>';
+        print '<td style="text-align:left">',"$y_amp",'</td>';
 
         print '<th>y_freq(in degree/sec)</th>';
-        print '<td align="LEFT">',"$y_freq",'</td>';
+        print '<td style="text-align:left">',"$y_freq",'</td>';
 
-        print '<th></th>';
-        print '<td align="LEFT"></td>';
+        print '<th>&#160;</th>';
+        print '<td style="text-align:left">&#160;</td>';
         print '</tr>';
 #----
 	
-	print '<tr><td></td><th>z_amp (in arcsec):</th>';
-	print '<td align="LEFT"><input type="text" name="Z_AMP_ASEC" value="',"$z_amp_asec",'" size="8"></td>';
+	print '<tr><td>&#160;</td><th>z_amp (in arcsec):</th>';
+	print '<td style="text-align:left"><input type="text" name="Z_AMP_ASEC" value="',"$z_amp_asec",'" size="8"></td>';
 
 	print '<th>z_freq (in arcsec/sec):</th>';
-	print '<td align="LEFT"><input type="text" name="Z_FREQ_ASEC" value="',"$z_freq_asec",'" size="8"></td>';
+	print '<td style="text-align:left"><input type="text" name="Z_FREQ_ASEC" value="',"$z_freq_asec",'" size="8"></td>';
 
 	print '<th>z_phase:</th>';
-	print '<td align="LEFT"><input type="text" name="Z_PHASE" value="',"$z_phase",'" size="8"></td>';
+	print '<td style="text-align:left"><input type="text" name="Z_PHASE" value="',"$z_phase",'" size="8"></td>';
 	print '</tr>';
 
 #---
-        print '<tr><td></td><th>z_amp (in degrees):</th>';
-        print '<td align="LEFT">',"$z_amp",'</td>';
+        print '<tr><td>&#160;</td><th>z_amp (in degrees):</th>';
+        print '<td style="text-align:left">',"$z_amp",'</td>';
  
         print '<th>z_freq(in degree/sec)</th>';
-        print '<td align="LEFT">',"$z_freq",'</td>';
+        print '<td style="text-align:left">',"$z_freq",'</td>';
  
-        print '<th></th>';
-        print '<td align="LEFT"></td>';
+        print '<th>&#160;&#160;</th>';
+        print '<td>&#160;</td>';
         print '</tr>';
 #----
 	
 	print '</table>';
 	
-	print '<hr>';
+	print '<hr />';
 
 #-------------------------------------
 #----- time constraint case start here
@@ -3383,9 +3395,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print "<input type=\"hidden\" name=\"TIME_ORDR_ADD\" value=\"$time_ordr_add\">";
 
 		if($time_ordr_add == 0){
+			print '<p style="padding-bottom:20px">';
 			print 'If you want to add ranks, press "Add Time Rank." If you want to remove null entries, press "Remove Null Time Entry."';
-			print '<br /><br />';
-			print '<b>Rank</b>: ';
+			print '</p>';
+			print '<strong>Rank</strong>: ';
 			print '<spacer type=horizontal size=30>';
 	
 			print '<spacer type=horizontal size=50>';
@@ -3393,7 +3406,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			print submit(-name=>'Check',-value=>'Remove Null Time Entry ')	;
 		}
 
-		print '<table cellspacing="0" cellpadding="5">';
+		print '<table style="border-width:0px">';
 		print '<tr><th>Rank</th>
 			<th>Window Constraint<th>
 			<th>Month</th><th>Date</th><th>Year</th><th>Time (24hr system)</th></tr>';
@@ -3434,9 +3447,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 				$end_month[$k]   = $wend_month;
 			}
 	
-			print '<tr><td align=center><b>';
+			print '<tr><td style="text-align:center"><strong>';
 			print "$k";
-			print '</b></td><td>';
+			print '</strong></td><td>';
 	
 			$twindow_constraint = 'WINDOW_CONSTRAINT'."$k";
 	
@@ -3477,7 +3490,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 			print textfield(-name=>"$tstart_time", -size=>'8', -default =>"$start_time[$k]", ,-override=>1000000);
 	
-			print '</td></tr><tr><td></td><td></td>';
+			print '</td></tr><tr><td>&#160;</td><td>&#160;</td>';
 	
 			print '</td><th>End</th><td>';
 	
@@ -3512,16 +3525,14 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		}
 		print '</table>';
 	}	
-	print '<hr/>';
+	print '<hr />';
 
 #-------------------------------------
 #---- Roll Constraint Case starts here
 #-------------------------------------
 
-        print '<br />';
-        print '<font size=+2><b>Roll Constraints </b></font>';
+        print '<h2 style="padding-bottom:20px">Roll Constraints </h2>';
 
-	print "<br /><br />";
 	
         $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 	
@@ -3543,11 +3554,11 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print "<input type=\"hidden\" name=\"ROLL_FLAG\" value=\"$droll_flag\">";
 
 		if($roll_ordr_add == 0){
-			print 'If you want to add a rank, press "Add Roll Rank".';
+			print '<p style="padding-bottom:20px">If you want to add a rank, press "Add Roll Rank".';
 			print 'If you want to remove null entries, press "Remove Null Roll Entry."';
-			print '<br /><br />';
+			print '</p>';
 
-			print '<b>Rank</b>: ';
+			print '<strong>Rank</strong>: ';
 			print '<spacer type=horizontal size=30>';
 	
 			print '<spacer type=horizontal size=50>';
@@ -3555,7 +3566,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			print submit(-name=>'Check',-value=>'Remove Null Roll Entry ') ;
 		}
 
-		print '<table cellspacing="0" cellpadding="5">';
+		print '<table style="border-width:0px">';
 		print '<tr><th>Rank</th>
 			<th>Type of Constraint</th>
 			<th>Roll180?</th>
@@ -3563,9 +3574,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			<th>Roll Tolerance</th></tr>';
 	
 		for($k = 1; $k <= $roll_ordr; $k++){
-			print '<tr><td align=center><b>';
+			print '<tr><td align=center><strong>';
 			print "$k";	
-			print '</b></td><td>';
+			print '</strong></td><td>';
 			$troll_constraint = 'ROLL_CONSTRAINT'."$k";
 			if($sp_user eq 'yes' || $droll_constraint[$k] =~ /YES/i){
 				print popup_menu(-name=>"$troll_constraint", -value=>['CONSTRAINT','PREFERENCE'],
@@ -3593,9 +3604,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #----- Other Constraint Case starts here
 #----------------------------------------
 
-	print '<hr/>';
+	print '<hr />';
 	print '<h2>Other Constraints</h2>';
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	
 
@@ -3605,10 +3616,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print ' </td></tr>';
 	print '</table>';
 
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	print '<th>Phase Constraint:</th>
-	<td align="LEFT">';
+	<td style="text-align:left">';
 	
 	print " $dphase_constraint_flag";
         print "<input type=\"hidden\" name=\"PHASE_CONSTRAINT_FLAG\" value=\"$dphase_constraint_flag\">";
@@ -3629,30 +3640,30 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	if($dphase_constraint_flag =~ /NONE/ || $dphase_constraint_flag =~ /NULL/){
 			# do nothing
 	}else{
-		print '<table cellspacing="10" cellpadding="5">';
-		print '<tr><td></td>';
+		print '<table style="border-width:0px">';
+		print '<tr><td>&#160;</td>';
 		print '<th>Phase Epoch:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_EPOCH" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_EPOCH" value=';
 		print "\"$phase_epoch\"",' size="12"></td>';
 		print '<th>Phase Period:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_PERIOD" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_PERIOD" value=';
 		print "\"$phase_period\"", ' size="12"></td>';
-		print '<td></td><td></td></tr>';
+		print '<td>&#160;</td><td>&#160;</td></tr>';
 		
-		print '<tr><td></td>';
+		print '<tr><td>&#160;</td>';
 		print '<th>Phase Start:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_START" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_START" value=';
 		print "\"$phase_start\"",' size="12"></td>';
 		print '<th>Phase Start Margin:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_START_MARGIN" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_START_MARGIN" value=';
 		print "\"$phase_start_margin\"",' size="12"></td>';
 		print '</tr><tr>';
-		print '<td></td>';
+		print '<td>&#160;</td>';
 		print '<th>Phase End:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_END" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_END" value=';
 		print "\"$phase_end\"",' size="12"></td>';
 		print '<th>Phase End Margin:</th>';
-		print '<td align="LEFT"><input type="text" name="PHASE_END_MARGIN" value=';
+		print '<td style="text-align:left"><input type="text" name="PHASE_END_MARGIN" value=';
 		print "\"$phase_end_margin\"",' size="12"></td>';
 		print '</tr></table>';
 	}
@@ -3681,7 +3692,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
                	@monitor_series_list  = sort @uniq;
        }
 
-	print '<table cellspacing="0" cellpadding="2">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 
 	print '<th>Group ID:</th>';
@@ -3720,28 +3731,28 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}
 
 	if($group_id =~ /No Group ID/ || $group_id !~ /\d/){
-		print '<table cellspacing="8" cellpadding="5">';
+		print '<table style="border-width:0px">';
 
-		print '<th>Follows ObsID#:</th>';
-		print '<td align="LEFT"><input type="text" name="PRE_ID" value="',"$pre_id",'" size="8"></td>';
+		print '<tr><th>Follows ObsID#:</th>';
+		print '<td style="text-align:left"><input type="text" name="PRE_ID" value="',"$pre_id",'" size="8"></td>';
 		
 		print '<th>Min Int<br />(pre_min_lead):</th>';
-		print '<td align="LEFT"><input type="text" name="PRE_MIN_LEAD" value="',"$pre_min_lead",'" size="8"></td>';
+		print '<td style="text-align:left"><input type="text" name="PRE_MIN_LEAD" value="',"$pre_min_lead",'" size="8"></td>';
 	
 		print '<th>Max Int<br />(pre_max_lead):</th>';
-		print '<td align="LEFT"><input type="text" name="PRE_MAX_LEAD" value="',"$pre_max_lead",'" size="8"></td>';
+		print '<td style="text-align:left"><input type="text" name="PRE_MAX_LEAD" value="',"$pre_max_lead",'" size="8"></td>';
 		print '</tr></table>';
 	}else{
-      			print '<table cellspacing="8" cellpadding="5">';
+      		print '<table style="border-width:0px">';
 
-       		print '<th>Follows ObsID#:</th>';
-       		print '<td align="LEFT">',"$pre_id",'</td>';
+       		print '<tr><th>Follows ObsID#:</th>';
+       		print '<td style="text-align:left">',"$pre_id",'</td>';
 	
        		print '<th>Min Int<br />(pre_min_lead):</th>';
-       		print '<td align="LEFT">',"$pre_min_lead",'</td>';
+       		print '<td style="text-align:left">',"$pre_min_lead",'</td>';
 	
        		print '<th>Max Int<br />(pre_max_lead):</th>';
-       		print '<td align="LEFT">',"$pre_max_lead",'</td>';
+       		print '<td style="text-align:left">',"$pre_max_lead",'</td>';
        		print '</tr></table>';
 
 		print "<input type=\"hidden\" name=\"PRE_ID\" value=\"$pre_id\"\>";
@@ -3750,29 +3761,27 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}
 
 
-	print '<table cellspacing=6 cellpadding=5>';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	print '<th>Coordinated Observation:</th><td>';
-
-
 	print popup_menu(-name=>'MULTITELESCOPE', -value=>['NO','YES','PREFERENCE'],
 	 		-default=>"$dmultitelescope",-override=>1000000);
-
 	print '</td>';
-	print '<td></td>';
+	print '<td>&#160;</td>';
 	print '<th>Observatories:</th>';
-	print '<td align="LEFT"><input type="text" name="OBSERVATORIES" value=';
+	print '<td style="text-align:left"><input type="text" name="OBSERVATORIES" value=';
 	print "\"$observatories\"",' size="12"></td>';
-               print '</tr>';
+        print '</tr>';
 
-               print '<tr>';
+        print '<tr>';
 	print '<th>Max Coordination Offset:</th>';
-	print '<td align="LEFT"><input type="text" name="MULTITELESCOPE_INTERVAL" value=';
+	print '<td style="text-align:left"><input type="text" name="MULTITELESCOPE_INTERVAL" value=';
 	print "\"$multitelescope_interval\"",' size="12"></td>';
+	print "<td>&#160;</td><td>&#160;</td><td>&#160;</td>";
 
 	print '</tr> </table>';
 
-	print '<hr/>';
+	print '<hr />';
 
 
 #--------------------
@@ -3780,7 +3789,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #--------------------
 
 	print '<h2>HRC Parameters</h2>';
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr><td></td>';
 
 	print '<th>HRC Timing Mode:</th><td>';
@@ -3794,28 +3803,27 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '</td><td>';
 
 	if($sp_user eq 'no'){
-		print '<th>SI Mode:</th>
-			<td align="LEFT">';
+		print '<th>SI Mode:</th><td style="text-align:left">';
 		print "$hrc_si_mode";
-		print '</td></tr>';
 		print "<input type=\"hidden\" name=\"HRC_SI_MODE\" value=\"$hrc_si_mode\">";
+		print '</td></tr>';
 	}else{
 		print '<th>SI Mode:</th>
-			<td align="LEFT"><input type="text" name="HRC_SI_MODE" value="';
+			<td style="text-align:left"><input type="text" name="HRC_SI_MODE" value="';
 		print "$hrc_si_mode";
 		print '" size="8"></td></tr>';
 	}
 
 	print '</table>';
 	
-	print '<hr/>';
+	print '<hr />';
 
 #---------------------
 #----- ACIS Parameters
 #--------------------
 
 	print '<h2>ACIS Parameters</h2>';
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	
 	print '<th>ACIS Exposure Mode:</th><td>';
@@ -3831,12 +3839,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print '<th>Frame Time:</th>';
 
-	print "<td align='LEFT'>";
+	print "<td style='text-align:left'>";
 	print textfield(-name=>'FRAME_TIME', -value=>"$frame_time",-size=>12, -override=>1000);
 	print "</td></tr>";
 
 	print '<tr>';
-	print '<td></td><td></td><td></td><td></td>
+	print '<td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
 		<th>Most Efficient:</th><td>';
 
 	print popup_menu(-name=>'MOST_EFFICIENT', -value=>['NULL','YES','NO'],
@@ -3844,7 +3852,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '</td>';
 	print '</tr></table>';
 	
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr><td></td>';
 
 
@@ -3860,7 +3868,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print "<input type=\"hidden\" name=\"FEP\" value=\"$fep\">";
 	print "<input type=\"hidden\" name=\"DROPPED_CHIP_COUNT\" value=\"$dropped_chip_count\">";
 
-	print '<table cellspacing="0" cellpadding="1">';
+	print '<table style="border-width:0px">';
 	print '<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>';
 	
 
@@ -3923,89 +3931,81 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '</tr></table><p>';
 	
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 	print '<tr>';
-
 	print '<Th>Use Subarray:</Th>';
-	
 	print '<td>';
 	print popup_menu(-name=>'SUBARRAY', -value=>['NO', 'YES'],
 		 	-default=>"$dsubarray", -override=>100000);
+	print '</td>';
+	print '<td colspan=4><strong>Please fill the next two entries, if you select YES.</strong></td>';
+	print '</tr>';
 
-	print '</td><td colspan=4><b>Please fill the next two entries, if you select YES.
-		</td></tr><tr>';
-	
-	print '<th>Start:</th>';
-	
-	print '<td align="LEFT"><input type="text" name="SUBARRAY_START_ROW" value="',"$subarray_start_row",'" size="12"></td>';
-	
-	print '<th>Rows:</th>';
-	
-	print '<td align="LEFT"><input type="text" name="SUBARRAY_ROW_COUNT" value="',"$subarray_row_count",'" size="12"></td>';
-	
-	
-	print '</td></tr>';
 	print '<tr>';
+	print '<th>Start:</th>';
+	print '<td style="text-align:left"><input type="text" name="SUBARRAY_START_ROW" value="',"$subarray_start_row",'" size="12"></td>';
+	print '<th>Rows:</th>';
+	print '<td style="text-align:left"><input type="text" name="SUBARRAY_ROW_COUNT" value="',"$subarray_row_count",'" size="12"></td>';
+	print "<td>&#160;</td><td>&#160;</td>";
+	print '</tr>';
 
-	print '<th>Duty Cycle:</th><td>';
+	print '<tr>';
+	print '<th>Duty Cycle:</th>';
+	print '<td>';
 	print popup_menu(-name=>'DUTY_CYCLE', -value=>['NULL','YES','NO'], 
 		 	-default=>"$dduty_cycle", -override=>100000);
 	print '</td>';
-	print '<th colspan=4><b>If you selected YES, please fill the next two entries</b></th>';
-	print '</tr><tr>';
+	print '<th colspan=4><strong>If you selected YES, please fill the next two entries</strong></th>';
+	print '</tr>';
 
+	print '<tr>';
 	print '<th>Number:</th>';
-	print '<td align="LEFT"><input type="text" name="SECONDARY_EXP_COUNT" value=';
+	print '<td style="text-align:left"><input type="text" name="SECONDARY_EXP_COUNT" value=';
 	print "\"$secondary_exp_count\"", ' size="12"></td>';
 	print '<th>Tprimary:</th>';
-	print '<td align="LEFT"><input type="text" name="PRIMARY_EXP_TIME" value=';
+	print '<td style="text-align:left"><input type="text" name="PRIMARY_EXP_TIME" value=';
 	print "\"$primary_exp_time\"", ' size="12"></td>';
-	print '</tr> <tr>';
+	print "<td>&#160;</td><td>&#160;</td>";
+	print '</tr>';
 
+	print ' <tr>';
 	print '<th>Onchip Summing:</th><td>';
 	print popup_menu(-name=>'ONCHIP_SUM', -value=>['NULL','YES','NO'], 
 		 	-default=>"$donchip_sum", -override=>100000);
 	print '</td>';
-
-	print '<th>Rows:';
-	print '</th><td align="LEFT"><input type="text" name="ONCHIP_ROW_COUNT" value=';
+	print '<th>Rows:</th>';
+	print '<td style="text-align:left"><input type="text" name="ONCHIP_ROW_COUNT" value=';
 	print "\"$onchip_row_count\"", ' size="12"></td>';
-	print '<th>Columns:';
-	print '</th><td align="LEFT"><input type="text" name="ONCHIP_COLUMN_COUNT" value=';
+	print '<th>Columns:</th>';
+	print '<td style="text-align:left"><input type="text" name="ONCHIP_COLUMN_COUNT" value=';
 	print "\"$onchip_column_count\"", ' size="12"></td>';
 	print '</tr>';
-	print '<tr>';
 
+	print '<tr>';
 	print '<th>Energy Filter:</th><td>';
-	
 	print popup_menu(-name=>'EVENTFILTER', -value=>['NULL','YES','NO'], 
 		 	-default=>"$deventfilter", -override=>100000);
 	print '</td>';
-
-
 	print '<th>Lowest Energy:</th>';
-	
-	print '<td align="LEFT"><input type="text" name="EVENTFILTER_LOWER" value="';
+	print '<td style="text-align:left"><input type="text" name="EVENTFILTER_LOWER" value="';
 	print "$eventfilter_lower";
 	print '" size="12"></td>';
-
 	print '<th>Energy Range:</th>';
-	
-	print '<td align="LEFT"><input type="text" name="EVENTFILTER_HIGHER" value="';
+	print '<td style="text-align:left"><input type="text" name="EVENTFILTER_HIGHER" value="';
 	print "$eventfilter_higher";
 	print '" size="12"></td>';
-	print '</tr><tr> ';
+	print '</tr>';
 
+	print '<tr> ';
 	print '<th>Multiple Spectral Lines:</th>';
-
-	print '<td align="LEFT">';
+	print '<td style="text-align:left">';
 	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
 	print '</td>';
-
 	print '<th>Spectra Max Count:</th>';
-	print '<td align="LEFT"><input type="text" name="SPECTRA_MAX_COUNT" value="';
+	print '<td style="text-align:left"><input type="text" name="SPECTRA_MAX_COUNT" value="';
 	print "$spectra_max_count";
 	print '" size="12"></td>';
+	print "<td>&#160;</td><td>&#160;</td>";
 	print '</tr> ';
 
 	print '</table>';
@@ -4020,9 +4020,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #--- ACIS window Constraints: some values are linked to eventfilter_lower condition
 #
 
-	print '<hr/>';
-	print '<h2> ACIS Window Constraints</H2>';
-	print '<table><tr><th>';
+	print '<hr />';
+	print '<h2> ACIS Window Constraints</h2>';
+	print '<table style="border-width:0px"><tr><th>';
 	print 'Window Filter:';
 	print '</th><td>';
 
@@ -4077,7 +4077,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #
 		OTUER:
 		if($eventfilter_lower > 0.5 || $awc_l_th == 1){
-			print '<font color=red>';
+			print '<p style="color:red"><strong>';
 			if($eventfilter_lower > 0.5 && $awc_l_th == 0){
 				print 'Energy Filter Lowest Energy is larger than 0.5 keV. ';
 			}elsif($eventfilter_lower > 0.5 && $awc_l_th == 1){
@@ -4089,9 +4089,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			print 'If you want to remove all the window constraints, change Lowest Energy ';
 			print 'to less than 0.5keV, and set Window Filter to No or Null, ';
 			print 'then Submit the change using the "Submit" button at the bottom of the page.';
-			print '</b></font>';
-			print "<a href=\"$usint_http/eventfilter_answer.html\" target='blank'>Why did this happen?</a>";
-			print '</font>';
+			print '</strong><br />';
+			print "<a href=\"$usint_http/eventfilter_answer.html\" target='_blank'>Why did this happen?</a>";
+			print '</p>';
 
 #
 #--- check how many ccds match with opened ccds
@@ -4113,33 +4113,32 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			}
 		}
 
-		print '<br />';
+		print '<p style="padding-top:10px;padding-bottom:20px">';
 		print 'If you want to modify the number of ranks, change Window Filter above to "YES", ';
 		print 'then change the rank entry below, and press "Add Window Rank"';
-		print '<br /><br />';
-		print '<b>Rank</b>: ';
+		print '</p>';
+		print '<strong>Rank</strong>: ';
 		print '<spacer type=horizontal size=30>';
 	
 		print '<spacer type=horizontal size=50>';
 		print submit(-name=>'Check',-value=>'     Add Window Rank     ') ;
-		print '<br /><br />';
-		print 'If you are changing any of following entries, make sure ';
+		
+		print '<p style="padding-top:20px;padding-bottom:20px">If you are changing any of following entries, make sure ';
 			print 'Window Filter above is set to "YES".<br />';
 		print 'Otherwise, all changes are automatically nullified ';
 		print 'when you submit the changes.';
-		print '<br /><br />';
+		print '</p>';
 	
 		if($eventfilter_lower > 0.5 || $awc_l_th == 1){
-			print 'If you change one or more CCD from YES to NO or the other way around in ACIS Parameters section, ';
+			print '<p>If you change one or more CCD from YES to NO or the other way around in ACIS Parameters section, ';
 			print '<br />';
 			print 'this action will affect the ranks below. After changing the CCD status, please click "Submit" button at the bottom of the page, ';
 			print '<br />';
 			print ' and then come back to this page ';
 			print 'using "PREVIOUS PAGE" button to make the effect to take place.';
-			print '<br /><br />';
+			print '</p>';
 		}
 
-		print '<table cellspacing="0" cellpadding="3">';
 
 		$add_extra_line = 0;
 		$reduced_ccd_no = 0;
@@ -4207,6 +4206,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #
 #----this line was removed: <th>Photon Inclusion</th>
 #
+		print '<table style="border-width:0px">';
 		print '<tr><th>Ordr</th>
 		<th>Chip</th>
 		<th>Start Row</th>
@@ -4216,7 +4216,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		<th>Lowest Energy</th>
 		<th>Energy Range</th>
 		<th>Sample Rate</th>
-		<th></th></tr>';
+		<th>&#160;</th></tr>';
 
 		if($aciswin_no == 0){
 			$aciswin_no = 1;
@@ -4272,6 +4272,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #
 #---- if the ordr entry is blank, remove the line from the data.
 #
+			if($ordr[$k] == 999){
+				print "<tr><td style='background-color:red'>";
+			}else{
+				print "<tr><td>";
+			}
+
 			if($ordr[$k] !~ /\d/){
 
 				if($orig_ordr[$k] =~ /\d/ && $orig_chip[$k] !~ /N/){
@@ -4353,12 +4359,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 					$pha_range[$k] = $eventfilter_higher;
 				}
 			}
+
 	
-			if($ordr[$k] == 999){
-				print "<tr><td style='background-color:red'>";
-			}else{
-				print "<tr><td>";
-			}
 			print textfield(-name=>"$tordr", -value=>"$ordr[$k]", -override=>10000, -size=>'2');
 			print " </td><td>";
 			print popup_menu(-name=>"$tchip",-value=>['NULL','I0','I1','I2','I3','S0','S1','S2','S3','S4','S5'],
@@ -4384,9 +4386,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			if($ordr[$k] == 999){
 				print "<em style='color:red'>You Cannot Remove This Entry</em>";
 			}
-			print '</td></tr>';
-
 			print "<input type=\"hidden\" name=\"$taciswin_id\" value=\"$aciswin_id[$k]\"\>";
+
+			print '</td></tr>';
 		}
 		print '</table>';
 
@@ -4397,7 +4399,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 		print '<p>* If you need to remove any window constraint entries, make "Ordr" a blank, then push: ';
 		print '<input type="submit" name="Check" value="Update">';
-		print '</p.';
+		print '</p>';
 
 
 
@@ -4441,39 +4443,52 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #----- TOO Parameter Case start here
 #-----------------------------------
 
-	print '<hr/>';
+	print '<hr />';
 	print '<h2>TOO Parameters</h2>';
 	
-	print '<table cellspacing=3 cellpadding=5>';
+	print '<table style="border-width:0px">';
 	print '<tr>';
-	print '<th valign=top>TOO ID:';
+	print '<th style="verticla-align:top">TOO ID:';
 	print '</th><td>';
 	print "$too_id",'</td>';
-	print '</tr><tr>';
-	print '<th valign=top nowrap>TOO Trigger:';
+	print '</tr>';
+	
+	print '<tr>';
+	print '<th style="verticla-align:top;white-space:nowrap">TOO Trigger:';
 	print '</th><td>',"$too_trig",'</td>';
 	print '</tr><tr>';
 	print '<th>TOO Type:</th><td>';
 	print "$too_type";
 	print '</td></tr></table>';
-	print '<table cellspacing=3 cellpadding=5>';
+
+	print '<table style="border-width:0px">';
 	print '<tr>';
 	print '<th>Exact response window (days):</th>';
-	print '</tr><tr>';
+	print '<td>&#160;</td><td>&#160;</td>';
+	print '<td>&#160;</td>';
+	print '</tr>';
+
+	print '<tr>';
 	print '<th>Start:</th><td>';
 	print "$too_start";
-	print '</td><td></td>';
+	print '</td>';
 	print '<th>Stop:</th><td>';
 	print "$too_stop";
-	print '</td><tr>';
+	print '</td>';
+	print '</tr>';
+
+	print '<tr>';
 	print '<th>';
 	print '# of Follow-up Observations:</th><td>';
 	print "$too_followup";
-	print '</td></tr></table>';
-	print '<table cellspacing=0 cellpadding=5>';
-	print '<tr><td></td>';
-	print '<th valign=top>';
-	print 'TOO Remarks</a>:</th><td>';
+	print '</td>';
+	print '<td>&#160;</td><td>&#160;</td>';
+	print '</tr></table>';
+
+	print '<table style="border-width:0px">';
+	print '<tr><td>&#160;</td>';
+	print '<th style="vertical-align:top">';
+	print 'TOO Remarks:</th><td>';
 	print "$too_remarks";
 	print '</td></tr></table>';
 	
@@ -4481,14 +4496,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #---- Comment and Remarks  -------->
 #---------------------------------->
 	
-	print '<hr/>';
+	print '<hr />';
 	print '<h2>Comments and Remarks</h2>';
-	print '<b>The remarks area below is reserved for remarks related to constraints, ';
+	print '<p style="padding-bottom:20px"><strong>The remarks area below is reserved for remarks related to constraints, ';
 	print 'actions/considerations that apply to the observation. ';
 	print 'Please put all other remarks/comments into the comment area below. ';
-	print '</b><br />';
-	print '<tr> ';
-	print '<br />';
+	print '</strong></p>';
 	
 
 #---------------------------------------------------------------------------------------
@@ -4531,30 +4544,32 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	$comments = $temp;
 
 
-	print '<table cellspacing="0" cellpadding="5">';
+	print '<table style="border-width:0px">';
 
-	print '<th valign=top>Remarks:</th>';
-	print '<td><textarea name="REMARKS" ROWS="10" COLS="60"  WRAP=virtual >';
+	print '<tr><th style="vertical-align:top">Remarks:</th>';
+#	print '<td><textarea name="REMARKS" ROWS="10" COLS="60"  WRAP=virtual >';
+	print '<td><textarea name="REMARKS" ROWS="10" COLS="60">';
 	print "$remarks";
-	print '</textarea></td></tr>';
+	print '</textarea></td><td>&#160;</td></tr>';
 
 
 	if($remark_cont ne ''){
-		print '<tr><th valign=top>Other Remark:</th><td>',"$remark_cont",'</td></tr>',"\n";
+		print '<tr><th style="vertical-align:top">Other Remark:</th><td>',"$remark_cont",'</td></tr>',"\n";
 	}
 
 	print "<tr><td colspan=3>";
-	print "<b> Comments are kept as a record of why a change was made.<br />";
+	print "<strong> Comments are kept as a record of why a change was made.<br />";
 	print "If a CDO approval is required, or if you have a special instruction for ARCOPS, ";
-	print "add the comment in this area.<br />";
+	print "add the comment in this area.</strong>";
 	print "</td></tr>";
 	print "<tr>";
-	print "<th  valign=top>Comments:</th><td>";
-	print "<textarea name='COMMENTS' ROWS='3' COLS='60' WRAP=virtual>$comments</textarea>";
-	print "</td></tr>";
+	print "<th  style='vertical-align:top'>Comments:</th><td>";
+#	print "<textarea name='COMMENTS' ROWS='3' COLS='60' WRAP=virtual>$comments</textarea>";
+	print "<textarea name='COMMENTS' ROWS='3' COLS='60' >$comments</textarea>";
+	print "</td><td>&#160;</td></tr>";
 
 	print "</table>";
-	print "<hr/>";
+	print "<hr />";
 	
 
 #------------------------------------->
@@ -4563,66 +4578,63 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 
 	if($mp_check > 0){
-		print "<h2><b><font color='red'>";
+		print "<h2><strong style='color:red;padding-bottom:10px'>";
 
 		print "Currently under review in an active OR list.";
-		print "</font></b><br /></h2>";
+		print "</strong></h2>";
 	}
 
-		print '<b>OPTIONS</b>';
-		print '<p>';
-		print '<table><tr><td>';
-		print '<b>Normal Change </b> ';
+		print '<strong>OPTIONS</strong>';
+		print '<table style="border-width:0px"><tr><td>';
+		print '<strong>Normal Change </strong> ';
 		print '</td><td>';
 		print 'Any changes other than APPROVAL status';
 		print '</td></tr><tr><td>';
-		print '<b>Observation is Approved for flight </b>';
+		print '<strong>Observation is Approved for flight </strong>';
 		print '</td><td>';
 		print 'Adds ObsID to the Approved File - nothing else<br />';
 		print '</td></tr><tr><td>';
-		print '<b>ObsID no longer ready to go </b> ';
+		print '<strong>ObsID no longer ready to go </strong> ';
 		print '</td><td>';
 	 	print 'REMOVES ObsID from the Approved File - nothing else<br />';
 		print '</td></tr>';
 
 		print '<tr><td>';
-		print '<b>Split this ObsID </b> ';
+		print '<strong>Split this ObsID </strong> ';
 		print '</td> <td> ';
 		print '	 	does NOT add them to the Approved File.<br />';
-		print '	<font color=fuchsia> Please add an explanation why you need<br /> to split this observation in the comment area.</font><br />';
+		print '	<span style="color:fuchsia"> Please add an explanation why you need<br /> to split this observation in the comment area.</span>';
 		print '</td></tr>';
 
 	
 		print '</table>';
-		print '</P>';
 		
-		print '<center>';
-		print '<p>';
-		print '<table border="0" cellspacing="0" cellpadding="5">';
+		print '<div style="text-align:center;margin-left:auto;margin-right:auto;padding-bottom:20px">';
+		print '<table style="border-width:0px">';
 		print '<tr>';
 	
 		if($asis eq 'NORM' || $asis eq ''){
-			print '<td><input type="RADIO" name="ASIS" value="NORM" CHECKED><b> Normal Change</b>';
+			print '<td><input type="RADIO" name="ASIS" value="NORM" CHECKED><strong> Normal Change</strong>';
 		}else{
-			print '<td><input type="RADIO" name="ASIS" value="NORM"><b> Normal Change</b>';
+			print '<td><input type="RADIO" name="ASIS" value="NORM"><strong> Normal Change</strong>';
 		}
 	
 		if($asis eq 'ASIS'){
-			print '<td><input type="RADIO" name="ASIS" value="ASIS" CHECKED><b> Observation is Approved for flight</b>';
+			print '<td><input type="RADIO" name="ASIS" value="ASIS" CHECKED><strong> Observation is Approved for flight</strong>';
 		}else{
-			print '<td><input type="RADIO" name="ASIS" value="ASIS"><b> Observation is Approved for flight</b>';
+			print '<td><input type="RADIO" name="ASIS" value="ASIS"><strong> Observation is Approved for flight</strong>';
 		}
 	
 		if($asis eq 'REMOVE'){
-			print '<td><input type="RADIO" name="ASIS" value="REMOVE" CHECKED> <b>ObsID no longer ready to go</b>';
+			print '<td><input type="RADIO" name="ASIS" value="REMOVE" CHECKED> <strong>ObsID no longer ready to go</strong>';
 		}else{
-			print '<td><input type="RADIO" name="ASIS" value="REMOVE"> <b>ObsID no longer ready to go</b>';
+			print '<td><input type="RADIO" name="ASIS" value="REMOVE"> <strong>ObsID no longer ready to go</strong>';
 		}
 
 		if($asis eq 'CLONE'){
-			print '<td><input type="RADIO" name="ASIS" value="CLONE" CHECKED><b> Split this ObsID</b>';
+			print '<td><input type="RADIO" name="ASIS" value="CLONE" CHECKED><strong> Split this ObsID</strong>';
 		}else{
-			print '<td><input type="RADIO" name="ASIS" value="CLONE"><b> Split this ObsID</b>';
+			print '<td><input type="RADIO" name="ASIS" value="CLONE"><strong> Split this ObsID</strong>';
 		}
 		
 	
@@ -4638,65 +4650,46 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print '<input type="hidden" name="email_address"'," value=\"$email_address\">";
 
 
-		print '<table border="0" cellspacing="0" cellpadding="5">';
+		print '<input type="hidden" name="USER"      value="',"$submitter",'">';
+		print '<input type="hidden" name="SUBMITTER" value="',"$submitter",'">';
+
+
+		print '<table style="border-width:0px">';
 		print '<tr>';
-
-			print '<input type="hidden" name="USER"      value="',"$submitter",'">';
-			print '<input type="hidden" name="SUBMITTER" value="',"$submitter",'">';
-			print '<input type="hidden" name="USER"      value="',"$submitter",'">';
-
 
 		print '<td><input type="submit" name="Check"  value="Submit">';
 		print '<td><input type="submit" name="Check"   value="     Update     ">';
 
 	print '</tr>';
 	print '</table>';
-	print '<br />';
-	print '</center>';
-	print '<br />';
-	print '</form>';
-	print '<p>';
+	print '</div>';
 
+
+	print "<p style='padding-bottom:20px'><strong>";
 	if($usint_on =~ /test/){
-		print "<b>";
 		print "If you have multiple entries to approve (as is), you can use: ";
 		print "<a href='$test_http/express_signoff.cgi?$obsid'>";
-		print "Express Approval Page";
-		print "</b>";
+		print "Express Approval Page</a>";
 	}elsif($usint_on =~ /yes/){
-		print "<b>";
 		print "If you have multiple entries to approve (as is), you can use: ";
 		print "<a href='$usint_http/express_signoff.cgi?$obsid'>";
-		print "Express Approval Page";
-		print "</b>";
+		print "Express Approval Page</a>";
 	}else{
-		print "<b>";
 		print "If you have multiple entries to approve (as is), you can use: ";
 		print "<a href='$obs_ss_http/express_signoff.cgi?$obsid'>";
-		print "Express Approval Page";
-		print "</b>";
+		print "Express Approval Page</a>";
 	}
+	print "</strong></p>";
 
 
-	print '<br /><br />';
 	print '<h3>';
 	print "<a href=\"$cdo_http/review_report/disp_report.cgi?";
 	print "$proposal_number";
 	print '">Link to peer review report and proposal</a>';
 	print '</h3>';
-	print '<br />';
 
-	print "Go to the <A HREF=\"$usint_http/search.html\">";
+	print "<p style='padding-top:20px'>Go to the <A HREF=\"$usint_http/search.html\">";
 	print 'Chandra User Observation Search Page</A><p>  ';
-
-#------------------------------------------------>
-#------- the end of the html page display ------->
-#------------------------------------------------>
-
-	print end_form();
-	print "</body>";
-	print "</html>";
-	exit();
 }
 
 ##################################################################################
@@ -5030,19 +5023,18 @@ sub chk_entry{
 	if($range_ind > 0){
 		if($header_chk == 0){
 			$header_chk++;
-			print "<h2><font color=red> Following values are out of range.</font> </h2>";
-			print '<br />';
+			print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range. </h2>";
 		}
 	
-		print '<table border= "1" cellpadding="4" >';
+		print '<table border=1>';
 		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 		foreach $ent (@out_range){
 			@atemp = split(/<->/,$ent);
 			$db_name = $atemp[0];
 			find_name();
 			print "<tr><th>$web_name ($atemp[0])</th>";
-			print "<td><font color=\"red\">$atemp[1]</font></td>";
-			print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
+			print "<td style='color:red'>$atemp[1]</td>";
+			print "<td style='color:green'>$atemp[2]</td></tr>";
 		}
 		print "</table>";
 	}
@@ -5066,25 +5058,24 @@ sub chk_entry{
 			$error_ind += $range_ind;
 			if($header_chk == 0){
 				$header_chk++;
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
 		
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 			foreach $ent (@out_range){
 				@atemp = split(/<->/,$ent);
 				$db_name = $atemp[0];
 				find_name();
 				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></td>";
-				print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
+				print "<td style='color:'red'>$atemp[1]</td>";
+				print "<td style='green'>$atemp[2]</td></tr>";
 			}
 	
 			if($count_ccd_on > 6){
 				print "<tr><th># of CCD On</th>";
-				print "<td><font color=\"red\">$count_ccd_on</font></td>";
-				print "<td><font color=\"green\">must be less than or equal to 6</font></td></tr>";
+				print "<td style='color:red'>$count_ccd_on</td>";
+				print "<td style='color:green'>must be less than or equal to 6</td></tr>";
 			}
 			print '</table>';
 		}
@@ -5139,13 +5130,12 @@ sub chk_entry{
 
         	if($ccd_warning == 1){
 			if($header_chk == 0){
-                		print "<h2><font color=red> Following values are out of range.</font> </h2>";
-                		print '<br />';
+                		print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
-                	print '<table border= "1" cellpadding="4" >';
+                	print '<table border=1>';
                 	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
                 	print "<tr><th>CCD Option Selection</th>";
-                	print "<td><font color=\"red\">";
+                	print "<td style='color:red'>";
 			
 			$chk = $o_cnt + $no_yes;
 			if($chk == 0){
@@ -5161,8 +5151,8 @@ sub chk_entry{
 					}
 				}
 			}
-			print "</font></td>";
-                	print "<td><font color=\"green\">$line</font></td></tr>";
+			print "</td>";
+                	print "<td style='color:green'>$line</td></tr>";
                 	print '</table>';
         	}
 	}
@@ -5191,22 +5181,21 @@ sub chk_entry{
 		if($range_ind > 0){			# write html page about bad news
 			$error_ind += $range_ind;
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
+				print "<h2 style='color:red'> Following values are out of range.</h2>";
 			}
 			$header_chk++;
-			print '<br />';
-			print '<b>Time Order: ',"$j",'</b><br />';
-			print '<br />';
+
+			print '<strong style="padding-top:10px; padding-bottom:20px">Time Order: ',"$j",'</strong>';
 		
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 				foreach $ent (@out_range){
 				@atemp = split(/<->/,$ent);
 				$db_name = $atemp[0];
 				find_name();
 				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></th>";
-				print "<td><font color=\"green\">$atemp[2]</font></th></tr>";
+				print "<td style='color:red'>$atemp[1]</th>";
+				print "<td style='color:green'>$atemp[2]</th></tr>";
 			}
 			print '</table>';
 		}
@@ -5234,22 +5223,22 @@ sub chk_entry{
 		if($range_ind > 0){			# write html page about bad news
 			$error_ind += $range_ind;
 			print '<br />';
-			print '<b>Roll Order: ',"$j",'</b><br />';
+			print '<strong>Roll Order: ',"$j",'</strong><br />';
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
+				print "<h2 style='color:red'> Following values are out of range.</h2>";
 				print '<br />';
 			}
 			$header_chk++;
 		
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 				foreach $ent (@out_range){
 				@atemp = split(/<->/,$ent);
 				$db_name = $atemp[0];
 				find_name();
 				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></th>";
-				print "<td><font color=\"green\">$atemp[2]</font></th></tr>";
+				print "<td style='color:red'>$atemp[1]</th>";
+				print "<td style='color:green'>$atemp[2]</th></tr>";
 			}
 			print '</table>';
 		}
@@ -5267,23 +5256,22 @@ sub chk_entry{
 		if($multiple_spectral_lines =~ /n/i || $spectra_max_count =~ /n/i || $spectra_max_count eq ''){
 
 			if($header_chk == 0){
-				 print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				 print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
 
 			$header_chk++;
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 			if($multiple_spectral_lines =~ /n/i){
 				print '<tr><th>Multiple Spectral Lines</th>';
-				print "<td><font color='red'>$multiple_spectral_lines</td>";
-				print '<td><font color="green">YES</td>';
+				print "<td style='color:red'>$multiple_spectral_lines</td>";
+				print '<td style="color:green">YES</td>';
 				print '</tr>';
 			}
 			if($spectra_max_count =~ /n/i || $spectra_max_count eq ''){
 				print '<tr><th>Spectral Max Count</th>';
-				print "<td><font color='red'>$spectra_max_count</td>";
-				print '<td><font color="green">1-1000000</td>';
+				print "<td style='color:red'>$spectra_max_count</td>";
+				print '<td style="color:green">1-1000000</td>';
 				print '</tr>';
 			}
 			print '<tr>';
@@ -5340,33 +5328,30 @@ sub chk_entry{
 #--- added 08/04/11
 #
                         if($chk_pha_range > 0){
-                                print "<h3><font color=fuchsia > Warning: PHA_RANGE > 13:</font> <br />";
+                                print "<h3 style='color:fuchsia;padding-bottom:10px'> Warning: PHA_RANGE > 13:<br />";
                                 print "In many configurations, an Energy Range above 13 keV will risk telemetry saturation.</h3>";
-                                print "<br />";
                         }
 
 
 			if($range_ind > 0){			# write html page about bad news
 				$error_ind += $range_ind;
 				if($header_chk == 0){
-					print "<h2><font color=red> Following values are out of range.</font> </h2>";
-					print '<br />';
+					print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 				}
 				$header_chk++;
 
-				print '<br />';
-				print '<b>Acis Window Entry: ',"$jj",'</b><br />';
+				print '<strong style="padding-top:10px;padding-bottom:10px">Acis Window Entry: ',"$jj",'</strong>';
 				$acis_order_head++;
 			
-				print '<table border= "1" cellpadding="4" >';
+				print '<table border=1>';
 				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
 				foreach $ent (@out_range){
 					@atemp = split(/<->/,$ent);
 					$db_name = $atemp[0];
 					find_name();
 					print "<tr><th>$web_name ($atemp[0])</th>";
-					print "<td><font color=\"red\">$atemp[1]</font></td>";
-					print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
+					print "<td style='color:red'>$atemp[1]</td>";
+					print "<td style='color:green'>$atemp[2]/td></tr>";
 				}
 				print '</table>';
 
@@ -5392,17 +5377,16 @@ sub chk_entry{
                                 }
                                 if($ocnt > $aciswin_no){
                                         if($header_chk == 0){
-                                                print "<h2><font color=red> Following values are out of range.</font> </h2>";
-                                                print '<br />';
+                                                print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
                                         }
                                         $header_chk++;
 
 					if($do_not_repeat != 1){
-                                        	print '<table border= "1" cellpadding="4" >';
+                                        	print '<table border=1>';
                                         	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
                                         	print "<tr><th>Energy Filter Lowest Energy</th>";
-                                        	print "<td><font color=\"red\">\>0.5 keV </td>";
-                                        	print "<td><font color=\"green\">Spatial Window param  must be filled";
+                                        	print "<td style='color:red'>0.5 keV </td>";
+                                        	print "<td style='color:green'>Spatial Window param  must be filled";
                                         	print "<br />(just click PREVIOUS PAGE)</td>";
                                         	print '</table>';
 						$do_not_repeat = 1;
@@ -5412,40 +5396,36 @@ sub chk_entry{
 
 			if(($lower_threshold[$j] < $eventfilter_lower) && ($lower_threshold[$j] ne '')){
 				if($header_chk == 0){
-					print "<h2><font color=red> Following values are out of range.</font> </h2>";
-					print '<br />';
+					print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 				}
 				$header_chk++;
 
 				if($acis_order_head == 0){
-					print '<br />';
-					print '<b>Acis Window Entry: ',"$jj",'</b><br />';
+					print '<strong style="padding-top:10px;padding-bottom:10px">Acis Window Entry: ',"$jj",'</strong>';
 					$acis_order_head++;
 				}
 
-				print '<table border= "1" cellpadding="4" >';
+				print '<table border=1>';
 				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-				print "<tr><th>ACIS Lowest Threshold</th><td><font color=\"red\">$lower_threshold[$j]</font></th>";
-				print "<td><font color=\"green\">lower_threshold must be larger than or equal to eventfilter_lower ($eventfilter_lower)</tr></tr>";
+				print "<tr><th>ACIS Lowest Threshold</th><td style='color:red'>$lower_threshold[$j]</th>";
+				print "<td style='olor:green'>lower_threshold must be larger than or equal to eventfilter_lower ($eventfilter_lower)</td></tr>";
 				print '</table>';
 			}
 			if($pha_range[$j] > $eventfilter_higher && $pha_range[$j] ne ''){
 				if($header_chk == 0){
-					print "<h2><font color=red> Following values are out of range.</font> </h2>";
-					print '<br />';
+					print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 				}
 				$header_chk++;
 
 				if($acis_order_head == 0){
-					print '<br />';
-					print '<b>Acis Window Entry: ',"$jj",'</b><br />';
+					print '<strong style="padding-top:10px;padding-bottom:10px">Acis Window Entry: ',"$jj",'</strong>';
 					$acis_order_head++;
 				}
 
-				print '<table border= "1" cellpadding="4" >';
+				print '<table border1>';
 				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-				print "<tr><th>ACIS Energy Range</th><td><font color=\"red\">$pha_range[$j]</font></th>";
-				print "<td><font color=\"green\">energy_range must be smaller than or equal to eventfilter_higher ($eventfilter_higher)</tr></tr>";
+				print "<tr><th>ACIS Energy Range</th><td style='color:red'>$pha_range[$j]</th>";
+				print "<td style='color:green'>energy_range must be smaller than or equal to eventfilter_higher ($eventfilter_higher)</td></tr>";
 				print '</table>';
 			}
 		}
@@ -5459,26 +5439,24 @@ sub chk_entry{
 
 		if($group_id){
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
 			$header_chk++;
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Monitor Flag</th><td><font color=\"red\">$monitor_flag</font></th>";
-			print "<td><font color=\"green\">A monitor_flag must be NULL or change group_id</th></tr>";
+			print "<tr><th>Monitor Flag</th><td style='color:red'>$monitor_flag</th>";
+			print "<td style='color:green'>A monitor_flag must be NULL or change group_id</td></tr>";
 			print '</table>';
 
 		}elsif($pre_min_lead eq '' || $pre_max_lead eq ''){
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
 			$header_chk++;
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Monitor Flag</th><td><font color=\"red\">$monitor_flag</font></th>";
-			print "<td><font color=\"green\">A monitor_flag must be NULL or add pre_min_lead and pre_max_lead</th></tr>";
+			print "<tr><th>Monitor Flag</th><td style='color:red'>$monitor_flag</th>";
+			print "<td style='color:green'>A monitor_flag must be NULL or add pre_min_lead and pre_max_lead</td></tr>";
 			print '</table>';
 		}
 	}
@@ -5487,26 +5465,24 @@ sub chk_entry{
 
 		if($monitor_flag =~ /Y/i){
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				print "<h2 style='color:red;padding-bottom:10px'>Following values are out of range.</h2>";
 			}
 			$header_chk++;
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Group ID</th><td><font color=\"red\">$group_id</font></th>";
-			print "<td><font color=\"green\">A group id must be NULL or change monitor_flag</th></tr>";
+			print "<tr><th>Group ID</th><td style='color:red'>$group_id</th>";
+			print "<td style='color:green'>A group id must be NULL or change monitor_flag</td></tr>";
 			print '</table>';
 
 		}elsif($pre_min_lead eq '' || $pre_max_lead eq ''){
 			if($header_chk == 0){
-				print "<h2><font color=red> Following values are out of range.</font> </h2>";
-				print '<br />';
+				print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
 			$header_chk++;
-			print '<table border= "1" cellpadding="4" >';
+			print '<table border=1>';
 			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Group ID</th><td><font color=\"red\">$group_id</font></th>";
-			print "<td><font color=\"green\">A group_id must be NULL or add pre_min_lead and pre_max_lead</th></tr>";
+			print "<tr><th>Group ID</th><td style='color:red'>$group_id</th>";
+			print "<td style='color:green'>A group_id must be NULL or add pre_min_lead and pre_max_lead</td></tr>";
 			print '</table>';
 		}
 	}
@@ -5514,28 +5490,26 @@ sub chk_entry{
 	if($pre_id == $obsid){
 
 		if($header_chk == 0){
-			print "<h2><font color=red> Following values are out of range.</font> </h2>";
-		 	print '<br />';
+			print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 		}
 		$header_chk++;
-		print '<table border= "1" cellpadding="4" >';
+		print '<table border=1>';
 		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-		print "<tr><th>Follows ObsID#</th><td><font color=\"red\">$pre_id</font></th>";
-		print "<td><font color=\"green\">pre_id must be different from the ObsID of this observation ($obsid) </th></tr>";
+		print "<tr><th>Follows ObsID#</th><td style='color=:red'>$pre_id</th>";
+		print "<td style='color:green'>pre_id must be different from the ObsID of this observation ($obsid) </td></tr>";
 		print '</table>';
 	}
 
 	if($pre_min_lead > $pre_max_lead){
 
 		if($header_chk == 0){
-			print "<h2><font color=red> Following values are out of range.</font> </h2>";
-			print  '<br />';
+			print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 		}
 		$header_chk++;
-		print '<table border= "1" cellpadding="4" >';
+		print '<table border=1>';
 		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-		print "<tr><th>Min Int</th><td><font color=\"red\">$pre_min_lead</font></th>";
-		print "<td><font color=\"green\">pre_min_lead must be smaller than pre_max_lead ($pre_max_lead)</th></tr>";
+		print "<tr><th>Min Int</th><td style='color:red'>$pre_min_lead</th>";
+		print "<td style='color:green'>pre_min_lead must be smaller than pre_max_lead ($pre_max_lead)</td></tr>";
 		print '</table>';
 	}
 	print '<br /><br />';
@@ -5588,7 +5562,7 @@ sub entry_test{
 			if(${$original} ne ${$uname}){
 				@{same.$name} = @{condition.$name};
 				shift @{condition.$name};
-				push(@{condition.$name},'<font color=red>Has CDO approved this change?</font>');
+				push(@{condition.$name},'<span style="color:red">Has CDO approved this change?</span>');
 				$rchk++;
 #
 #--- keep CDO warning
@@ -5786,11 +5760,11 @@ sub entry_test{
 					$warning_line = '';
 
 					if($hrc_si_mode eq '' || $hrc_si_mode =~ /NULL/){
-						$warning_line = 'The value for <b>HRC_SI_MODE</b> must be provided';
+						$warning_line = 'The value for <strong>HRC_SI_MODE</strong> must be provided';
 					}
 
 					@{same.$name} = @{condition.$name};
-					@{condition.$name} =("<font color=red>Has CDO approved this instrument change?(all ACIS params are NULLed) <br />$warning_line </font>");
+					@{condition.$name} =("<span style='color:red'>Has CDO approved this instrument change?(all ACIS params are NULLed) <br />$warning_line </span>");
 					$line = "$name<->${$uname}<->@{condition.$name}";
 					push(@out_range,$line);
 					@{condition.$name}= @{same.$name};
@@ -5818,7 +5792,7 @@ sub entry_test{
 				if($test_inst eq 'aciswin'){
 
 					if($spwindow  eq '' || $spwindow  =~ /NULL/){
-						$warning_line = 'The value for <b>ACIS Winodw Filter</b> must be provided<br />';
+						$warning_line = 'The value for <strong>ACIS Winodw Filter</strong> must be provided<br />';
 					}
 					$test_inst = '';
 				}else{
@@ -5828,13 +5802,13 @@ sub entry_test{
 						$ltest = lc($test);
 
 						if(${$ltest} eq '' || ${$ltest} =~ /NULL/){
-							$warning_line = "$warning_line"."The value for <b>$test</b> must be provided<br />";
+							$warning_line = "$warning_line"."The value for <strong>$test</strong> must be provided<br />";
 						}
 					}
 				}
 
 				@{same.$name}      = @{condition.$name};
-				@{condition.$name} = ("<font color=red>Has CDO approved this instrument change? (All HRC params are NULLed)<br />$warning_line</font>");
+				@{condition.$name} = ("<span style='color:red'>Has CDO approved this instrument change? (All HRC params are NULLed)<br />$warning_line</span>");
 				$line              = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
@@ -5859,7 +5833,7 @@ sub entry_test{
 
 			if($orig_grating ne $grating){
 				@{same.$name}      = @{condition.$name};
-				@{condition.$name} = ("<font color=red>CDO approval is required </font>");
+				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
 				$line              = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
@@ -5883,7 +5857,7 @@ sub entry_test{
 
 			if($orig_obj_flag ne $obj_flag){
 				@{same.$name}      = @{condition.$name};
-				@{condition.$name} = ("<font color=red>CDO approval is required </font>");
+				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
 				$line              = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
@@ -5938,7 +5912,7 @@ sub entry_test{
 				$wline = "$wline".'2) If you desire CDO approval please use the Helpdesk (link) and select ';
 				$wline = "$wline".'obscat changes.';
 
-				@{condition.$name} = ("<font color=red>$wline<\/font>");
+				@{condition.$name} = ("<span style='olor:red'>$wline<\/span>");
 
 				$line = "$name<->RA+DEC > 8 arcmin<->@{condition.$name}";
 				push(@out_range,$line);
@@ -5964,7 +5938,7 @@ sub entry_test{
 
 			if($orig_multitelescope ne $multitelescope){
 				@{same.$name}      = @{condition.$name};
-				@{condition.$name} = ("<font color=red>CDO approval is required </font>");
+				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
 				$line              = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name} = @{same.$name};
@@ -5989,7 +5963,7 @@ sub entry_test{
 
 			if($orig_observatories ne $observatories){
 				@{same.$name}      = @{condition.$name};
-				@{condition.$name} = ("<font color=red>CDO approval is required </font>");
+				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
 				$line              = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
@@ -6068,34 +6042,34 @@ sub restriction_check{
 			if($rest_ind > 0){
 				if($btemp[0] eq 'MUST'){
 					if($comp_val eq 'NULL'){
-						$add =  "$add"."A value for <i><b>$web_name1 ($chname)</i></b> is required.<br />";
+						$add =  "$add"."A value for <em><strong>$web_name1 ($chname)</strong></em> is required.<br />";
 						$sind++;
 					}
 				}elsif($btemp[0] eq 'NULL'){
 					if($comp_val ne 'NULL'){
 						$db_name = $name;
 						find_name();
-						$add = "$add"."A value for <i><b>$web_name1 ($chname)</i></b> must be ";
-						$add = "$add"."<font color=\"magenta\">NULL</font>,<br />";
-						$add = "$add"."or change the value for <i><b>$web_name ($name)</i></b><br />";
+						$add = "$add"."A value for <em><strong>$web_name1 ($chname)</strong></em> must be ";
+						$add = "$add"."<span style='color:magenta'>NULL</span>,<br />";
+						$add = "$add"."or change the value for <em><strong>$web_name ($name)</strong></em><br />";
 						$sind++;
 					}
 				}elsif($btemp[0] =~ /^N/i){
 					if($comp_val ne 'N' && $comp_val ne 'NULL' && $comp_val ne 'NONE' && $comp_val ne 'NO'){
 						$db_name = $name;
 						find_name();
-						$add = "$add"."A value for <i><b>$web_name1 ($chname)</i></b> must be ";
-						$add = "$add"."<font color=\"magenta\">NULL or NO</font>,<br />";
-						$add = "$add"."or change the value for <i><b>$web_name ($name)</i></b><br />";
+						$add = "$add"."A value for <em><strong>$web_name1 ($chname)</strong></em> must be ";
+						$add = "$add"."<span style='color:magenta'>NULL or NO</span>,<br />";
+						$add = "$add"."or change the value for <em><strong>$web_name ($name)</strong></em><br />";
 						$sind++;
 					}
 				}else{
 					if($comp_val ne $btemp[0] && $btemp[0] ne 'OPEN' && $btemp[0] ne ''){
 						$db_name = $name;
 						find_name();
-						$add = "$add"."A value for <i><b>$web_name1 ($chname)</i></b> must be ";
-						$add = "$add"."<font color=\"magenta\">$btemp[0]</font>,<br />";
-						$add = "$add"."or change the value for <i><b>$web_name ($name)</i></b><br />";
+						$add = "$add"."A value for <em><strong>$web_name1 ($chname)</strong></em> must be ";
+						$add = "$add"."<span style='color:magenta'>$btemp[0]</span>,<br />";
+						$add = "$add"."or change the value for <em><strong>$web_name ($name)</strong></em><br />";
 						$sind++;
 					}
 				}
@@ -6109,7 +6083,7 @@ sub restriction_check{
 					if($btemp[0] eq 'OPEN'){
 					}elsif($btemp[0] eq 'MUST'){
 						if($comp_val eq '' || $comp_val eq 'NONE' || $comp_val eq 'NULL'){
-							$add = "$add"."A value for <i><b>$web_name2 (${rest.$m.$name})</i></b> ";
+							$add = "$add"."A value for <em><strong>$web_name2 (${rest.$m.$name})</strong></em> ";
 							$add = "$add"."is required.<br />";
 						$sind++;
 						}
@@ -6117,14 +6091,14 @@ sub restriction_check{
 						if($comp_val ne 'N' && $comp_val ne 'NULL' &&  $comp_val ne 'NONE'){
 							$db_name = $name;
 							find_name();
-							$add = "$add"."A value for <i><b>$web_name1 ($chname)</i></b> must be ";
-							$add = "$add"."<font color=\"magenta\">NULL or NO</font>,<br />";
-							$add = "$add"."or change the value for <i><b>$web_name ($name)</i></b><br />";
+							$add = "$add"."A value for <em><strong>$web_name1 ($chname)</strong></em> must be ";
+							$add = "$add"."<span style='color:magenta'>NULL or NO</span>,<br />";
+							$add = "$add"."or change the value for <em><strong>$web_name ($name)</strong></em><br />";
 							$sind++;
 						}
 					}else{
-						$add = "$add"."A value for <i><b>$web_name2 (${rest.$m.$name})</i></b> ";
-						$add = "$add"."must be <font color=\"magenta\">$btemp[0]</font>,<br />";
+						$add = "$add"."A value for <em><strong>$web_name2 (${rest.$m.$name})</strong></em> ";
+						$add = "$add"."must be <span style='color:magenta'>$btemp[0]</span>,<br />";
 						$sind++;
 					}
 				}
@@ -6132,37 +6106,6 @@ sub restriction_check{
 		}
 	}
 }
-
-
-###################################################################
-### print_clone_page: print comment entry for clone case       ####
-###################################################################
-
-sub print_clone_page{
-
-	print '<table>';
-        print '<tr><td colspan=3>';
-        print '<b> Please write why you want to make a clone of this observation in the comment area.<br /> </td></tr>';
-        print '<tr>';
-        print '<th  valign=top> Comments:</th><td>';
-        print '<textarea name="COMMENTS" ROWS="3" COLS="60" WRAP=virtual>',"$comments",'</textarea>';
-        print '</td></tr>';
-        print '</table>';
-
-	print '<b>Username : </b><input type="text" name="USER" size="12" value="',"$submitter",'" >';
-	print '<input type="submit" name="Check"  value="Submit Clone">';
-	print '<input type="submit" name="Check"  value="Previous Page">';
-
-	print '<input type="HIDDEN" name="ASIS" value="CLONE">';
-	
-	foreach $name (@paramarray){
-		$lname = lc ($name);
-		$value = ${$lname};
-		print '<input type="HIDDEN" name="',"$name",'" value="',"$value",'">';
-	}
-}
-
-
 
 
 ###################################################################
@@ -6177,8 +6120,7 @@ sub read_range{
 #---- the conditions/restrictions are in the file "ocat_values
 #-------------------------------------------------------------
 
-####	open(FH,"$data_dir/ocat_values");
-	open(FH,"$data_dir/ocat_values_test");
+	open(FH,"$data_dir/ocat_values");
 	OUTER:
 	while(<FH>){
 		chomp $_;
@@ -6266,18 +6208,18 @@ sub read_user_name{
 
 sub user_warning {
 
-	print "<br /><br />";
+	print "<div style='padding-top:20px;padding-bottom:20px'>";
 	if($submitter eq ''){
-		print "<b>No user name is typed in. </b>";
+		print "<strong>No user name is typed in. </strong>";
 	}else{
-        	print "<b> The user: <font color=magenta>$submitter</font> is not in our database. </b>";
+        	print "<strong> The user: <span style='color:magenta'>$submitter</span> is not in our database. </strong>";
 	}
-	print "<b> Please go back and enter a correct one (use the Back button on the browser).</b>";
-	print "<br /><br />";
+	print "<strong> Please go back and enter a correct one (use the Back button on the browser).</strong>";
+	print "</div>";
 
-        print "</form>";
-        print "</body>";
-        print "</html>";
+#        print "</form>";
+#        print "</body>";
+#        print "</html>";
 }
 
 ###################################################################################
@@ -6564,19 +6506,18 @@ sub submit_entry{
 	        $wrong_si = 0;
         	if($si_mode =~ /blank/i || $si_mode =~ /NULL/i || $si_mode eq '' || $si_mode =~ /\s+/){
                 	$wrong_si = 9999;
-                	print "<b><font color='red'>";
+                	print "<p><strong style='color:red;padding-bottom:20px'>";
                 	print "Warning, an obsid, may not be approved without an SI_mode.";
                 	print 'Please contact "acisdude" or and HRC contact as appropriate';
                 	print "and request they enter an SI-mode befor proceding.";
-                	print "</b></font>";
-                	print "<br /><br />";
+                	print "</strong></p>";
         	}else{
-    			print "<b>You have checked that this obsid ($obsid) is ready for flight.";
-			print "  Any parameter changes you made will not be submitted with this request.</b><p>";
+    			print "<p><strong>You have checked that this obsid ($obsid) is ready for flight.";
+			print "  Any parameter changes you made will not be submitted with this request.</strong></p>";
 		}
     	}elsif($asis eq "REMOVE") {
-        	print "<b>You have requested this obsid ($obsid) to be removed from the \"ready to go\" list.";
- 		print " Any parameter changes you made will not be submitted with this request.</b><p>";
+        	print "<p><strong>You have requested this obsid ($obsid) to be removed from the \"ready to go\" list.";
+ 		print " Any parameter changes you made will not be submitted with this request.</strong></p>";
     	}
 
     	if($asis eq "ASIS"){
@@ -6597,8 +6538,6 @@ sub submit_entry{
 		}
 	}
 	print "<input type=\"SUBMIT\"  name = \"Check\"  value=\"PREVIOUS PAGE\">";
-    	print "</form></body></html>";
-    	exit(0);
    }
 
 #--------------------------------------------#
@@ -6771,19 +6710,18 @@ sub submit_entry{
 #--------- print html page for clone case
 #----------------------------------------
 
-    	print "<html>";
-    	print "<head><title>Target info for obsid : $obsid</title></head>";
-    	print "<body bgcolor=\"#FFFFFF\">";
+#    	print "<html>";
+#    	print "<head><title>Target info for obsid : $obsid</title></head>";
+#    	print "<body bgcolor=\"#FFFFFF\">";
     	print "Username = $submitter<p>";
-    	print "<b>You have submitted a a request for splitting obsid $obsid.  No parameter changes will";
-	print "  be submitted with this request.</b><p>";
+    	print "<p><strong>You have submitted a a request for splitting obsid $obsid.  No parameter changes will";
+	print "  be submitted with this request.</strong></p>";
 
 	if($comments eq $orig_comments){
-		print '<b><font color=red>You need to explain why you need to split this observation.';
-		print 'Plese go back and add the explanation in the comment area</font></b>';
-		print '<br />';
+		print '<p style="padding-bottom:10px"><strong style="color:red">You need to explain why you need to split this observation.';
+		print 'Plese go back and add the explanation in the comment area</strong></p>';
 	}else{
-		print '<table><tr><th>Reasons for cloning:</th><td> ';
+		print '<table style="border-width:0px"><tr><th>Reasons for cloning:</th><td> ';
 		print "$comments",'</td></tr></table>';
 	}
 	
@@ -6800,9 +6738,9 @@ sub submit_entry{
 		print "<input type=\"SUBMIT\"  name = \"Check\"  value=\"FINALIZE\">";
 	}
 	print "<input type=\"SUBMIT\"  name = \"Check\"  value=\"PREVIOUS PAGE\">";
-	print "</form></body></html>";
-	exit(0);
    }
+
+    if ($asis ne "ASIS" && $asis ne "REMOVE" && $asis ne "CLONE"){
 
 #------------------------------------------#
 #------------------------------------------#
@@ -6842,12 +6780,11 @@ sub submit_entry{
 #----- print the verification webpage
 #------------------------------------
 
-	print "<html>";
-	print "<head><title>Target info for obsid : $obsid</title></head>";
-	print "<body bgcolor=\"#FFFFFF\">\n";
+#	print "<html>";
+#	print "<head><title>Target info for obsid : $obsid</title></head>";
+#	print "<body bgcolor=\"#FFFFFF\">\n";
 
-	print "<b>You have submitted the following values for obsid $obsid: </b>";
-	print '<br />';
+	print "<p style='padding-bottom:10'><strong>You have submitted the following values for obsid $obsid:</strong> </p>";
 
 	if($error_ind == 0 || $usint_on =~ /yes/){
 		print "<input type=\"SUBMIT\"  name = \"Check\"  value=\"FINALIZE\">";
@@ -6953,7 +6890,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:#FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$k++; 		#telling asicwin has modified param!
 							}
 						}
@@ -7000,7 +6937,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:#FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$m++;		#telling general change is ON
 							}
 						}
@@ -7047,7 +6984,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$m++;		# telling general change is ON
 							}
 						}
@@ -7110,7 +7047,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:#FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$k++;		#telling aciswin param changes
 							}
 						}
@@ -7121,7 +7058,7 @@ sub submit_entry{
 #---------------------
 
 				}elsif($name =~ /TIME_ORDR/){
-					print "<font color=\"\#FF0000\">$name changed from $old_value to $new_value</font><br />";
+					print "<span style='color:#FF0000'>$name changed from $old_value to $new_value</span><br />";
 
 					for($j = 1; $j <= $time_ordr; $j++){
 					print '<spacer type=horizontal size=5>';
@@ -7157,7 +7094,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:#FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$m++; 			# telling general change is ON
 							}
 						}
@@ -7166,7 +7103,7 @@ sub submit_entry{
 #----- roll order case
 #---------------------
 				}elsif($name =~ /ROLL_ORDR/){
-					print "<font color=\"\#FF0000\">$name changed from $old_value to $new_value</font><br />";
+					print "<span style='color:#FF0000'>$name changed from $old_value to $new_value</span><br />";
 
 					for($j = 1; $j <= $roll_ordr; $j++){
 					print '<spacer type=horizontal size=5>';
@@ -7183,7 +7120,7 @@ sub submit_entry{
 								print "$tent unchanged, set to $new_value<br />";
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<font color=\"\#FF0000\">$tent changed from $old_value to $new_value</font><br />";
+								print "<span style='color:#FF0000'>$tent changed from $old_value to $new_value</span><br />";
 								$m++;			# telling general change is ON
 							}
 						}
@@ -7195,9 +7132,9 @@ sub submit_entry{
 					if((($old_value =~ /OPT/) && ($new_value =~ /Y/))
 						|| (($old_value =~ /Y/) && ($new_value =~ /OPT/))){
 						
-						print "<font color=\"lime\">$name changed from $old_value to $new_value</font><br />";
+						print "<span style='color:lime'>$name changed from $old_value to $new_value</span><br />";
 					}else{
-						print "<font color=\"\#FF0000\">$name changed from $old_value to $new_value</font><br />";
+						print "<span style='color:#FF0000'>$name changed from $old_value to $new_value</span><br />";
 					}
 				}
 
@@ -7230,7 +7167,7 @@ sub submit_entry{
 	$torig_remarks =~ s/\s+//g;
 	
 	if($tremarks ne $torig_remarks){
-		print "<font color=\"\#FF0000\">REMARKS changed from<br /> $orig_remarks<br /> to<br /> $remarks</font><br /><br />";
+		print "<span style='color:#FF0000'>REMARKS changed from<br /> $orig_remarks<br /> to<br /> $remarks</sapn><br /><br />";
 		$m++;			# remark is a part of general change
 		$cnt_modified++;
 	} else {
@@ -7245,17 +7182,17 @@ sub submit_entry{
 	if ($tcomments ne $torig_comments){
 		$cnt_modified++;
 
-		print "<font color=\"\#FF0000\">COMMENTS changed from<br /> $orig_comments";
+		print "<span style='color:#FF0000'>COMMENTS changed from<br /> $orig_comments";
 		print"<br />to<br />";
-		print "$comments<br /></font>";
+		print "$comments<br /></span>";
 	} else {
 		print "COMMENTS unchanged, set to $comments<br />";
 	}
 
 	print "<br />";
 	if($wrong_si == 0){
-		print "<b>If these values are correct, click the FINALIZE button.<br />";
-		print "Otherwise, use the previous page button to edit.</b><br />";
+		print "<strong>If these values are correct, click the FINALIZE button.<br />";
+		print "Otherwise, use the previous page button to edit.</strong><br />";
 	}
 	$j = 0;
 
@@ -7319,7 +7256,6 @@ sub submit_entry{
 		}
 	}
 	print "<input type=\"SUBMIT\" name =\"Check\"  value=\"PREVIOUS PAGE\">";
-	print "</form></body></html>";
 
 #---------------------------------
 #--------------- print email form
@@ -7711,7 +7647,7 @@ sub submit_entry{
 	print ARNOLDFILE "$obsid\t$submitter$date\t$chips\t$exp_mode-$bep_pack\t$arnoldarray[0]\t$arnoldarray[1]\t$arnoldarray[2]\t$arnoldarray[3]\t$arnoldarray[4]\t$arnoldarray[5]\n";
 	print ARNOLDFILE "\t\t\t\t\t\tSpatial window, see update page\n" if ($spw);
 	close (ARNOLDFILE);
-	
+    }						#------ end of General case
 }
 
 #########################################################################
@@ -7905,8 +7841,8 @@ sub oredit{
 #----  if it hasn't died yet, then close nicely
 #----------------------------------------------
 
-        print "<b>Thank you.  Your request has been submitted.";
-        print "Approvals occur immediately, changes may take 48 hours. </b><p>";
+        print "<p><strong>Thank you.  Your request has been submitted.";
+        print "Approvals occur immediately, changes may take 48 hours. </strong></p>";
 
 
 	if($usint_on =~ /test/){
@@ -7915,8 +7851,8 @@ sub oredit{
 		print "<A HREF=\"https://icxc.harvard.edu/cgi-bin/target_search/search.html\">Go Back to Search  Page</a>";
 	}
 
-	print "</body>";
-	print "</html>";
+#	print "</body>";
+#	print "</html>";
 }
 
 #####################################################################################
@@ -8357,18 +8293,16 @@ sub send_mail_to_usint{
 #----  say thank you to submit email to USINT.
 #
 
-	print "<br /><br />";
-        print "<b>Thank you.  Your request has been submitted.<br /><br />";
-	print "If you have any quesitons, please contact: <a href=\"mailto:$usint_mail\">$usint_mail</a>.</b>";
-	print "<br /><br />";
+        print "<p style='padding-top:20px;padding-bottom:20px'><strong>Thank you.  Your request has been submitted.<br /><br />";
+	print "If you have any quesitons, please contact: <a href=\"mailto:$usint_mail\">$usint_mail</a>.</strong></p>";
 
         if($usint_on =~ /test/){
                 print "<A HREF=\"$obs_ss_http/search.html\">Go Back to the Search Page</A>";
         }else{
                 print "<A HREF=\"$chandra_http\">Chandra Observatory Page</a>";
         }
-        print "</body>";
-        print "</html>";
+#        print "</body>";
+#        print "</html>";
 }
 
 #####################################################################################
@@ -8416,9 +8350,9 @@ sub mail_out_to_usint{
 	find_usint();
 	
 	if($usint_on =~ /test/){
-		system("cat $temp_file | mailx -s\"Subject: TEST!! USINT assist requested (to $usint_mail)\n\" -rcus\@head.cfa.harvard.edu $test_email");
+		system("cat $temp_file | mailx -s\"Subject: TEST!! USINT assist requested (to $usint_mail)\n\"  $test_email");
 	}else{
-		system("cat $temp_file | mailx -s\"Subject: USINT assist requested\n\" -rcus\@head.cfa.harvard.edu $usint_mail");
+		system("cat $temp_file | mailx -s\"Subject: USINT assist requested\n\"  $usint_mail");
 	}
 
 	system("rm $temp_file");
@@ -8523,9 +8457,9 @@ sub send_email_to_mp{
 	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
-		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\" -rcus\@head.cfa.harvard.edu $test_email");
+		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\" $test_email");
 	}else{
-		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\" -rcus\@head.cfa.harvard.edu $mp_email cus\@head.cfa.harvard.edu");
+		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
 	}
 
 	system("rm $temp_file");

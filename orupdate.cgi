@@ -74,6 +74,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # T. Isobe Oct 01, 2012									#
 #    sccs is replaced by flock								#
 #											#
+# T. Isobe Nov 06, 2012									#
+#    html 5 conformed									#
+#											#
 #########################################################################################
 
 
@@ -277,9 +280,17 @@ $pass_cookie = cookie(-name    =>'password',
 #---- new cookies worte in
 #-------------------------
 
-#print "Content-type: text/html\n\n";	# start html setting
-print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html');
-print start_html(-bgcolor=>"white", -title=>'Target Parameter Update Status Form'); 
+print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html; charset=utf-8');
+
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>Target Parameter Update Status Form</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
 
 
 #
@@ -287,7 +298,7 @@ print start_html(-bgcolor=>"white", -title=>'Target Parameter Update Status Form
 #
 
 print <<ENDOFHTML;
-<script language="JavaScript">
+<script>
 <!-- hide me
 
 	var text = '<p style="text-align:justify; padding-right:4em"><b>Changes are separated into <em>General</em> ' 
@@ -334,7 +345,10 @@ function WindowOpen(){
 
 ENDOFHTML
 
-print "<body bgcolor=\"#FFFFFF\">";
+print "</head>";
+
+print "<body style='color:#000000;background-color:#FFFFE0'>";
+
 
 #-------------------
 #--- starting a form
@@ -359,8 +373,8 @@ if($usint_on =~ /yes/){
 
 if($pass eq '' || $pass eq 'no'){
 	if(($pass eq 'no') && ($ac_user  ne ''|| $pass_word ne '')){
-		print "<font color='red'>Name and/or Password are not valid.";
-		print " Please try again.</font><br />";
+		print "<p style='color:red;padding-bottom:20px'>Name and/or Password are not valid.";
+		print " Please try again.</p>";
 	}
 	password_check();	# this one create password input page
 
@@ -404,7 +418,7 @@ if($pass eq '' || $pass eq 'no'){
 	orupdate_main();		# this sub creates and displays a html page
 
 }else{
-	print 'Something wrong. Exit<br />';
+	print '<p>Something wrong. Exiting.</p>';
 	exit(1);
 }
 
@@ -419,7 +433,7 @@ print end_html();
 
 sub password_check{
 	print '<h3>Please type your user name and password</h3>';
-	print '<table><tr><th>Name</th><td>';
+	print '<table style="border-width:0px"><tr><th>Name</th><td>';
 	print textfield(-name=>'ac_user', -value=>'', -size=>20);
 	print '</td></tr><tr><th>Password</th><td>';
 	print password_field( -name=>'password', -value=>'', -size=>20);
@@ -594,9 +608,9 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 #----- a couple of hidden parameters to pass
 #-------------------------------------------
 
-#	print start_form();
-	print hidden(-name=>'ac_user', -vaule=>"$ac_user");
+	print hidden(-name=>'ac_user',  -value=>"$ac_user");
 	print hidden(-name=>'password', -value=>"$password");
+
 
 #
 #--- read CDO warning list--- only large coordinate shift case recorded
@@ -630,7 +644,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 	print '<p><a href="#" onClick="WindowOpen(text);return false;"><strong>More Explanation.</strong></a></p>';
 
 
-	print "<p style='text-align:justify; padding-right:4em'><b>";
+	print "<p style='text-align:justify; padding-right:4em;padding-bottom:20px'><strong>";
 	print "If you need to remove an accidental submission, please go to ";
 
 	if($usint_on =~ /test/i){
@@ -638,21 +652,13 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 	}else{
 		print "<a href=\"$usint_http/rm_submission.cgi/\">Remove An Accidental Submission Page</a>.";
 	}
-
-#	print '<h2 style="color:red">New!</h2>';
-#	print '<ul style="text-align:justify;margin-left:2em; margin-right:7em;">';
-#	print '<li style="padding-bottom:1em">If you are a submitter, type your ID in the  ';
-#	print '"Your User ID" box, and click "Submit" (or Regrouping button). It will percolate up all your ';
-#	print 'obsids to the top of the list.</li></ul>';
-
+	print '</strong></p>';
 		
-	print '<br /><br />';
 ###	print " If the row is highlighted with yellow, it is a user input</b><p>";
-	print '</b></p>';
 
-	print '<table border=0>';
+	print '<table style="border-width:0px">';
 	print '<tr>';
-	print '<td width=40%  align=left>';
+	print '<td style="text-align:left;width:40%">';
 	if($usint_on =~ /no/){
 		print "<strong><a href=\"$obs_ss_http/index.html\">Verification Page</a></strong> ";
 	}else{
@@ -660,7 +666,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 		print "<strong><a href=\"$main_http\">Go To Chandra Uplink Support Organizational Page</a></strong>";
 	}
 	print '</td>';
-	print '<td width=40% align=right>';
+	print '<td style="text-align:right;width:40%">';
 
 #-------------------------------------------------------------------------------------------------------------
 #---- a button to rearrnage the entries. one is by obsid, and the other is by (reversed) submitted time order
@@ -683,7 +689,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 
 	print hidden(-name=>"reorder", -value=>"$reorder");
 	print hidden(-name=>"userid", -value=>"$userid");
-	print '<br />';
+	print '<div style="padding-bottom:20px"></div>';
 
 #-----------------------------------------------------------------------------
 #--- limit the data reading to the only part which has not been signed off yet
@@ -696,23 +702,38 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 	system("rm $temp_dir/ztemp");
 	close(FILE);
 
-	if($usint_on =~ /test/){
+#	if($usint_on =~ /test/){
+#
+#		print "<form name=\"update\" method=\"post\" action=\"$test_http/orupdate_test.cgi\">";
+#
+#	}elsif($usint_on =~ /no/){
+#
+#		print "<form name=\"update\" method=\"post\" action=\"$obs_ss_http/orupdate.cgi\">";
+#
+#	}else{
+#		print "<form name=\"update\" method=\"post\" action=\"$usint_http/orupdate.cgi\">";
+#
+#	}
 
-		print "<form name=\"update\" method=\"post\" action=\"$test_http/orupdate_test.cgi\">";
-
-	}elsif($usint_on =~ /no/){
-
-		print "<form name=\"update\" method=\"post\" action=\"$obs_ss_http/orupdate.cgi\">";
-
-	}else{
-		print "<form name=\"update\" method=\"post\" action=\"$usint_http/orupdate.cgi\">";
-
-	}
-
-	print "<table border=\"1\" cellpadding=\"5\">";
+	print "<table border=1>";
 	print "<tr><th>OBSID.revision</th><th>general obscat edits by</th>";
 	print "<th>ACIS obscat edits by</th><th>SI MODE edits by</th><th>Verified by";
 	print "</th><th>&nbsp;</th><th>Note</th></tr>";
+
+#
+#---- save "hidden" value pass till the end of the table
+#
+	@save_dname     = ();
+	@save_lnmae     = ();
+	@save_lval      = ();
+	@save_too_obsid = ();
+	@save_too_val   = ();
+	@save_ddt_obsid = ();
+	@save_ddt_val   = ();
+	@pass_name_save = ();
+	@pass_name_val  = ();
+	@ap_cnt_save	= ();
+	@ap_cnt_val	= ();
 
 #-----------------------------------------------------------------------------------------
 #--- keep the record of revision # of each obsid; one is the highest rev # submitted, and 
@@ -792,8 +813,11 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 		$chklist    = 'chk'."$ent";
 		${$chklist} = $ychk;
 
-		print hidden(-name=>"$dname", -value=>"${$dname}", -override=>"${$dname}");
-		print hidden(-name=>"$lname", -value=>"$ychk", -override=>"$ychk");
+#		print hidden(-name=>"$dname", -value=>"${$dname}", -override=>"${$dname}");
+#		print hidden(-name=>"$lname", -value=>"$ychk", -override=>"$ychk");
+		push(@save_dname, $dname);
+		push(@save_lnmae, $lname);
+		push(@save_lval,  $ychk);
 
 #-------------------------------------
 #--- assign color code for each obsid
@@ -919,15 +943,23 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 
 			if($too_chk > 0){
 				$name = "too_status.$obsid";
-				print hidden(-name=>"$name", -override=>'Y', -value=>'Y');
+#				print hidden(-name=>"$name", -override=>'Y', -value=>'Y');
+				push(@save_too_obsid, $name);
+				push(@save_too_val,   'Y');
 			}elsif($ddt_chk > 0){
 				$name = "ddt_status.$obsid";
-				print hidden(-name=>"$name", -override=>'Y', -value=>'Y');
+#				print hidden(-name=>"$name", -override=>'Y', -value=>'Y');
+				push(@save_ddt_obsid, $name);
+				push(@save_ddt_val,   'Y');
 			}else{
 				$name = "too_status.$obsid";
-				print hidden(-name=>"$name", -override=>'F', -value=>'F');
 				$name = "ddt_status.$obsid";
-				print hidden(-name=>"$name", -override=>'F', -value=>'F');
+#				print hidden(-name=>"$name", -override=>'F', -value=>'F');
+#				print hidden(-name=>"$name", -override=>'F', -value=>'F');
+				push(@save_too_obsid, $name);
+				push(@save_too_val,   'F');
+				push(@save_ddt_obsid, $name);
+				push(@save_ddt_val,   'F');
 			}
 
 #--------------------
@@ -942,7 +974,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 				}
 			}
 			if($usint_user eq 'no'){
-###				print '<tr bgcolor=yellow>';
+###				print '<tr style="background-color:yellow">';
 				print '<tr>';
 			}else{
 				print "<tr>";
@@ -974,7 +1006,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 #--------------------
 			if ($general_status =~/NULL/){
 
-				print "<td align=center>$general_status</td>";
+				print "<td style='text-align:center'>$general_status</td>";
 
 			} elsif ($general_status =~/NA/){
 
@@ -983,46 +1015,46 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 #----------------------------------------------------------------------------
 
 				if($sp_user eq 'yes'){
-					print "<td align=center><input type=\"text\" name=\"general_status#$obsrev";
+					print "<td style='text-align:center'><input type=\"text\" name=\"general_status#$obsrev";
 					print "\" size=\"12\"></td>";
 					push(@pass_list, "general_status#$obsrev");
 				}else{
-					print "<td align=center>---</td>";
+					print "<td style='text-align:center'>---</td>";
 				}
 			} else {
-				print "<td align=center>$general_status</td>";
+				print "<td style='text-align:center'>$general_status</td>";
 			}
 #------------------
 #----- acis obscat
 #------------------
 			if ($acis_status =~/NULL/){
-				print "<td align=center>$acis_status</td>";
+				print "<td style='text-align:center'>$acis_status</td>";
 			} elsif ($acis_status =~/NA/){
 				if($sp_user eq 'yes'){
-					print "<td align=center><input type=\"text\" name=\"acis_status#$obsrev";
+					print "<td style='text-align:center'><input type=\"text\" name=\"acis_status#$obsrev";
 					print "\" size=\"12\"></td>";
 					push(@pass_list, "acis_status#$obsrev");
 				}else{
-					print "<td align=center>---</td>";
+					print "<td style='text-align:center'>---</td>";
 				}
 			} else {
-				print "<td align=center>$acis_status</td>";
+				print "<td style='text-align:center'>$acis_status</td>";
 			}
 #-------------
 #----- si mode
 #-------------
 			if ($si_mode_status =~/NULL/){
-				print "<td align=center>$si_mode_status</td>";
+				print "<td style='text-align:center'>$si_mode_status</td>";
 			} elsif ($si_mode_status =~/NA/){
 				if($sp_user eq 'yes'){
-					print "<td align=center><input type=\"text\" name=\"si_mode_status#$obsrev";
+					print "<td style='text-align:center'><input type=\"text\" name=\"si_mode_status#$obsrev";
 					print "\" size=\"12\"></td>";
 					push(@pass_list, "si_mode_status#$obsrev");
 				}else{
-						print "<td align=center>---</td>";
+						print "<td style='text-align:center'>---</td>";
 				}
 			} else {
-				print "<td align=center>$si_mode_status</td>";
+				print "<td style='text-align:center'>$si_mode_status</td>";
 			}
 
 #------------------
@@ -1032,23 +1064,23 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 			if ($dutysci_status =~ /NA/){
 				if($sign_off eq 'yes'){
 					if($sp_user eq 'yes'){
-						print "<td align=center><input type=\"text\" name=\"dutysci_status#$obsrev";
+						print "<td style='text-align:center'><input type=\"text\" name=\"dutysci_status#$obsrev";
 						print "\" size=\"12\"></td><td><input type=\"submit\" value=\"Update\">";
 						push(@pass_list, "dutysci_status#$obsrev");
 					}elsif($general_status ne 'NA' && $acis_status ne 'NA' && $si_mode_status ne 'NA'){
-						print "<td align=center><input type=\"text\" name=\"dutysci_status#$obsrev";
+						print "<td style='text-align:center'><input type=\"text\" name=\"dutysci_status#$obsrev";
 						print "\" size=\"12\"></td><td><input type=\"submit\" value=\"Update\">";
 						push(@pass_list, "dutysci_status#$obsrev");
 					}else{
-						print "<td align=center><font color='red'>Not Ready for Sign Off</font></td>";
+						print "<td style='text-align:center'><font color='red'>Not Ready for Sign Off</font></td>";
 					}
 				}else{
-					print "<td align=center><font color='red'>No Access</font></td>";
-					print "<td align=center>&#160</td>";
+					print "<td style='text-align:center'><font color='red'>No Access</font></td>";
+					print "<td style='text-align:center'>&#160</td>";
 				}
 			} else {
-				print "<td align=center><font color=\"#005C00\">$dutysci_status</font></td>";
-				print "<td align=center>---</td>";
+				print "<td style='text-align:center'><font color=\"#005C00\">$dutysci_status</font></td>";
+				print "<td style='text-align:center'>---</td>";
 			}
 
 #---------------------------------------------------------
@@ -1088,14 +1120,14 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 
 			$bchk = 0;
 			if($new_comment == 1 && $large_coord == 0){
-				print "<td><font color=red>New Comment</font>";
+				print "<td><span style='color:red'>New Comment</span>";
 				$bchk++;
 			}elsif($new_comment == 1 && $large_coord == 1){
-				print '<td><font color=red>New Comment</font><br/>';
-				print '<font color=blue>Large Coordinates Shift</font>';
+				print '<td><span style="color:red">New Comment</span><br/>';
+				print '<span style="color:blue">Large Coordinates Shift</span>';
 				$bchk++;
 			}elsif($new_comment == 0 && $large_coord == 1){
-				print '<td><font color=blue>Large<br/> Coordinates <br/>Shift</font>';
+				print '<td><span style="color:blue">Large<br/> Coordinates <br/>Shift</span>';
 				$bchk++;
 			}
 
@@ -1105,9 +1137,9 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 
 			if(${$sname} > 1){
 				if($bchk > 0){
-					print '<br><font color=#D2691E>Multiple Revisions Open</font>';
+					print '<br><span style="color:#D2691E">Multiple Revisions Open</span>';
 				}else{
-					print '<td><font color=#D2691E>Multiple Revisions Open</font>';
+					print '<td><span style="color:#D2691E">Multiple Revisions Open</span>';
 					$bchk++;
 				}
 			}
@@ -1118,50 +1150,21 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 
 			if(${$hirev}  > 0){ 
 				if($bchk > 0){
-					print "<br><font color=#4B0082>Higher Rev # (${$lrev}) Was Already Signed Off</font>";
+					print "<br><span style='color:#4B0082'>Higher Rev # (${$lrev}) Was Already Signed Off</span>";
 				}else{
-					print "<td><font color=#4B0082>Higher Rev # (${$lrev}) Was Already Signed Off</font>";
+					print "<td><span style='color:#4B0082'>Higher Rev # (${$lrev}) Was Already Signed Off</span>";
 					$bchk++;
 				}
 			}
 		}
 
 		if($bchk == 0){
-			print '<td>&#160';
+			print '<td>&#160;';
 		}
 
 		print "</td>";
 		print "</tr>";
 
-#-----------------------------------------------------------------
-#----- the case duty scientist already signed off the observation	#--THIS PART IS NOW OBSOLATE
-#-----------------------------------------------------------------
-
-#			@dudate= split (" ", $dutysci_status);
-#			$newdate = @dudate[1];
-#			if ($today =~/$newdate/){
-#				$usint_user = 'no';
-#				OUTER:
-#				foreach $comp (@special_user){
-#					if($user eq $comp){
-#						$usint_user = 'yes';
-#						last OUTER;
-#					}
-#				}
-#				if($usint_user eq 'no'){
-#					print '<tr bgcolor=yellow>';
-#	    				print "<td><a href=\"$obs_ss_http/";
-#				}else{
-#					print "<tr>";
-#	    				print "<td><a href=\"$usint_http/";
-#				}
-#
-#				print "chkupdata.cgi\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime";
-#				print "<br />$user</td><td align=center>$general_status</td><td align=center>$acis_status</td>";
-#				print "<td align=center>$si_mode_status</td><td align=center><font color=\"#005C00\">";
-#				print "$dutysci_status</font></td><td>&nbsp;</td></tr>";
-#			}
-#    		}
 	}
 
 #-------------------------------
@@ -1170,10 +1173,14 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 	$ap_cnt = 0;
 	foreach $ent (@pass_list){
 		$name = 'pass_name.'."$ap_cnt";
-		print hidden(-name=>"$name", -value=>"$ent", -override=>"$ent");
+#		print hidden(-name=>"$name", -value=>"$ent", -override=>"$ent");
+		push(@pass_name_save, $name);
+		push(@pass_name_val,  $ent);
 		$ap_cnt++;
 	}
-	print hidden(-name=>'ap_cnt', -value=>"$ap_cnt", override=>"$ap_cnt");
+#	print hidden(-name=>'ap_cnt', -value=>"$ap_cnt", override=>"$ap_cnt");
+	push(@ap_cnt_save, 'ap_cnt');
+	push(@ap_cnt_val,  $ap_cnt);
 	
 #------------------------------------------------------------------
 #--- adding already signed off entries from the past couple of days
@@ -1259,12 +1266,46 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 		print "<tr>";
 		print "<td><a href=\"$usint_http/";
 		print "chkupdata.cgi\?$btemp[0]\">$btemp[0]</a><br />$btemp[5]<br />$ftime";
-		print "<br />$btemp[6]</td><td align=center>$btemp[1]</td><td align=center>$btemp[2]</td>";
-		print "<td align=center>$btemp[3]</td><td align=center><font color=\"#005C00\">";
-		print "$btemp[4]</font></td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+		print "<br />$btemp[6]</td><td style='text-align:center'>$btemp[1]</td><td style='text-align:center'>$btemp[2]</td>";
+		print "<td style='text-align:center'>$btemp[3]</td><td style='text-align:center;color;#005C00'>";
+		print "$btemp[4]</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
 	}
 
-	print "</table></form></body></html>";
+	print "</table>";
+
+#
+#--- now pass the hidden values to the next round
+#
+	foreach $dname (@save_dname){
+		print hidden(-name=>"$dname", -value=>"${$dname}", -override=>"${$dname}");
+	}
+
+	$j = 0;
+	foreach $name (@save_too_obsid){
+		$val = $save_too_val[$j];
+		print hidden(-name=>"$name", -override=>"$val", -value=>"$val");
+		$j++;
+	}
+
+	$j = 0;
+	foreach $name (@save_ddt_obsid){
+		$val = $save_ddt_val[$j];
+		print hidden(-name=>"$name", -override=>"$val", -value=>"$val");
+		$j++;
+	}
+
+	$j = 0;
+	foreach $name (@pass_name_save){
+		$ent = $pass_name_val[$j];
+		print hidden(-name=>"$name", -value=>"$ent", -override=>"$ent");
+		$j++;
+	}
+
+	foreach $ap_cnt (@ap_cnt_val){
+		print hidden(-name=>'ap_cnt', -value=>"$ap_cnt", override=>"$ap_cnt");
+	}
+
+
 }  
 
 ###################################################################################
@@ -1943,7 +1984,7 @@ sub update_info {
 
 	        OUTER:
 	        while($lpass == 0){
-	                open(my $update, '>', $efile) or die "Locked";
+	                open(my $update, '>>', $efile) or die "Locked";
 	                if($@){
 #
 #--- wait 2 cpu seconds before attempt to check in another round

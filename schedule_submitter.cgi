@@ -1,4 +1,4 @@
-#!/opt/local/bin/perl 
+#!/home/ascds/DS.release/ots/bin/perl
 use CGI qw/:standard :netscape /;
 
 #################################################################################################################
@@ -15,17 +15,9 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-#$test_run  = 0;                                                                # live run
-$test_run  = 1;                                                                 # tst run case  
 
-if($test_run = 1){
-        $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
-}else{  
-        $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
-}
-
-open(IN, "$d_path/dir_list");
-
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+open(IN, '/data/udoc1/ocat/Test/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -111,13 +103,7 @@ print  "<h2 style='background-color:blue; color:#FAEBD7; margin-right:4em;'>Sche
 
 
 print '<div style="text-align:right;padding-right:8em">';
-
-if($test_run == 0){
-	print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
-}else{
-	print '<a href="https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/too_contact_schedule.html">';
-}
-
+print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
 print '<strong><em style="background-color:red;color:yellow;">Back to USINT TOO Point of Contact</em></strong></a>',"\n";
 print '</div>';
 
@@ -1435,13 +1421,7 @@ print hidden(-name=>'total', -value=>"$total");
 print '<input type="submit" name="submit" value="Submit Updates">',"\n";
 
 print  '<br /><br />',"\n";
-
-if($test_run == 0){
-	print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
-}else{
-	print '<a href="https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/too_contact_schedule.html">';
-}
-
+print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
 print '<strong><em style="background-color:red;color:yellow;">Back to USINT TOO Point of Contact</em></strong></a>',"\n";
 print '<br />',"\n";
 
@@ -1484,8 +1464,7 @@ sub update_database{
 #
 #--- create backup copy
 #
-	system("chmod 777 $data_dir/schedule~");
-	system("rm $data_dir/schedule~");
+
 	system("mv $data_dir/schedule $data_dir/schedule~");
 
 #
@@ -1715,14 +1694,12 @@ sub update_database{
 				$contact2 = '';
 			}
 
-			if($test_run == 0){
-				if($contact1 =~ /\w/ && $contact2 =~ /\w/){
-					system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1 $contact2");
-				}elsif($cotact1 =~ /\w/ && $contact2 !~ /\w/){
-					system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
-				}elsif($cotact1 !~ /\w/ && $contact2 =~ /\w/){
-					system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact2");
-				}
+			if($contact1 =~ /\w/ && $contact2 =~ /\w/){
+				system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1 $contact2");
+			}elsif($cotact1 =~ /\w/ && $contact2 !~ /\w/){
+				system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
+			}elsif($cotact1 !~ /\w/ && $contact2 =~ /\w/){
+				system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Change\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact2");
 			}
 
 			system("rm $temp_dir/zztemp");
@@ -1764,9 +1741,7 @@ sub update_database{
 			close(OUT);
 
 			system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated: $contact1\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
-			if($test_run == 0){
-				system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
-			}
+			system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
 
 			system("rm $temp_dir/zztemp");
 		}
@@ -1911,9 +1886,7 @@ sub cut_line_on_database{
 			close(OUT);
 
 			system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated: $contact1\n\" -rcus\@head.cfa.harvard.edu isobe\@head.cfa.harvard.edu");
-			if($test_run == 0){
-				system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
-			}
+			system("cat $temp_dir/zztemp|mailx -s\"Subject: TOO Schedule Updated\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu swolk\@head.cfa.harvard.edu $contact1");
 
 			system("rm $temp_dir/zztemp");
 		}

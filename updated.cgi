@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 use CGI;
 
 #################################################################################
@@ -10,7 +10,7 @@ use CGI;
 #		originally written by						#
 # 		R. Kilgard, Jan 30/31 2000					#
 #										#
-#	last update: Mar 30, 2011						#
+#	last update: Oct 31, 2012						#
 #										#
 #										#
 #################################################################################
@@ -202,21 +202,33 @@ sub conv_time_1998 {
 ###############################################################################
 
 sub create_main_page{
-	print "Content-type: text/html\n\n";
+	print "Content-type: text/html; charset=utf-8\n\n";
 
 	read(STDIN, $newinfo, $ENV{'CONTENT_LENGTH'});
 
+	print "<!DOCTYPE html>";
 	print "<html>";
-	print "<head><title>Updated Targets List</title></head>";
-	print "<body bgcolor=\"#FFFFFF\">";
+	print "<head>";
+	print "<title>Updated Target List</title>";
+	print "<style  type='text/css'>";
+	print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+	print "a:link {color:blue;}";
+	print "a:visited {color:teal;}";
+	print "</style>";
+	print "</head>";
+
+	print "<body style='color:#000000;background-color:#FFFFE0'>";
+
 
 	print "<h1>Updated Targets List</h1>";
 	print "<p>This list contains all targets which have been verified as updated.</p>";
-	print "<ul><li>Please selet a verified month to see the list of targets.</li>";
+	print "<ul>";
+	print "<li>Please selet a verified month to see the list of targets.</li>";
 	print "<li style='padding-top:6px'>If you want to see the most recent data list, plese reload this page<br /> ";
-	print " before open a list of targets. The update may take several seconds.</li></ul>";
+	print " before open a list of targets. The update may take several seconds.</li>";
+	print "</ul>";
 	
-	print "<table border=\"1\" cellpadding=\"5\" cellspacing=\"5\">";
+	print "<table border=1>";
     	($t0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8) = localtime(time);
     	$month = $t4 + 1;
     	$day   = $t3;
@@ -244,7 +256,7 @@ sub create_main_page{
 				print "<td><a href=\"$html/Save_month_html/$file_name\">$lmon</a></td>";
 			}elsif($i >= $idiff -1){
 				if($dmon > $month){
-					print '&#160';
+					print '<td>&#160;</td>';
 				}else{
 					print "<td><a href=\"$html/Save_month_html/$file_name\">$lmon</a></td>";
 				}
@@ -254,13 +266,13 @@ sub create_main_page{
 	}
 	print "</table>";
 
-	print "<p style='padding-top:30px'> <strong>Back to:";
-	print "<ul><li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\">Chandra Uplink Support Observation Search Form</a></li>";
-	print "<li><a href=\"https://icxc.harvard.edu/cus/\">Chandra Uplink Support Organizational Page</a></strong></li></ul></strong></p>";
+	print "<p style='padding-top:30px'> <strong>Back to:</strong></p>";
+	print "<ul><li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
+	print "<li><a href=\"https://icxc.harvard.edu/cus/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li></ul>";
 	print "<hr />";
 	print "<p style='padding-top:10px'><em>If you have any questions about this page, please contact ";
-	print "<a href='mailto:swolk\@head.cfa.harvard.edu'>swolk\@head.cfa.harvard.edu</a>.</em>";
-	print "</form></body></html>";
+	print "<a href='mailto:swolk\@head.cfa.harvard.edu'>swolk\@head.cfa.harvard.edu</a>.</em></p>";
+	print "</body></html>";
 }
 
 ###############################################################################
@@ -358,26 +370,36 @@ sub print_month_html {
 		
 	open(OUT, ">$cus_dir/Save_month_html/$file_name");
 
-	print OUT "<html>";
-	print OUT "<hred><title>Updated Targets List</title></head>";
-	print OUT "\n";
-	print OUT "<body bgcolor=\"#FFFFFF\">";
-	print OUT "\n";
-	
+	print OUT "<!DOCTYPE html>\n";
+	print OUT "<html>\n";
+	print OUT "<head>\n";
+	print OUT "<title>Updated Target List  $lmon/$iyear</title>\n";
+	print OUT "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n";
+	print OUT "<style  type='text/css'>\n";
+	print OUT "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}\n";
+	print OUT "a:link {color:blue;}\n";
+	print OUT "a:visited {color:teal;}\n";
+	print OUT "</style>\n";
+	print OUT "</head>\n";
+
+	print OUT "<body style='color:#000000;background-color:#FFFFE0'>\n";
+
 	
 	print OUT "<h1>Updated Targets List</h1>";
 	print OUT "\n";
 	print OUT "<p>This list contains all targets which have been verified as updated in $lmon $iyear.</p>";
 	print OUT "\n";
-	print OUT "<strong>Back to: \n";
-	print OUT "<ul><li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\">Chandra Uplink Support Observation Search Form</a></li>";
+	print OUT "<strong>Back to:</strong> \n";
+	print OUT "<ul>\n";
+	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
 	print OUT "\n";
-	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/\">Chandra Uplink Support Organizational Page</a></li>";
+	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li>";
 	print OUT "\n";
-	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\">Back to Updated Targets List top page</a></li></ul></strong>";
+	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\"><strong>Back to Updated Targets List top page</strong></a></li>\n";
+	print OUT "</ul>\n";
 	print OUT "\n";
 	
-	print OUT "<table border=\"1\" cellpadding=\"5\">";
+	print OUT "<table border=1>";
 	print OUT "\n";
 	print OUT "<tr><th>OBSID.revision</th><th>general obscat edits by</th><th>ACIS obscat edits by</th><th>SI MODE edits by</th><th>Verified by</th></tr>";
 	print OUT "\n";
@@ -412,10 +434,10 @@ sub print_month_html {
 	print OUT "</table>";
 	print OUT "\n";
 
-	print OUT "<p><strong><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\">Back to Updated Targets List top page</a></strong>";
+	print OUT "<p style='padding-top:20px;padding-bottom:20px'><strong><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\">Back to Updated Targets List top page</a></strong>";
 	print OUT "\n";
 
-	print OUT "</form></body></html>";
+	print OUT "</body></html>";
 	print OUT "\n";
 	close(OUT);
 

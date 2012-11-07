@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 
 use DBI;
 #use DBD::Sybase;
@@ -10,7 +10,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Oct. 25, 2011							#
+#		last update: Oct  31, 2012							#
 #												#
 #################################################################################################
 
@@ -18,17 +18,7 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-#$test_run  = 0;                                                                # live run
-$test_run  = 1;                                                                 # tst run case  
-
-if($test_run = 1){
-        $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
-}else{  
-        $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
-}
-
-open(IN, "$d_path/dir_list");
-
+open(IN, '/data/udoc1/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -115,7 +105,7 @@ while(<FH>){
 	push(@obsid_list,  $atemp[2]);
 	push(@status_list, $atemp[3]);
 	push(@person_list, $atemp[4]);
-	push(@date_list,   $atemp[5]);
+	push(@date_list,   $atemp[6]);
 	$total++;
 
 	push(@susint_list,  $atemp[0]);
@@ -123,7 +113,7 @@ while(<FH>){
 	push(@sobsid_list,  $atemp[2]);
 	push(@sstatus_list, $atemp[3]);
 	push(@sperson_list, $atemp[4]);
-	push(@sdate_list,   $atemp[5]);
+	push(@sdate_list,   $atemp[6]);
 	$stotal++;
 }
 close(FH);
@@ -138,7 +128,7 @@ while(<FH>){
 	push(@obsid_list,  $atemp[2]);
 	push(@status_list, $atemp[3]);
 	push(@person_list, $atemp[4]);
-	push(@date_list,    $atemp[5]);
+	push(@date_list,    $atemp[6]);
 	$total++;
 
 	push(@susint_list,  $atemp[0]);
@@ -146,7 +136,7 @@ while(<FH>){
 	push(@sobsid_list,  $atemp[2]);
 	push(@sstatus_list, $atemp[3]);
 	push(@sperson_list, $atemp[4]);
-	push(@sdate_list,   $atemp[5]);
+	push(@sdate_list,   $atemp[6]);
 	$stotal++;
 }
 close(FH);
@@ -187,21 +177,25 @@ close(FH);
 #--- here we start html/cgi
 #
 
-print header(-type => 'text/html');
-print start_html(-bgcolor=>"white", -title=>'USINT Contact Finder');
+print header(-type => 'text/html; charset=utf-8');
+
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>USINT Contact Finder</title>";
+print "<style  type='text/css'>";
+print "table{text-align:center;margin-left:auto;margin-right:auto;border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
 
 print  '<body style="background-color:#FAEBD7; font-family:serif, sans-serif;font-size:12pt; color:black;" >';
 
 
 print '<h2 style="background-color:blue; color:#FAEBD7">USINT Contact For A Given OBSID/Sequence Number</h2>';
 print '<div style="text-align:right"><a href="https://icxc.harvard.edu/cus/"><strong>Back to USINT Page</strong></a></div>';
-
-if($test_run == 0){
-	print '<div style="text-align:right"><a href="https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi">';
-}else{
-	print '<div style="text-align:right"><a href="https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/poc_obsid_list.cgi">';
-}
-
+print '<div style="text-align:right"><a href="https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi">';
 print '<strong>Go to "A List Of Observations For A Given POC ID" Page</strong></a></div>';
 
 
@@ -255,26 +249,26 @@ if($check =~ /Submit/){
 	}
 }
 
-print '<table border=0 cellpadding=5 cellspacing=5>';
+print '<table style="border-width:0px">';
 
 print '<tr>';
-print '<th align=left>Type OBSID or Seqence Number, and click "Submit"<br />';
+print '<th style="text-align:left">Type OBSID or Seqence Number, and click "Submit"<br />';
 print 'to find who is POC for the observation</th> ';
-print "<td align=center><input type='text' size='10' name='input_no' value='$input_no'>";
+print "<td style='text-align:center'><input type='text' size='10' name='input_no' value='$input_no'>";
 print '<input type="submit" name="Check" value="Submit"></td>';
 print '</tr>';
 
 print '<tr>';
-print '<th align=left>Show Approved  DDT/TOO List </th> ';
-print '<td align=center><input type="submit" name="Check" value="DDT/TOO List"></td>';
+print '<th style="text-align:left">Show Approved  DDT/TOO List </th> ';
+print '<td style="text-align:center"><input type="submit" name="Check" value="DDT/TOO List"></td>';
 print '</tr>';
 print '<tr>';
-print '<th align=left>Show Observation Scheduled in the Next 30 days </th>';
-print '<td align=center><input type="submit" name="Check" value="Scheduled List"></td>';
+print '<th style="text-align:left">Show Observation Scheduled in the Next 30 days </th>';
+print '<td style="text-align:center"><input type="submit" name="Check" value="Scheduled List"></td>';
 print '</tr>';
 print '</table>';
 
-print '<br /><br /><hr /><br />';
+print '<div style="padding-bottom:40px"></div>';
 
 if($input_no =~ /\d/){
 	$chk = 0;
@@ -338,9 +332,8 @@ if($input_no =~ /\d/){
 		}
 	
 		print "<h3>Contact for <div style='color:#20B2AA'>";
-		print "ObsID: <a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$obsid'  target='_blank'>$obsid</a> / ";
-
-		print "Sequene Number: <a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$seqno' target='_blank'>$seqno</a>";
+		print "ObsID: <a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details&amp;obsid=$obsid'  target='_blank'>$obsid</a> / ";
+		print "Sequene Number: <a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&obsid=$obsid' target='_blank'>$seqno</a>";
 		if($sts ne ''){
 			print " ($status -- <em style='font-size:80%'>$sts</em>) </div>",' </h3>';
 		}else{
@@ -355,7 +348,7 @@ if($input_no =~ /\d/){
 		if($usint eq '' && ($status =~ /scheduled/ || $status =~ /unobserved/)){
 			print '<h3>USINT person is not assigned for this observation yet.</h3>';
 		}else{
-			print '<table border=2 cellpadding=5 cellspacing=5>';
+			print '<table>';
 			print '<tr><th>Name</th><th>Office Phone</th><th>Cell Phone</th><th>Home Phone</th><th>Email</th></tr>';
 			print '<tr>';
 
@@ -371,12 +364,7 @@ if($input_no =~ /\d/){
 				$user = 'CAL';
 			}
 
-			if($test_run == 0){
-				print "<td style='text-align:center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$name[$pos]</a>", '</td>';
-			}else{
-				print "<td style='text-align:center'><a href='https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/poc_obsid_list.cgi\?$user'>$name[$pos]</a>", '</td>';
-			}
-
+			print "<td style='text-align:center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$name[$pos]</a>", '</td>';
 			print "<td style='text-align:center'>$o_tel[$pos]",'</td>';
 			print "<td style='text-align:center'>$h_tel[$pos]",'</td>';
 			print "<td style='text-align:center'>$c_tel[$pos]",'</td>';
@@ -387,7 +375,7 @@ if($input_no =~ /\d/){
 			print "<p style='font-size:80%'>If you like to see all observations under <em>$name[$pos]</em>, please click the name above.</p>";
 		}
 	
-		print '<br /><br />';
+		print '<div style="padding-bottom:20px"></div>';
 		$cnt1 = 0;
 		foreach (@group_obsid){
 			$cnt1++;
@@ -401,7 +389,7 @@ if($input_no =~ /\d/){
 			print '<h3>Related OBSIDs </h3>';
 	
 			if($cnt1 > 0){
-				print '<table border=0 cellpadding=5 cellspacing=5>';
+				print '<table style="border-width:0px">';
 				print '<tr>';
 				print '<th colspan=4>Grouped Observation</th></tr>';
 				print '<tr><th>ObsID</th><th>Seq. No</th><th>Status</th><th>Scheduled Date</th></tr>';
@@ -419,8 +407,8 @@ if($input_no =~ /\d/){
 							last OUTER;
 						}
 					}
-					print "<tr><td><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$ent' target='_blank'>$ent</td>";
-					print "<td><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$seqno' target='_blank'>$seqno</td>";
+					print "<tr><td><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details&amp;obsid=$ent' target='_blank'>$ent</a></td>";
+					print "<td><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&amp;obsid=$ent' target='_blank'>$seqno</a></td>";
 					print "<td>$status</td><td>$sts</td></tr>";
 				}
 				print '</table>';
@@ -428,7 +416,7 @@ if($input_no =~ /\d/){
 			}
 
 			if($cnt2 > 0){
-				print '<table border=0 cellpadding=5 cellspacing=5>';
+				print '<table style="border-width:0px">';
 				print '<tr><th colspan=4>Monitoring Observation</th></tr>';
 				print '<tr><th>ObsID</th><th>Seq. No</th><th>Status</th><th>Scheduled Date</th></tr>';
 				foreach $ent (@monitor_series){
@@ -445,12 +433,12 @@ if($input_no =~ /\d/){
 							last OUTER;
 						}
 					}
-					print "<tr><td><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$ent' target='_blank'>$ent</td>";
-					print "<td><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$seqno' target='_blank'>$seqno</td>";
+					print "<tr><td><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details&amp;obsid=$ent' target='_blank'>$ent</a></td>";
+					print "<td><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&amp;obsid=$ent' target='_blank'>$seqno</a></td>";
 					print "<td style='text-align:center' >$status</td><td>$sts</td></tr>";
 				}
 				print '</table>';
-				print '<br /><br />';
+				print '<div style="padding-bottom:20px"></div>';
 			}
 		}		
 	}
@@ -459,7 +447,7 @@ if($input_no =~ /\d/){
 
 	print '<p>Click POC name to display the contact information.</p>';
 
-	print "<table border=2 cellpadding=5 cellspacing=5>";
+	print "<table border=1>";
 	print "<tr>";
 	print "<th>Type</th>";
 	print "<th>OBSID</th>";
@@ -472,10 +460,10 @@ if($input_no =~ /\d/){
 	for($i = 0; $i < $stotal; $i++){
 		print "<tr>";
 		$type = uc($susint_list[$i]);
-		print "<td align=center>$type</td>";
-		print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$sobsid_list[$i]' target='_blank'>$sobsid_list[$i]</td>";
-		print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$sseqno_list[$i]'   target='_blank'>$sseqno_list[$i]</td>";
-		print "<td align=center>$sstatus_list[$i]</td>";
+		print "<td style='text-align:center'>$type</td>";
+		print "<td style='text-align:center'><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details&amp;obsid=$sobsid_list[$i]' target='_blank'>$sobsid_list[$i]</a></td>";
+		print "<td style='text-align:center'><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&amp;obsid=$sobsid_list[$i]'  target='_blank'>$sseqno_list[$i]</a></td>";
+		print "<td style='text-align:center'>$sstatus_list[$i]</td>";
 
 		OUTER:
 		for($k = 0; $k < $ptot; $k++){
@@ -490,7 +478,7 @@ if($input_no =~ /\d/){
 		if($pnam =~ /br/){
 			$pnam =~ s/\<br\>/ \/ /;
 		}
-		print "<td align='center'><input type='submit' name='Check' value='$pnam'></a></td>";
+		print "<td style='text-align:center'><input type='submit' name='Check' value='$pnam'></td>";
 		print "<td>$sdate_list[$i]</td>";
 		print "</tr>";
 	}
@@ -499,7 +487,7 @@ if($input_no =~ /\d/){
 
 	if($disp > 1){
 		print "<h3>Contact Information</h3>";
-		print "<table border=2 cellpadding=5 cellspacing=5 style='paddinig-top:30px'>";
+		print "<table border=1 style='paddinig-top:30px'>";
 		print "<tr>";
 		print "<th>Name</th><th>Office Tel</th><th>Home Tel</th><th>Cell Phone</th><th>Email</th>";
 		print "</tr><tr>";
@@ -515,16 +503,11 @@ if($input_no =~ /\d/){
 			$user = 'CAL';
 		}
 
-		if($test_run == 0){
-			print "<td align='center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
-		}else{
-			print "<td align='center'><a href='https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
-		}
-
-		print "<td align='center'>$p_o_tel</td>";
-		print "<td align='center'>$p_h_tel</td>";
-		print "<td align='center'>$p_c_tel</td>";
-		print "<td align='center'><a href='mailto:$p_email'>$p_email</a></td>";
+		print "<td style='text-align:center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
+		print "<td style='text-align:center'>$p_o_tel</td>";
+		print "<td style='text-align:center'>$p_h_tel</td>";
+		print "<td style='text-align:center'>$p_c_tel</td>";
+		print "<td style='text-align:center'><a href='mailto:$p_email'>$p_email</a></td>";
 		print "</tr>";
 		print "</table>";
 		print "<p style='font-size:80%;padding-bottom:20px'>If you like to see all observations under <em>$p_name</em>, please click the name above.</p>";
@@ -552,16 +535,11 @@ if($input_no =~ /\d/){
 				$user = 'CAL';
 			}
 
-			if($test_run == 0){
-				print "<td align='center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
-			}else{
-				print "<td align='center'><a href='https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
-			}
-
-			print "<td align='center'>$p_o_tel</td>";
-			print "<td align='center'>$p_h_tel</td>";
-			print "<td align='center'>$p_c_tel</td>";
-			print "<td align='center'><a href='mailto:$p_email'>$p_email</a></td>";
+			print "<td style='text-align:center'><a href='https://icxc.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
+			print "<td style='text-align:center'>$p_o_tel</td>";
+			print "<td style='text-align:center'>$p_h_tel</td>";
+			print "<td style='text-align:center'>$p_c_tel</td>";
+			print "<td style='text-align:center'><a href='mailto:$p_email'>$p_email</a></td>";
 			print "</tr>";
 			print "</table>";
 			print "<p style='font-size:80%;padding-bottom:20px'>If you like to see all observations under <em>$p_name</em>, please click the name above.</p>";
@@ -582,10 +560,13 @@ if($input_no =~ /\d/){
 		for($i = 0; $i < $ntotal; $i++){
 			print "<tr>";
 			$type = uc($nusint_list[$i]);
-			print "<td align=center>$type</td>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$nobsid_list[$i]' target='_blank'>$nobsid_list[$i]</td>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$nseqno_list[$i]'   target='_blank'>$nseqno_list[$i]</td>";
-			print "<td align=center>$nstatus_list[$i]</td>";
+			print "<td style='text-align:center'>$type</td>";
+			print "<td><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details&amp;obsid=$nobsid_list[$i]' target='_blank'>$nobsid_list[$i]</a></td>";
+			print "<td><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&amp;obsid=$nobsid_list[$i]' target='_blank'>$nseqno_list[$i]</a></td>";
+
+#			print "<td style='text-align:center'><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$nobsid_list[$i]' target='_blank'>$nobsid_list[$i]</a></td>";
+#			print "<td style='text-align:center'><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$nseqno_list[$i]'   target='_blank'>$nseqno_list[$i]</a></td>";
+			print "<td style='text-align:center'>$nstatus_list[$i]</td>";
 	
 			OUTER:
 			for($k = 0; $k < $ptot; $k++){
@@ -600,15 +581,18 @@ if($input_no =~ /\d/){
 			if($pnam =~ /br/){
 				$pnam =~ s/\<br\>/ \/ /;
 			}
-			print "<td align='center'><input type='submit' name='Check' value='$pnam'></a></td>";
+			print "<td style='text-align:center'><input type='submit' name='Check' value='$pnam'></a></td>";
 			print "<td>$ndate_list[$i]</td>";
 			print "</tr>";
 		}
 		print'</table>';
 }
 	
+print end_form();
 
+print "<div style='padding-top:20px;padding-bottom:10px'>";
 print '<hr />';
+print "</div>";
 print "<p style='font-size:80%'><em>";
 print 'If you have any questions about this site, please contact: <a href="mailto:swolk@head.cfa.harvard.edu">swolk@head.cfa.harvard.edu</a>';
 print "</em></p>";

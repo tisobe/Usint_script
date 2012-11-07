@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 
 use DBI;
 #use DBD::Sybase;
@@ -10,7 +10,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Oct. 25, 2011							#
+#		last update: Oct  30, 2012							#
 #												#
 #################################################################################################
 
@@ -22,17 +22,7 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-#$test_run  = 0;                                                                # live run
-$test_run  = 1;                                                                 # tst run case  
-
-if($test_run = 1){
-        $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
-}else{  
-        $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
-}
-
-open(IN, "$d_path/dir_list");
-
+open(IN, '/data/udoc1/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -196,21 +186,25 @@ $name_temp  = $ARGV[0];
 #--- here we start html/cgi
 #
 
-print header(-type => 'text/html');
-print start_html(-bgcolor=>"white", -title=>'A List Of Observations For A Given POC ID');
+print header(-type => 'text/html; charset=utf-8');
+print "<!DOCTYPE html>";
+print "<html>";
+print "<head>";
+print "<title>A List Of Observations For A Given POC ID</title>";
+print "<style  type='text/css'>";
+print "table{border-style:solid;border-spacing:8px;border-width:2px;border-collapse:separate}";
+print "a:link {color:blue;}";
+print "a:visited {color:teal;}";
+print "</style>";
+print "</head>";
 
 print  '<body style="background-color:#FAEBD7; font-family:serif, sans-serif;font-size:12pt; color:black;" >';
 
 
 print '<h2 style="background-color:blue; color:#FAEBD7">A List Of Observations For A Given POC ID</h2>';
+
 print '<div style="text-align:right"><a href="https://icxc.harvard.edu/cus/"><strong>Back to USINT Page</strong></a></div>';
-
-if($test_run == 0){
-	print '<div style="text-align:right"><a href="https://icxc.harvard.edu/mta/CUS/Usint/obsid_usint_list.cgi">';
-}else{
-	print '<div style="text-align:right"><a href="https://icxc.harvard.edu/cgi-bin/obs_ss/Usint_test/obsid_usint_list.cgi">';
-}
-
+print '<div style="text-align:right"><a href="https://icxc.harvard.edu/mta/CUS/Usint/obsid_usint_list.cgi">';
 print '<strong>Go to "USINT Contact For A Given OBSID/Sequence Number" Page</strong></a></div>';
 
 
@@ -222,7 +216,6 @@ if($contact eq ''){
 }
 
 if($contact =~ /Nancy Adams Wolk/)   {$poc = 'nraw'}
-#elsif($contact =~ /Maxim Markevitch/){$poc = 'mm'}
 elsif($contact =~ /CAL/)             {$poc = 'cal'}
 elsif($contact =~ /Jean Connelly/)   {$poc = 'jeanconn'}
 elsif($contact =~ /Dan Schwartz/)    {$poc = 'das'}
@@ -230,7 +223,6 @@ elsif($contact =~ /HETG/)            {$poc = 'hetg'}
 elsif($contact =~ /Jeremy Drake/)    {$poc = 'jd'}
 elsif($contact =~ /Scott Wolk/)      {$poc = 'sjw'}
 elsif($contact =~ /HRC/)             {$poc = 'hrc'}
-#elsif($contact =~ /Ed Kellogg/)      {$poc = 'emk'}
 elsif($contact =~ /Ping Zhao/)       {$poc = 'ping'}
 elsif($contact =~ /Paul Plucinsky/)  {$poc = 'ppp'}
 elsif($contact =~ /LETG/)            {$poc = 'letg'}
@@ -240,76 +232,67 @@ elsif($contact =~ /Brad Spitzbart/)  {$poc = 'brad'}
 print '<h3>Please choose POC to display the list of observations</h3>';
 
 
-print '<table border=0 cellpadding=2';
+print '<table style="border-width:0px">';
+
 print '<tr>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Nancy Adams Wolk">';
 print '</td>';
-print '<td align="center">';
-#print '<input type="submit" name="poc" value="Maxim Markevitch">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Brad Spitzbart">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="CAL">';
 print '</td>';
-print '</td>';
 print '</tr>';
+
 print '<tr>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Jean Connelly">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Dan Schwartz">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="HETG">';
 print '</td>';
 print '</tr>';
-print '</tr>';
+
 print '<tr>';
-print '<td align="center">';
-#print '<input type="submit" name="poc" value="Jeremy Drake">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Paul Plucinsky">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Scott Wolk">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="HRC">';
 print '</td>';
 print '</tr>';
+
+
 print '<tr>';
-
-#print '<td align="center">';
-#print '<input type="submit" name="poc" value="Ed Kellogg">';
-#print '</td>';
-<td>&#160</td>
-
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="Ping Zhao">';
 print '</td>';
-print '<td align="center">';
+print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="LETG">';
 print '</td>';
+print '<td>&#160;</td>';
 print '</tr>';
-#print '<tr>';
-#print '<td align="center">';
-#print '<input type="submit" name="poc" value="Brad Spitzbart">';
-#print '</td>';
-#print '<td>&#160</td><td>&#160</td>';
-#print '</tr>';
+
 print '</table>';
 
 
 if($poc ne '' && $poc !~ /\s+/){
  
-	print "<p style='padding-left:40px'>";
+	print "<div style='padding-left:40px'>";
 	print "<h3>POC: $contact</h3>";
 
 	OUTER:
 	for($k = 0; $k < $ptot; $k++){
 		if($id[$k] =~ /$poc/){
-			print '<table border=2 cellpadding=5 cellspacing=5>';
+			print '<table border=1>';
 			print '<tr>';
 			if($poc =~ /hrc/i || $poc =~ /cal/i || $poc =~ /hetg/i || $poc =~ /letg/i){
 				print "<th>Name</th>";
@@ -318,7 +301,7 @@ if($poc ne '' && $poc !~ /\s+/){
 			print '<tr>';
 
 			if($poc =~ /hrc/i || $poc =~ /cal/i || $poc =~ /hetg/i || $poc =~ /letg/i){
-				print "<td align=center>$name[$k]</td>";
+				print "<td style='text-align:center'>$name[$k]</td>";
 			}
 
 			print "<td style='text-align:center'>$o_tel[$k]",'</td>';
@@ -335,7 +318,8 @@ if($poc ne '' && $poc !~ /\s+/){
 	print "DDT/TOO observations are indicated by <em style='color:lime;background-color:lime'>color</em>, and all other observations<br />";
 	print "scheduled in the next 30 days are indicated by <em style='color:#ADFF2F;background-color:#ADFF2F'>color</em>.";
 	print "</p>";
-	print "<table border=2 cellpadding=3 cellpspacig=3'>";
+
+	print "<table border=1> ";
 	print "<tr>";
 	print "<th>OBSID</th>";
 	print "<th>Seq #</th>";
@@ -346,51 +330,48 @@ if($poc ne '' && $poc !~ /\s+/){
 	print "</tr>";
 
 	if($total > 0){
-		print '<tr><td colspan=6>&#160</td</tr>';
+		print '<tr><td colspan=6>&#160;</td></tr>';
 	}
 
 	$chk = 0;
 	for($i = 0; $i < $total; $i++){
 		if($person_list[$i] =~ /$poc/){
 			print "<tr bgcolor=lime>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$obsid_list[$i]' target='_blank'>$obsid_list[$i]</a></td>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$seqno_list[$i]' target='_blank'>$seqno_list[$i]</td>";
-			print "<td align=center>$status_list[$i]</td>";
+			print "<td style='text-align:center'><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details\&obsid=$obsid_list[$i]' target='_blank'>$obsid_list[$i]</a></td>";
+			print "<td style='text-align:center'><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&obsid=$obsid_list[$i]' target='_blank'>$seqno_list[$i]</a></td>";
+			print "<td style='text-align:center'>$status_list[$i]</td>";
 			$type = uc($usint_list[$i]);
-			print "<td align=center><strong style='color:red'>$type</strong></td>";
-			print "<td align=center>${ao.$obsid_list[$i]}{ao}[0]</td>";
-			print "<td align=center>$date_list[$i]</td>";
+			print "<td style='text-align:center'><strong style='color:red'>$type</strong></td>";
+			print "<td style='text-align:center'>${ao.$obsid_list[$i]}{ao}[0]</td>";
+			print "<td style='text-align:center'>$date_list[$i]</td>";
 			print "</tr>";
 			$chk++;
 		}
 	}
 
 	if($chk == 0){
-		print '<tr><td colspan=6 align=center>No DDT/TOO Observation</td</tr>';
+		print '<tr><td colspan=6 style="text-align:center">No DDT/TOO Observation</td</tr>';
 	}
-	print '<tr><td colspan=6>&#160</td</tr>';
+	print '<tr><td colspan=6>&#160;</td</tr>';
 
 	@chkobs = ();
 	$chk    = 0;
 	for($i = 0; $i < $ntotal; $i++){
 		if($nperson_list[$i] =~ /$poc/){
-			print "<tr bgcolor=#ADFF2F>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$nobsid_list[$i]' target='_blank'>$nobsid_list[$i]</a></td>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$nseqno_list[$i]' target='_blank'>$nseqno_list[$i]</td>";
-#			if($nstatus_list[$i] =~ /unobserved/)  {$color = '#F0E68C'}
-#			elsif($nstatus_list[$i] =~ /scheduled/){$color = '#7FFF00'}
-#			elsif($nstatus_list[$i] =~ /observed/) {$color = '#00FFFF'}
-			print "<td  align=center>$nstatus_list[$i]</td>";
-			print "<td align=center>$nusint_list[$i]</td>";
-			print "<td align=center>$nao_list[$i]</td>";
-			print "<td align=center>$ndate_list[$i]</td>";
+			print "<tr sytle='background-color:#ADFF2F'>";
+			print "<td style='text-align:center'><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details\&obsid=$nobsid_list[$i]' target='_blank'>$nobsid_list[$i]</a></td>";
+			print "<td style='text-align:center'><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&obsid=$nobsid_list[$i]' target='_blank'>$nseqno_list[$i]</a></td>";
+			print "<td  style='text-align:center'>$nstatus_list[$i]</td>";
+			print "<td style='text-align:center'>$nusint_list[$i]</td>";
+			print "<td style='text-align:center'>$nao_list[$i]</td>";
+			print "<td style='text-align:center'>$ndate_list[$i]</td>";
 			print "</tr>";
 			push(@chkobs, $nobsid_list[$i]);
 			$chk++;
 		}
 	}
 	if($chk > 0){
-		print '<tr><td colspan=6 align=center>&#160</td</tr>';
+		print '<tr><td colspan=6 style="text-align:center">&#160;</td></tr>';
 	}
 
 
@@ -405,35 +386,38 @@ if($poc ne '' && $poc !~ /\s+/){
 				}
 			}
 			print "<tr>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/target_param.cgi\?$oobsid_list[$i]' target='_blank'>$oobsid_list[$i]</a></td>";
-			print "<td align=center><a href='http://cxc.harvard.edu/cgi-gen/mp/target.cgi\?$oseqno_list[$i]' target='_blank'>$oseqno_list[$i]</td>";
+			print "<td style='text-align:center'><a href='http://cda.harvard.edu/chaser/startViewer.do\?menuItem=details\&obsid=$oobsid_list[$i]' target='_blank'>$oobsid_list[$i]</a></td>";
+			print "<td style='text-align:center'><a href='http://cda.cfa.harvard.edu/chaser/startViewer.do\?menuItem=sequenceSummary&obsid=$oobsid_list[$i]' target='_blank'>$oseqno_list[$i]</a></td>";
 			if($ostatus_list[$i] =~ /unobserved/)  {$color = '#F0E68C'}
 			elsif($ostatus_list[$i] =~ /scheduled/){$color = '#7FFF00'}
 			elsif($ostatus_list[$i] =~ /observed/) {$color = '#00FFFF'}
-			print "<td bgcolor=$color align=center>$ostatus_list[$i]</td>";
-			print "<td align=center>$ousint_list[$i]</td>";
-			print "<td align=center>$oao_list[$i]</td>";
-			print "<td align=center>$odate_list[$i]</td>";
+			print "<td bgcolor=$color style='text-align:center'>$ostatus_list[$i]</td>";
+			print "<td style='text-align:center'>$ousint_list[$i]</td>";
+			print "<td style='text-align:center'>$oao_list[$i]</td>";
+			print "<td style='text-align:center'>$odate_list[$i]</td>";
 			print "</tr>";
 			$chk++;
 		}
 	}
 	if($chk == 0){
-		print '<tr><td colspan=6 align=center>No Observation Assigned</td</tr>';
+		print '<tr><td colspan=6 style="text-align:center">No Observation Assigned</td</tr>';
 	}
 
 	print "</table>";
-	print "</p>";
+	print '</div>';
 }
 
+print end_form();
 
 print '<hr />';
 print "<p style='font-size:80%'><em>";
 print 'If you have any questions about this site, please contact: <a href="mailto:swolk@head.cfa.harvard.edu">swolk@head.cfa.harvard.edu</a>';
 print "</em></p>";
-print "<p style='font-size:80%;text-align:right'><em>";
-print 'Last Update: Oct 06, 2010';
+print "<p style='font-size:80%;text-align:right'>";
+print "<em>";
+print 'Last Update: Oct 30, 2012';
 print '</em></p>';
+
 
 print "</body>";
 print "</html>";
