@@ -8,7 +8,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # rm_submission.cgi: remove an accidental submission from database			#
 #											#
 # 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
-#		Last Update: Oct. 31, 2012 						#
+#		Last Update: Nov  28, 2012 						#
 # This script removes an obsid from database.    	                            	#
 #											#
 #########################################################################################
@@ -526,7 +526,7 @@ sub update_info {
 	        my $efile = "$ocat_dir/updates_table.list";
 	        OUTER:
 	        while($lpass == 0){
-	                open(my $update, '+>', $efile) or die "Locked";
+	                open(my $update, '+<', $efile) or die "Locked";
 	                if($@){
 #
 #--- wait 2 cpu seconds before attempt to check in another round

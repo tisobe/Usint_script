@@ -6,7 +6,7 @@
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: Mar 24, 2011								#
+#	last update: Nov 26, 2012								#
 #												#
 #################################################################################################
 
@@ -456,6 +456,10 @@ if($cnt_sign_off > 0){
 
 		@atemp = split(/\s+/, $ent);
 		$obsid = $atemp[1];
+
+		if($obsid !~ /\d/){					#---- if obsid is not digit, something wrong. get out
+			next OUTER;
+		}
 		$chk = 0;
 #
 #--- check whether the obsid is in approved list (it may be signed off after the
@@ -510,9 +514,9 @@ if($cnt_sign_off > 0){
 				
 
 		if($usint_on =~ /test/){
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\" -rcus\@head.cfa.harvard.edu  $test_email");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\"  $test_email");
 		}else{
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\" -rcus\@head.cfa.harvard.edu $usint $test_email cus\@head.cfa.harvard.edu");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\"  $usint $test_email cus\@head.cfa.harvard.edu");
 		}	
 
 		system("rm $temp_dir/temp_email");

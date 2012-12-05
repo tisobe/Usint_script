@@ -6,7 +6,7 @@
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Mar 04, 2011						#
+#		last update: Nov 26, 2011						#
 #											#
 #########################################################################################
 
@@ -246,9 +246,9 @@ sub send_mail{
 	close(OUT);
 
 	if($usint_on =~ /test/){
-		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation ($submitter_email)\" -rcus\@head.cfa.harvard.edu $test_email");
+		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation ($submitter_email)\" $test_email");
 	}else{
-		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation\" -rcus\@head.cfa.harvard.edu  $submitter_email $test_email cus\@head.cfa.harvard.edu");
+		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation\" $submitter_email $test_email cus\@head.cfa.harvard.edu");
 	}
 	system("rm $temp_dir/arcops_send_email");
 }

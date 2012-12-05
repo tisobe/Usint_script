@@ -197,6 +197,13 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # time, order, and acis window constraint setting changed
 # (Oct 18, 2012)
 #
+# flock bug fixed
+# (Nov 28, 2012)
+#
+# ocat data value conversion problem corrected (line starting 9140 as of Nov 29, 2012)
+# (Nov 29, 2012)
+#
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -9130,135 +9137,15 @@ sub prep_submit{
 #----------- find database values for them
 #----------------------------------------------------------------
 	
-	if($proposal_joint    eq 'NULL')	{$proposal_joint = 'NULL'}
-	elsif($proposal_joint eq 'YES') 	{$proposal_joint = 'Y'}
-	elsif($proposal_joint eq 'NO')  	{$proposal_joint = 'N'}
-	
-	if($roll_flag    eq 'NULL')      	{$roll_flag = 'NULL'}
-	elsif($roll_flag eq 'YES')       	{$roll_flag = 'Y'}
-	elsif($roll_flag eq 'NO')        	{$roll_flag = 'N'}
-	elsif($roll_flag eq 'PREFERENCE')	{$roll_flag = 'P'}
-	
-	if($window_flag    eq 'NULL')      	{$window_flag = 'NULL'}
-	elsif($window_flag eq 'YES')       	{$window_flag = 'Y'}
-	elsif($window_flag eq 'NO')        	{$window_flag = 'N'}
-	elsif($window_flag eq 'PREFERENCE')	{$window_flag = 'P'}
-	
-	if($dither_flag    eq 'NULL')		{$dither_flag = 'NULL'}
-	elsif($dither_flag eq 'YES') 		{$dither_flag = 'Y'}
-	elsif($dither_flag eq 'NO')  		{$dither_flag = 'N'}
-	
-	if($uninterrupt    eq 'NULL')      	{$uninterrupt = 'NULL'}
-	elsif($uninterrupt eq 'NO')        	{$uninterrupt ='N'}
-	elsif($uninterrupt eq 'YES')       	{$uninterrupt ='Y'}
-	elsif($uninterrupt eq 'PREFERENCE')	{$uninterrupt = 'P'}
-	
-	if($photometry_flag    eq 'NULL')	{$photometry_flag = 'NULL'}
-	elsif($photometry_flag eq 'YES') 	{$photometry_flag = 'Y'}
-	elsif($photometry_flag eq 'NO')  	{$photometry_flag = 'N'}
+	@dname_list = ('proposal_joint', 'roll_flag', 'window_flag', 'dither_flag', 'uninterrupt', 'photometry_flag', 'multitelescope', 'hrc_zero_block',
+        	'hrc_timing_mode', 'most_efficient', 'onchip_sum', 'duty_cycle', 'eventfilter', 'multiple_spectral_lines', 'spwindow', 'extended_src',
+        	'phase_constraint_flag', 'window_constrint', 'constr_in_remarks', 'ccdi0_on', 'ccdi1_on', 'ccdi2_on', 'ccdi3_on', 'ccds0_on', 'ccds1_on',
+        	'ccds2_on', 'ccds3_on', 'ccds4_on', 'ccds5_on');
 
-	if($multitelescope    eq 'NO')		{$multitelescope = 'N'}
-	elsif($multitelescope eq 'YES')		{$multitelescope = 'Y'}
-	elsif($multitelescope eq 'PREFERENCE')	{$multitelescope = 'P'}
-	
-	if($hrc_zero_block    eq 'NULL')	{$hrc_zero_block = 'NULL'}
-	elsif($hrc_zero_block eq 'YES') 	{$hrc_zero_block = 'Y'}
-	elsif($hrc_zero_block eq 'NO')  	{$hrc_zero_block = 'N'}
-	
-	if($hrc_timing_mode    eq 'NULL')	{$hrc_timing_mode = 'NULL'}
-	elsif($hrc_timing_mode eq 'YES')	{$hrc_timing_mode = 'Y'}
-	elsif($hrc_timing_mode eq 'NO')		{$hrc_timing_mode = 'N'}
-	
-	if($most_efficient    eq 'NULL')	{$most_efficient = 'NULL'}
-	elsif($most_efficient eq 'YES')		{$most_efficient = 'Y'}
-	elsif($most_efficient eq 'NO')		{$most_efficient = 'N'}
-	
-#	if($standard_chips    eq 'NULL')	{$standard_chips = 'NULL'}
-#	elsif($standard_chips eq 'YES')		{$standard_chips = 'Y'}
-#	elsif($standard_chips eq 'NO')		{$standard_chips = 'N'}
-	
-	if($onchip_sum    eq 'NULL')		{$onchip_sum = 'NULL'}
-	elsif($onchip_sum eq 'YES')		{$onchip_sum = 'Y'}
-	elsif($onchip_sum eq 'NO')		{$onchip_sum = 'N'}
-	
-	if($duty_cycle    eq 'NULL')		{$duty_cycle = 'NULL'}
-	elsif($duty_cycle eq 'YES')		{$duty_cycle = 'Y'}
-	elsif($duty_cycle eq 'NO') 		{$duty_cycle = 'N'}
-	
-	if($eventfilter    eq 'NULL')		{$eventfilter = 'NULL'}
-	elsif($eventfilter eq 'YES')		{$eventfilter = 'Y'}
-	elsif($eventfilter eq 'NO')		{$eventfilter  = 'N'}
-#
-#--- added 03/31/11
-#	
-	if($multiple_spectral_lines    eq 'NULL')	{$multiple_spectral_lines = 'NULL'}
-	elsif($multiple_spectral_lines eq 'YES')	{$multiple_spectral_lines = 'Y'}
-	elsif($multiple_spectral_lines eq 'NO')		{$multiple_spectral_lines = 'N'}
-	
-	if($spwindow    eq 'NULL')		{$spwindow = 'NULL'}
-	elsif($spwindow eq 'YES')		{$spwindow = 'Y'}
-	elsif($spwindow eq 'NO')		{$spwindow = 'N'}
+	foreach $d_name (@dname_list){
+		adjust_o_values();
+	}
 
-#
-#--- added 08/01/11
-#
-	if($extended_src    eq 'YES') {$extended_src = 'Y'}
-	elsif($extended_src eq 'NO')  {$extended_src = 'N'}
-	
-	if($phase_constraint_flag    eq 'NULL')		{$phase_constraint_flag = 'NULL'}
-	elsif($phase_constraint_flag eq 'NONE')		{$phase_constraint_flag = 'N'}
-	elsif($phase_constraint_flag eq 'CONSTRAINT')	{$phase_constraint_flag = 'Y'}
-	elsif($phase_constraint_flag eq 'PREFERENCE')	{$phase_constraint_flag = 'P'}
-	
-	if($window_constrint    eq 'NONE')	{$window_constrint = 'N'}
-	elsif($window_constrint eq 'NULL')	{$window_constrint = 'NULL'}
-	elsif($window_constrint eq 'CONSTRAINT'){$window_constrint = 'Y'}
-	elsif($window_constrint eq 'PREFERENCE'){$window_constrint = 'P'}
-	
-	if($constr_in_remarks    eq 'YES')	 {$constr_in_remarks = 'Y'}
-	elsif($constr_in_remarks eq 'PREFERENCE'){$constr_in_remarks = 'P'}
-	elsif($constr_in_remarks eq 'NO')	 {$constr_in_remarks = 'N'}
-	
-	if($ccdi0_on    eq 'NULL'){$ccdi0_on = 'NULL'}
-	elsif($ccdi0_on eq 'YES') {$ccdi0_on = 'Y'}
-	elsif($ccdi0_on eq 'NO')  {$ccdi0_on = 'N'}
-	
-	if($ccdi1_on    eq 'NULL'){$ccdi1_on = 'NULL'}
-	elsif($ccdi1_on eq 'YES') {$ccdi1_on = 'Y'}
-	elsif($ccdi1_on eq 'NO')  {$ccdi1_on = 'N'}
-	
-	if($ccdi2_on    eq 'NULL'){$ccdi2_on = 'NULL'}
-	elsif($ccdi2_on eq 'YES') {$ccdi2_on = 'Y'}
-	elsif($ccdi2_on eq 'NO')  {$ccdi2_on = 'N'}
-	
-	if($ccdi3_on    eq 'NULL'){$ccdi3_on = 'NULL'}
-	elsif($ccdi3_on eq 'YES') {$ccdi3_on = 'Y'}
-	elsif($ccdi3_on eq 'NO')  {$ccdi3_on = 'N'}
-	
-	if($ccds0_on    eq 'NULL'){$ccds0_on = 'NULL'}
-	elsif($ccds0_on eq 'YES') {$ccds0_on = 'Y'}
-	elsif($ccds0_on eq 'NO')  {$ccds0_on = 'N'}
-	
-	if($ccds1_on    eq 'NULL'){$ccds1_on = 'NULL'}
-	elsif($ccds1_on eq 'YES') {$ccds1_on = 'Y'}
-	elsif($ccds1_on eq 'NO')  {$ccds1_on = 'N'}
-	
-	if($ccds2_on    eq 'NULL'){$ccds2_on = 'NULL'}
-	elsif($ccds2_on eq 'YES') {$ccds2_on = 'Y'}
-	elsif($ccds2_on eq 'NO')  {$ccds2_on = 'N'}
-	
-	if($ccds3_on    eq 'NULL'){$ccds3_on = 'NULL'}
-	elsif($ccds3_on eq 'YES') {$ccds3_on = 'Y'}
-	elsif($ccds3_on eq 'NO')  {$ccds3_on = 'N'}
-	
-	if($ccds4_on    eq 'NULL'){$ccds4_on = 'NULL'}
-	elsif($ccds4_on eq 'YES') {$ccds4_on = 'Y'}
-	elsif($ccds4_on eq 'NO')  {$ccds4_on = 'N'}
-	
-	if($ccds5_on    eq 'NULL'){$ccds5_on = 'NULL'}
-	elsif($ccds5_on eq 'YES') {$ccds5_on = 'Y'}
-	elsif($ccds5_on eq 'NO')  {$ccds5_on = 'N'}
-	
 	read_user_name();					# read registered user name
 	
 	$usr_ind      = 0;
@@ -13457,3 +13344,51 @@ $send_email = 'yes';
 
 	system("chmod 755 $ocat_dir/updates_table.list*");
 }
+
+##################################################################################
+### adjust_o_values: adjust output letter values to a correct one              ###
+##################################################################################
+
+sub adjust_o_values{
+
+	$orig_name = 'orig_'."$d_name";			#--- original value is kept here
+
+	if(${$d_name} =~ /CONSTRAINT/i){
+		${$d_name} = 'Y';
+	}elsif(${$d_name} =~ /PREFERENCE/i){
+		${$d_name} = 'P';
+	}elsif(${$d_name} =~ /INCLUDE/i){
+		${$d_name} = 'I';
+	}elsif(${$d_name} =~ /EXCLUDE/i){
+		${$d_name} = 'E';
+	}elsif(${$d_name} =~ /YES/i){
+		${$d_name} = 'Y';
+
+	}elsif(${$d_name} =~ /NO/i){
+		if(${$orig_name} eq 'NO'){
+			${$d_name} = 'NO';
+		}elsif(${$orig_name} eq ''){
+			${$d_name} = '';
+		}else{
+			${$d_name} = 'N';
+		}
+
+
+	}elsif(${$d_name} =~ /NULL/i){
+		if(${$orig_name} eq 'N'){
+			${$d_name} = 'N';
+		}elsif(${$orig_name} eq ''){
+			${$d_name} = '';
+		}
+
+	}elsif(${$d_name} =~ /NONE/i){
+		if(${$orig_name} eq 'NO'){
+			${$d_name} = 'NO';
+		}elsif(${$orig_name} eq 'N'){
+			${$d_name} = 'N';
+		}elsif(${$orig_name} eq ''){
+			${$d_name} = '';
+		}
+	}
+}
+

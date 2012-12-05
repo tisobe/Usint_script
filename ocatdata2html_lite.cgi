@@ -14,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Nov 07, 2012
+#		last update: Nov 29, 2012
 #  
 ###############################################################################
 
@@ -49,22 +49,22 @@ $cus_email   = 'cus@head.cfa.harvard.edu';
 
 open(IN, '/data/udoc1/ocat/Info_save/dir_list');
 while(<IN>){
-        chomp $_;
-        @atemp    = split(/:/, $_);
-        $atemp[0] =~ s/\s+//g;
-        if($atemp[0] =~ /obs_ss/){
-                $obs_ss   = $atemp[1];
-        }elsif($atemp[0]  =~ /pass_dir/){
-                $pass_dir = $atemp[1];
-        }elsif($atemp[0]  =~ /htemp_dir/){
-                $temp_dir = $atemp[1];
-        }elsif($atemp[0]  =~ /data_dir/){
-                $data_dir = $atemp[1];
-        }elsif($atemp[0]  =~ /ocat_dir/){
-                $real_dir = $atemp[1];
-        }elsif($atemp[0]  =~ /test_dir/){
-                $test_dir = $atemp[1];
-        }
+    chomp $_;
+    @atemp    = split(/:/, $_);
+    $atemp[0] =~ s/\s+//g;
+    if($atemp[0] =~ /obs_ss/){
+        $obs_ss   = $atemp[1];
+    }elsif($atemp[0]  =~ /pass_dir/){
+        $pass_dir = $atemp[1];
+    }elsif($atemp[0]  =~ /htemp_dir/){
+        $temp_dir = $atemp[1];
+    }elsif($atemp[0]  =~ /data_dir/){
+        $data_dir = $atemp[1];
+    }elsif($atemp[0]  =~ /ocat_dir/){
+        $real_dir = $atemp[1];
+    }elsif($atemp[0]  =~ /test_dir/){
+        $test_dir = $atemp[1];
+    }
 }
 close(IN);
 
@@ -155,12 +155,12 @@ while(<FH>){
 
 open(FH, "<$pass_dir/.htpasswd");
 
-%pwd_list = ();                         	# save the user-password list
+%pwd_list = ();             	# save the user-password list
 while(<FH>) {
-        chomp $_;
-        @passwd = split(/:/,$_);
-        $pwd_list{"$passwd[0]"} = $passwd[1];
-        push(@user_name_list, $passwd[0]);
+    chomp $_;
+    @passwd = split(/:/,$_);
+    $pwd_list{"$passwd[0]"} = $passwd[1];
+    push(@user_name_list, $passwd[0]);
 }
 close(FH);
 
@@ -175,24 +175,24 @@ close(FH);
 @Cookie_Encode_Chars = ('\%', '\+', '\;', '\,', '\=', '\&', '\:\:', '\s');
 
 %Cookie_Encode_Chars = ('\%',   '%25',
-                        '\+',   '%2B',
-                        '\;',   '%3B',
-                        '\,',   '%2C',
-                        '\=',   '%3D',
-                        '\&',   '%26',
-                        '\:\:', '%3A%3A',
-                        '\s',   '+');
+            '\+',   '%2B',
+            '\;',   '%3B',
+            '\,',   '%2C',
+            '\=',   '%3D',
+            '\&',   '%26',
+            '\:\:', '%3A%3A',
+            '\s',   '+');
 
 @Cookie_Decode_Chars = ('\+', '\%3A\%3A', '\%26', '\%3D', '\%2C', '\%3B', '\%2B', '\%25');
 
 %Cookie_Decode_Chars = ('\+',       ' ',
-                        '\%3A\%3A', '::',
-                        '\%26',     '&',
-                        '\%3D',     '=',
-                        '\%2C',     ',',
-                        '\%3B',     ';',
-                        '\%2B',     '+',
-                        '\%25',     '%');
+            '\%3A\%3A', '::',
+            '\%26',     '&',
+            '\%3D',     '=',
+            '\%2C',     ',',
+            '\%3B',     ';',
+            '\%2B',     '+',
+            '\%25',     '%');
 
 #----------------
 #--- read cookies
@@ -206,8 +206,8 @@ $pass_word = cookie('pass_word');
 #-------------------
 
 foreach $char (@Cookie_Decode_Chars) {
-        $submitter  =~ s/$char/$Cookie_Decode_Chars{$char}/g;
-        $pass_word  =~ s/$char/$Cookie_Decode_Chars{$char}/g;
+    $submitter  =~ s/$char/$Cookie_Decode_Chars{$char}/g;
+    $pass_word  =~ s/$char/$Cookie_Decode_Chars{$char}/g;
 }
 
 #-----------------------------------------------
@@ -225,18 +225,18 @@ $en_submitter = $submitter;
 $en_pass_word = $pass_word;
 
 foreach $char (@Cookie_Encode_Chars) {
-        $en_submitter   =~ s/$char/$Cookie_Encode_Chars{$char}/g;
-        $en_pass_word   =~ s/$char/$Cookie_Encode_Chars{$char}/g;
+    $en_submitter   =~ s/$char/$Cookie_Encode_Chars{$char}/g;
+    $en_pass_word   =~ s/$char/$Cookie_Encode_Chars{$char}/g;
 }
 
 $user_cookie = cookie(-name    => 'submitter',
-                      -value   => "$en_submitter",
-                      -path    => '/',
-                      -expires => '+8h');
+              -value   => "$en_submitter",
+              -path    => '/',
+              -expires => '+8h');
 $pass_cookie = cookie(-name    => 'pass_word',
-                      -value   => "$en_pass_word",
-                      -path    => '/',
-                      -expires => '+8h');
+              -value   => "$en_pass_word",
+              -path    => '/',
+              -expires => '+8h');
 
 #-------------------------
 #---- new cookies worte in
@@ -271,8 +271,8 @@ open(SIN, "$obs_ss/sot_ocat.out");
 while(<SIN>){
       	chomp $_;
       	if($_ =~ /scheduled/ || $_ =~ /unobserved/){
-              	@atemp = split(/\^/, $_);
-            	$atemp[1] =~ s/\s+//g;
+          	@atemp = split(/\^/, $_);
+        	$atemp[1] =~ s/\s+//g;
 		push(@schdulable_list, $atemp[1]);
        	}
 }
@@ -320,7 +320,7 @@ print start_form();
 $time_ordr_special = 'no';
 $roll_ordr_special = 'no';
 $ordr_special      = 'no';
-$check             = param("Check");			# a param which indicates which page to be displayed 
+$check         = param("Check");			# a param which indicates which page to be displayed 
 
 print hidden(-name=>'send_email', -value=>"$send_email");
 
@@ -330,7 +330,7 @@ print hidden(-name=>'send_email', -value=>"$send_email");
 
 if($check eq ''){
 	$chg_user_ind = param('chg_user_ind');
-	match_user();                           	# sub to check inputed user and password
+	match_user();               	# sub to check inputed user and password
 
 #---------------------------------------------------------------
 #--------- if a user and a password do not match ask to re-type
@@ -339,15 +339,15 @@ if($check eq ''){
 	if($chg_user_ind eq 'yes'){
 		password_check();
 	}elsif($pass eq '' || $pass eq 'no'){
-        	if(($pass eq 'no') && ($submitter  ne ''|| $pass_word ne '')){
+    	if(($pass eq 'no') && ($submitter  ne ''|| $pass_word ne '')){
 
-                	print "<h3 style='color:red'>Name and/or Password are not valid.</h3>";
+        	print "<h3 style='color:red'>Name and/or Password are not valid.</h3>";
 
-        	}
+    	}
 
-        	password_check();       			# this one create password input page
+    	password_check();       			# this one create password input page
 
-	}elsif($pass eq 'yes'){ 		        	# ok a user and a password matched
+	}elsif($pass eq 'yes'){ 		    	# ok a user and a password matched
 
 #-------------------------------------------
 #------ check whether s/he is a special user
@@ -356,15 +356,15 @@ if($check eq ''){
 		$sp_user   = 'yes';
 		$access_ok = 'yes';
        		special_user();			# sub to check whether s/he is a special user
-               	pi_check();			# sub to check whether the pi has an access
+           	pi_check();			# sub to check whether the pi has an access
 
 		print hidden(-name=>'send_email', -value=>"$send_email");
 
-                data_input_page();      # sub to display data for edit
+        data_input_page();      # sub to display data for edit
 
 	}else{
-        	print 'Something wrong. Exit<br />';
-        	exit(1);
+    	print 'Something wrong. Exit<br />';
+    	exit(1);
 	}
 }
 
@@ -386,69 +386,69 @@ if($access_ok eq 'yes'){
 
 	if($check eq '     Add Time Rank     '){
 
-        	$time_ordr         = param("TIME_ORDR");
-        	$roll_ordr         = param("ROLL_ORDR");
-        	$aciswin_no        = param("ACISWIN_NO");
-        	$time_ordr_special = 'yes';
-        	$roll_ordr_special = 'no';
-        	$ordr_special      = 'no';
-        	$time_ordr++;
+    	$time_ordr     = param("TIME_ORDR");
+    	$roll_ordr     = param("ROLL_ORDR");
+    	$aciswin_no    = param("ACISWIN_NO");
+    	$time_ordr_special = 'yes';
+    	$roll_ordr_special = 'no';
+    	$ordr_special      = 'no';
+    	$time_ordr++;
 
-        	pass_param();                           # a sub which passes all parameters between pages
-        	data_input_page();                      # a sub to  print ocat data page
+    	pass_param();               # a sub which passes all parameters between pages
+    	data_input_page();              # a sub to  print ocat data page
 
 	}elsif($check eq 'Remove Null Time Entry '){
 
-        	$time_ordr         = param("TIME_ORDR");
-        	$roll_ordr         = param("ROLL_ORDR");
-        	$aciswin_no        = param("ACISWIN_NO");
-        	$time_ordr_special = 'yes';
-        	$roll_ordr_special = 'no';
-        	$ordr_special      = 'no';
+    	$time_ordr     = param("TIME_ORDR");
+    	$roll_ordr     = param("ROLL_ORDR");
+    	$aciswin_no    = param("ACISWIN_NO");
+    	$time_ordr_special = 'yes';
+    	$roll_ordr_special = 'no';
+    	$ordr_special      = 'no';
 
-        	pass_param();                           # a sub which passes all parameters between pages
-        	data_input_page();                      # a sub to  print ocat data page
+    	pass_param();               # a sub which passes all parameters between pages
+    	data_input_page();              # a sub to  print ocat data page
 
 	}elsif($check eq '     Add Roll Rank     '){
 
-        	$time_ordr         = param("TIME_ORDR");
-        	$roll_ordr         = param("ROLL_ORDR");
-        	$aciswin_no        = param("ACISWIN_NO");
-        	$time_ordr_special = 'no';
-        	$roll_ordr_special = 'yes';
-        	$ordr_special      = 'no';
-        	$roll_ordr++;
+    	$time_ordr     = param("TIME_ORDR");
+    	$roll_ordr     = param("ROLL_ORDR");
+    	$aciswin_no    = param("ACISWIN_NO");
+    	$time_ordr_special = 'no';
+    	$roll_ordr_special = 'yes';
+    	$ordr_special      = 'no';
+    	$roll_ordr++;
 
-        	pass_param();                           
-        	data_input_page();                      
+    	pass_param();               
+    	data_input_page();              
 
 	}elsif($check eq 'Remove Null Roll Entry '){
 
-        	$time_ordr         = param("TIME_ORDR");
-        	$roll_ordr         = param("ROLL_ORDR");
-        	$aciswin_no        = param("ACISWIN_NO");
-        	$time_ordr_special = 'no';
-        	$roll_ordr_special = 'yes';
-        	$ordr_special      = 'no';
+    	$time_ordr     = param("TIME_ORDR");
+    	$roll_ordr     = param("ROLL_ORDR");
+    	$aciswin_no    = param("ACISWIN_NO");
+    	$time_ordr_special = 'no';
+    	$roll_ordr_special = 'yes';
+    	$ordr_special      = 'no';
 
-        	pass_param();                           # a sub which passes all parameters between pages
-        	data_input_page();                      # a sub to  print ocat data page
+    	pass_param();               # a sub which passes all parameters between pages
+    	data_input_page();              # a sub to  print ocat data page
 
 	}elsif($check eq '     Add Window Rank     '){
 
-        	$time_ordr         = param("TIME_ORDR");
-        	$roll_ordr         = param("ROLL_ORDR");
-        	$aciswin_no        = param("ACISWIN_NO");
-        	$time_ordr_special = 'no';
-        	$roll_ordr_special = 'no';
-        	$ordr_special      = 'yes';
+    	$time_ordr     = param("TIME_ORDR");
+    	$roll_ordr     = param("ROLL_ORDR");
+    	$aciswin_no    = param("ACISWIN_NO");
+    	$time_ordr_special = 'no';
+    	$roll_ordr_special = 'no';
+    	$ordr_special      = 'yes';
 		
 		$aciswin_no++;
 	
 		$add_window_rank   = 1;			# need this to check whether ADD button is selected 
 	
-        	pass_param();                           
-        	data_input_page();                      
+    	pass_param();               
+    	data_input_page();              
 
 #------------------------------------------------
 #--- or just s/he wants to update the main page.
@@ -519,13 +519,13 @@ if($access_ok eq 'yes'){
 #
 
 		if($asis =~ /ARCOPS/i){
-        		$date = `date '+%D'`;
-        		chomp $date;
+    		$date = `date '+%D'`;
+    		chomp $date;
 
-        		open(OUT, ">>$ocat_dir/arcops_list");
-        		print OUT "$obsid\t$date\t$submitter\t$targname\t$instrument\t$grating\n";
-        		close(OUT);
-#        		system("chmod 777 $ocat_dir/arcops_list");
+    		open(OUT, ">>$ocat_dir/arcops_list");
+    		print OUT "$obsid\t$date\t$submitter\t$targname\t$instrument\t$grating\n";
+    		close(OUT);
+#    		system("chmod 777 $ocat_dir/arcops_list");
 		}
 
 
@@ -547,9 +547,9 @@ if($access_ok eq 'yes'){
 #----------------------------------------------------------------------------------------------------
 
 	}else{
-        	if($prev_app == 0){
-                	data_input_page();              # just print ocat data page
-        	}
+    	if($prev_app == 0){
+        	data_input_page();          # just print ocat data page
+    	}
 	}
 }							#---- the end of access_ok loop
 
@@ -568,31 +568,31 @@ print "</html>";
 
 
 #########################################################################
-### password_check: open a user - a password input page               ###
+### password_check: open a user - a password input page           ###
 #########################################################################
 
 sub password_check{
 	print '<h3>Please type your user name and password</h3>';
-        print '<table style="border-width:0px"><tr><th>Name</th><td>';
-        print textfield(-name=>'submitter', -value=>'', -size=>20);
-        print '</td></tr><tr><th>Password</th><td>';
-        print password_field( -name=>'password', -value=>'', -size=>20);
-        print '</td></tr></table><br />';
+    print '<table style="border-width:0px"><tr><th>Name</th><td>';
+    print textfield(-name=>'submitter', -value=>'', -size=>20);
+    print '</td></tr><tr><th>Password</th><td>';
+    print password_field( -name=>'password', -value=>'', -size=>20);
+    print '</td></tr></table><br />';
 
 	print hidden(-name=>'Check', -override=>'', -value=>'');
-        print '<input type="submit" name="Check" value="Submit">';
+    print '<input type="submit" name="Check" value="Submit">';
 }
 
 #########################################################################
-### match_user: check a user and a password matches                   ###
+### match_user: check a user and a password matches           ###
 #########################################################################
 
 sub match_user{
 	if($submitter eq ''){
-        	$submitter = param('submitter');
-        	$submitter =~s/^\s+//g;
-        	$pass_word = param('password');
-        	$pass_word =~s/^\s+//g;
+    	$submitter = param('submitter');
+    	$submitter =~s/^\s+//g;
+    	$pass_word = param('password');
+    	$pass_word =~s/^\s+//g;
 	}
 	
 	$sp_status = 'no';
@@ -602,45 +602,45 @@ sub match_user{
 	if($pass eq 'yes'){
 		$pass_status = 'match';
 	}else{
-        	OUTER:
-        	foreach $test_name (@user_name_list){
-                	$ppwd  = $pwd_list{"$submitter"};
-                	$ptest = crypt("$pass_word","$ppwd");
+    	OUTER:
+    	foreach $test_name (@user_name_list){
+        	$ppwd  = $pwd_list{"$submitter"};
+        	$ptest = crypt("$pass_word","$ppwd");
 	
-                	if(($submitter =~ /$test_name/i) && ($ptest  eq $ppwd)){
-                        	$pass_status = 'match';
-                        	last OUTER;
-                	}
+        	if(($submitter =~ /$test_name/i) && ($ptest  eq $ppwd)){
+            	$pass_status = 'match';
+            	last OUTER;
         	}
+    	}
 	}
 
 	if(($usint_on =~ /yes/) && ($sp_status eq 'yes') && ($pass_status eq 'match')){
 		$pass = 'yes';
 		print hidden(-name=>'pass', -override=>"$pass", -value=>"$pass");
-        }else{
-                $pass = 'no';
-        }
+    }else{
+        $pass = 'no';
+    }
 }
 
 #########################################################################
-### special_user: check whether the user is a special user            ###
+### special_user: check whether the user is a special user        ###
 #########################################################################
 
 sub special_user{
 
-        $sp_user = 'no';
+    $sp_user = 'no';
 	$user    = lc($submitter);
-        OUTER:
-        foreach $comp (@special_user){
-                if($user eq $comp){
-                        $sp_user = 'yes';
-                        last OUTER;
-                }
+    OUTER:
+    foreach $comp (@special_user){
+        if($user eq $comp){
+            $sp_user = 'yes';
+            last OUTER;
         }
+    }
 }
 
 ###################################################################################
-### pi_check: check whether the observer has an access to the data              ###
+### pi_check: check whether the observer has an access to the data          ###
 ###################################################################################
 
 sub pi_check{
@@ -655,7 +655,7 @@ sub pi_check{
 }
 
 ################################################################################
-### pass_param: passing cgi parameter values to the next window              ###
+### pass_param: passing cgi parameter values to the next window          ###
 ################################################################################
 
 sub pass_param {
@@ -673,7 +673,7 @@ sub pass_param {
 
 	$sp_user       = param('sp_user');
 	$access_ok     = param('access_ok');
-	$pass          = param('pass');
+	$pass      = param('pass');
 	$submitter     = param('submitter');
 	$email_address = param('email_address');
 	$si_mode       = param('SI_MODE');
@@ -693,7 +693,7 @@ sub pass_param {
 #------- house keeping
 #---------------------
 
-	$sf            = param('tmp_suf');			# suffix for temp file written in $temp_dir
+	$sf        = param('tmp_suf');			# suffix for temp file written in $temp_dir
 								# this avoids to over write other user's file
 								# see "submit_entry"
 #
@@ -709,31 +709,31 @@ sub pass_param {
 #
 #--- time order, roll order, and window space order must be checked
 #
-                if($time_ordr_special =~ /yes/i){
-                        if($ent =~ /TIME_ORDR/i){
-                                $time_ordr_special = 'no';
-                        }else{
-                                $new_entry    = lc ($ent);
-                                ${$new_entry} = param("$ent");
-                        }
-                }elsif($roll_ordr_special =~ /yes/i){
-                        if($ent =~ /ROLL_ORDR/i){
-                                $roll_ordr_special = 'no';
-                        }else{
-                                $new_entry    = lc ($ent);
-                                ${$new_entry} = param("$ent");
-                        }
-                }elsif($ordr_special =~/yes/i){
-                        if($ent  =~ /ACISWIN_ID/i){
-                                $ordr_special = 'no';
-                        }else{
-                                $new_entry    = lc ($ent);
-                                ${$new_entry} = param("$ent");
-                        }
+        if($time_ordr_special =~ /yes/i){
+            if($ent =~ /TIME_ORDR/i){
+                $time_ordr_special = 'no';
+            }else{
+                $new_entry    = lc ($ent);
+                ${$new_entry} = param("$ent");
+            }
+        }elsif($roll_ordr_special =~ /yes/i){
+            if($ent =~ /ROLL_ORDR/i){
+                $roll_ordr_special = 'no';
+            }else{
+                $new_entry    = lc ($ent);
+                ${$new_entry} = param("$ent");
+            }
+        }elsif($ordr_special =~/yes/i){
+            if($ent  =~ /ACISWIN_ID/i){
+                $ordr_special = 'no';
+            }else{
+                $new_entry    = lc ($ent);
+                ${$new_entry} = param("$ent");
+            }
 #
 #--- all other cases
 #
-                }else{
+        }else{
 			$new_entry    = lc ($ent);
 			${$new_entry} = param("$ent");
 		}
@@ -852,14 +852,14 @@ sub pass_param {
 			}
 		}
 
-		if($window_constraint[$j]    eq 'Y')         {$dwindow_constraint[$j] = 'CONSTRAINT'}
+		if($window_constraint[$j]    eq 'Y')     {$dwindow_constraint[$j] = 'CONSTRAINT'}
 		elsif($window_constraint[$j] eq 'CONSTRAINT'){$dwindow_constraint[$j] = 'CONSTRAINT'}
-		elsif($window_constraint[$j] eq 'P')         {$dwindow_constraint[$j] = 'PREFERENCE'}
+		elsif($window_constraint[$j] eq 'P')     {$dwindow_constraint[$j] = 'PREFERENCE'}
 		elsif($window_constraint[$j] eq 'PREFERENCE'){$dwindow_constraint[$j] = 'PREFERENCE'}
-#		elsif($window_constraint[$j] eq 'N')         {$dwindow_constraint[$j] = 'NONE'}
+#		elsif($window_constraint[$j] eq 'N')     {$dwindow_constraint[$j] = 'NONE'}
 #		elsif($window_constraint[$j] eq 'NONE')      {$dwindow_constraint[$j] = 'NONE'}
 #		elsif($window_constraint[$j] eq 'NULL')      {$dwindow_constraint[$j] = 'NULL'}
-#		elsif($window_constraint[$j] eq '')          {$dwindow_constraint[$j] = 'NULL'}
+#		elsif($window_constraint[$j] eq '')      {$dwindow_constraint[$j] = 'NULL'}
 	}
 
 #
@@ -878,31 +878,31 @@ sub pass_param {
 						$window_constraint[$j]   = $window_constraint[$jj];
 						$dwindow_constraint[$j]  = $dwindow_constraint[$jj];
 
-						$start_month[$j]         = $start_month[$jj];
-						$start_date[$j]          = $start_date[$jj];
-						$start_year[$j]          = $start_year[$jj];
-						$start_time[$j]          = $start_time[$jj];
-						$end_month[$j]           = $end_month[$jj];
-						$end_date[$j]            = $end_date[$jj];
+						$start_month[$j]     = $start_month[$jj];
+						$start_date[$j]      = $start_date[$jj];
+						$start_year[$j]      = $start_year[$jj];
+						$start_time[$j]      = $start_time[$jj];
+						$end_month[$j]       = $end_month[$jj];
+						$end_date[$j]        = $end_date[$jj];
 						$end_year[$j]		 = $end_year[$jj];
-						$end_time[$j]            = $end_time[$jj];
+						$end_time[$j]        = $end_time[$jj];
 
-						$tstart[$j]              = $tstart[$jj];
-						$tstop[$j]               = $tstop[$jj];
+						$tstart[$j]          = $tstart[$jj];
+						$tstop[$j]           = $tstop[$jj];
 
 #						$window_constraint[$jj]  = 'NULL';
 #						$dwindow_constraint[$jj] = 'NULL';
-						$start_month[$jj]        =  '';
-						$start_date[$jj]         =  '';
-						$start_year[$jj]         =  '';
-						$start_time[$jj]         =  '';
-						$end_month[$jj]          =  '';
-						$end_date[$jj]           =  '';
+						$start_month[$jj]    =  '';
+						$start_date[$jj]     =  '';
+						$start_year[$jj]     =  '';
+						$start_time[$jj]     =  '';
+						$end_month[$jj]      =  '';
+						$end_date[$jj]       =  '';
 						$end_year[$jj]		 =  '';
-						$end_time[$jj]           =  '';
+						$end_time[$jj]       =  '';
 
-						$tstart[$jj]             =  '';
-						$tstop[$jj]              =  '';
+						$tstart[$jj]         =  '';
+						$tstop[$jj]          =  '';
 
 						$new_ordr--;
 						next TOUT1;
@@ -910,17 +910,17 @@ sub pass_param {
 
 #						$window_constraint[$j]   = 'NULL';
 #						$dwindow_constraint[$j]  = 'NULL';
-						$start_month[$j]         =  '';
-						$start_date[$j]          =  '';
-						$start_year[$j]          =  '';
-						$start_time[$j]          =  '';
-						$end_month[$j]           =  '';
-						$end_date[$j]            =  '';
+						$start_month[$j]     =  '';
+						$start_date[$j]      =  '';
+						$start_year[$j]      =  '';
+						$start_time[$j]      =  '';
+						$end_month[$j]       =  '';
+						$end_date[$j]        =  '';
 						$end_year[$j]		 =  '';
-						$end_time[$j]            =  '';
+						$end_time[$j]        =  '';
 
-						$tstart[$j]              =  '';
-						$tstop[$j]               =  '';
+						$tstart[$j]          =  '';
+						$tstop[$j]           =  '';
 
 						$new_ordr--;
 						last TOUT1;
@@ -935,9 +935,9 @@ sub pass_param {
 
 
 
-        if($window_constraint[0] =~ /Y/ || $window_constraint[0] =~ /C/i || $window_constraint[0] =~ /P/i){
-                $window_flag = 'Y';
-        }
+    if($window_constraint[0] =~ /Y/ || $window_constraint[0] =~ /C/i || $window_constraint[0] =~ /P/i){
+        $window_flag = 'Y';
+    }
 
 #------------------------------
 #-------- roll constraint case
@@ -947,19 +947,19 @@ sub pass_param {
 
 	for($j = 1; $j <= $roll_ordr; $j++){
 		foreach $ent ('ROLL_CONSTRAINT','ROLL_180','ROLL','ROLL_TOLERANCE'){
-			$name         = "$ent"."$j";
-			$val          =  param("$name");
-			$lname        = lc($ent);
+			$name     = "$ent"."$j";
+			$val      =  param("$name");
+			$lname    = lc($ent);
 			${$lname}[$j] = $val;
 		}
-		if($roll_constraint[$j]    eq 'Y')         {$droll_constraint[$j] = 'CONSTRAINT'}
+		if($roll_constraint[$j]    eq 'Y')     {$droll_constraint[$j] = 'CONSTRAINT'}
 		if($roll_constraint[$j]    eq 'CONSTRAINT'){$droll_constraint[$j] = 'CONSTRAINT'}
-		elsif($roll_constraint[$j] eq 'P')         {$droll_constraint[$j] = 'PREFERENCE'}
+		elsif($roll_constraint[$j] eq 'P')     {$droll_constraint[$j] = 'PREFERENCE'}
 		elsif($roll_constraint[$j] eq 'PREFERENCE'){$droll_constraint[$j] = 'PREFERENCE'}
-#		elsif($roll_constraint[$j] eq 'N')         {$droll_constraint[$j] = 'NONE'}
+#		elsif($roll_constraint[$j] eq 'N')     {$droll_constraint[$j] = 'NONE'}
 #		elsif($roll_constraint[$j] eq 'NONE')      {$droll_constraint[$j] = 'NONE'}
 #		elsif($roll_constraint[$j] eq 'NULL')      {$droll_constraint[$j] = 'NULL'}
-#		elsif($roll_constraint[$j] eq '')          {$droll_constraint[$j] = 'NULL'}
+#		elsif($roll_constraint[$j] eq '')      {$droll_constraint[$j] = 'NULL'}
 
 		if($roll_180[$j]    eq 'Y')   {$droll_180[$j] = 'YES'}
 		elsif($roll_180[$j] eq 'YES') {$droll_180[$j] = 'YES'}
@@ -985,16 +985,16 @@ sub pass_param {
 					if($roll_constraint[$jj] =~ /Y/i || $roll_constraint[$jj] =~ /CONST/i || $roll_constraint[$jj] =~ /P/i){
 						$roll_constraint[$j]   = $roll_constraint[$jj];
 						$droll_constraint[$j]  = $droll_constraint[$jj];
-						$roll_180[$j]          = $roll_180[$jj];
-						$droll_180[$j]         = $droll_180[$jj];
-						$roll[$j]              = $roll[$jj];
+						$roll_180[$j]      = $roll_180[$jj];
+						$droll_180[$j]     = $droll_180[$jj];
+						$roll[$j]          = $roll[$jj];
 						$roll_tolerance[$j]    = $roll_tolerance[$jj];
 
 #						$roll_constraint[$jj]  = 'NULL';
 #						$droll_constraint[$jj] = 'NULL';
-						$roll_180[$jj]         = 'NULL';
-						$droll_180[$jj]        = 'NULL';
-						$roll[$jj]             = '';
+						$roll_180[$jj]     = 'NULL';
+						$droll_180[$jj]    = 'NULL';
+						$roll[$jj]         = '';
 						$roll_tolerance[$jj]   = '';
 
 						$new_ordr--;
@@ -1003,9 +1003,9 @@ sub pass_param {
 					}elsif($jj == $roll_ordr){
 #						$roll_constraint[$jj]  = 'NULL';
 #						$droll_constraint[$jj] = 'NULL';
-						$roll_180[$jj]         = 'NULL';
-						$droll_180[$jj]        = 'NULL';
-						$roll[$jj]             = '';
+						$roll_180[$jj]     = 'NULL';
+						$droll_180[$jj]    = 'NULL';
+						$roll[$jj]         = '';
 						$roll_tolerance[$jj]   = '';
 
 						$new_ordr--;
@@ -1032,18 +1032,18 @@ sub pass_param {
 			foreach $ent ('ACISWIN_ID', 'ORDR', 'CHIP',
 					'START_ROW','START_COLUMN','HEIGHT','WIDTH',
 					'LOWER_THRESHOLD','PHA_RANGE','SAMPLE'){
-				$name         = "$ent"."$j";
-				$val          =  param("$name");
+				$name     = "$ent"."$j";
+				$val      =  param("$name");
 #
 #--- added 08/05/11
 #
-                                if($name =~ /LOWER_THRESHOLD/i && $val !~ /\d/){
-                                        $val  = 0.08;
-                                }elsif($name =~ /PHA_RANGE/i && $val !~ /\d/){
-                                        $val  = 13.0;
-                                }
+                if($name =~ /LOWER_THRESHOLD/i && $val !~ /\d/){
+                    $val  = 0.08;
+                }elsif($name =~ /PHA_RANGE/i && $val !~ /\d/){
+                    $val  = 13.0;
+                }
 
-				$lname        = lc($ent);
+				$lname    = lc($ent);
 				${$lname}[$j] = $val;
 			}
 
@@ -1055,17 +1055,17 @@ sub pass_param {
 #---- if window filter is set to Null or No, set everything to a Null setting
 #
 		$aicswin_id[0]      = '';
-		$ordr[0]            = '';
-                $chip[0]            = 'NULL';
-                $dinclude_flag[0]   = 'INCLUDE';
-                $include_flag[0]    = 'I';
-                $start_row[0]       = '';
-                $start_column[0]    = '';
-                $height[0]          = '';
-                $width[0]           = '';
-                $lower_threshold[0] = '';
-                $pha_range[0]       = '';
-                $sample[0]          = '';
+		$ordr[0]        = '';
+        $chip[0]        = 'NULL';
+        $dinclude_flag[0]   = 'INCLUDE';
+        $include_flag[0]    = 'I';
+        $start_row[0]       = '';
+        $start_column[0]    = '';
+        $height[0]      = '';
+        $width[0]       = '';
+        $lower_threshold[0] = '';
+        $pha_range[0]       = '';
+        $sample[0]      = '';
 	}
 
 #----------------
@@ -1112,37 +1112,37 @@ sub pass_param {
 	}
 	
 	if($window_flag    eq 'NULL')      {$dwindow_flag = 'NULL'}
-	elsif($window_flag eq '')          {$dwindow_flag = 'NULL'; $window_flag = 'NULL';}
-	elsif($window_flag eq 'Y')         {$dwindow_flag = 'YES'}
+	elsif($window_flag eq '')      {$dwindow_flag = 'NULL'; $window_flag = 'NULL';}
+	elsif($window_flag eq 'Y')     {$dwindow_flag = 'YES'}
 	elsif($window_flag eq 'YES')       {$dwindow_flag = 'YES'}
-	elsif($window_flag eq 'N')         {$dwindow_flag = 'NO'}
-	elsif($window_flag eq 'NO')        {$dwindow_flag = 'NO'}
-	elsif($window_flag eq 'P')         {$dwindow_flag = 'PREFERENCE'}
+	elsif($window_flag eq 'N')     {$dwindow_flag = 'NO'}
+	elsif($window_flag eq 'NO')    {$dwindow_flag = 'NO'}
+	elsif($window_flag eq 'P')     {$dwindow_flag = 'PREFERENCE'}
 	elsif($window_flag eq 'PREFERENCE'){$dwindow_flag = 'PREFERENCE'}
 
-	if($roll_flag    eq 'NULL')        {$droll_flag = 'NULL'}
-	elsif($roll_flag eq '')            {$droll_flag = 'NULL'; $roll_flag = 'NULL';}
-	elsif($roll_flag eq 'Y')           {$droll_flag = 'YES'}
-	elsif($roll_flag eq 'YES')         {$droll_flag = 'YES'}
-	elsif($roll_flag eq 'N')           {$droll_flag = 'NO'}
-	elsif($roll_flag eq 'NO')          {$droll_flag = 'NO'}
-	elsif($roll_flag eq 'P')           {$droll_flag = 'PREFERENCE'}
+	if($roll_flag    eq 'NULL')    {$droll_flag = 'NULL'}
+	elsif($roll_flag eq '')        {$droll_flag = 'NULL'; $roll_flag = 'NULL';}
+	elsif($roll_flag eq 'Y')       {$droll_flag = 'YES'}
+	elsif($roll_flag eq 'YES')     {$droll_flag = 'YES'}
+	elsif($roll_flag eq 'N')       {$droll_flag = 'NO'}
+	elsif($roll_flag eq 'NO')      {$droll_flag = 'NO'}
+	elsif($roll_flag eq 'P')       {$droll_flag = 'PREFERENCE'}
 	elsif($roll_flag eq 'PREFERENCE')  {$droll_flag = 'PREFERENCE'}
 	
 	if($dither_flag    eq 'NULL')      {$ddither_flag = 'NULL'}
-	elsif($dither_flag eq '')          {$ddither_flag = 'NULL'; $dither_flag = 'NULL';}
-	elsif($dither_flag eq 'Y')         {$ddither_flag = 'YES'}
+	elsif($dither_flag eq '')      {$ddither_flag = 'NULL'; $dither_flag = 'NULL';}
+	elsif($dither_flag eq 'Y')     {$ddither_flag = 'YES'}
 	elsif($dither_flag eq 'YES')       {$ddither_flag = 'YES'}
-	elsif($dither_flag eq 'N')         {$ddither_flag = 'NO'}
-	elsif($dither_flag eq 'NO')        {$ddither_flag = 'NO'}
+	elsif($dither_flag eq 'N')     {$ddither_flag = 'NO'}
+	elsif($dither_flag eq 'NO')    {$ddither_flag = 'NO'}
 	
 	if($uninterrupt    eq 'NULL')      {$duninterrupt = 'NULL'}
-	elsif($uninterrupt eq '')          {$duninterrupt = 'NULL'; $uninterrupt = 'NULL';}
-	elsif($uninterrupt eq 'N')         {$duninterrupt = 'NO'}
-	elsif($uninterrupt eq 'NO')        {$duninterrupt = 'NO'}
-	elsif($uninterrupt eq 'Y')         {$duninterrupt = 'YES'}
+	elsif($uninterrupt eq '')      {$duninterrupt = 'NULL'; $uninterrupt = 'NULL';}
+	elsif($uninterrupt eq 'N')     {$duninterrupt = 'NO'}
+	elsif($uninterrupt eq 'NO')    {$duninterrupt = 'NO'}
+	elsif($uninterrupt eq 'Y')     {$duninterrupt = 'YES'}
 	elsif($uninterrupt eq 'YES')       {$duninterrupt = 'YES'}
-	elsif($uninterrupt eq 'P')         {$duninterrupt = 'PREFERENCE'}
+	elsif($uninterrupt eq 'P')     {$duninterrupt = 'PREFERENCE'}
 	elsif($uninterrupt eq 'PREFERENCE'){$duninterrupt = 'PREFERENCE'}
 
 	if($photometry_flag    eq 'NULL')  {$dphotometry_flag = 'NULL'}
@@ -1151,29 +1151,29 @@ sub pass_param {
 	elsif($photometry_flag eq 'N')     {$dphotometry_flag = 'NO'}
 	elsif($photometry_flag eq 'NO')    {$dphotometry_flag = 'NO'}
 	
-	if($constr_in_remarks    eq 'N')             {$dconstr_in_remarks = 'NO'}
-	elsif($constr_in_remarks eq 'NO')            {$dconstr_in_remarks = 'NO'}
-	elsif($constr_in_remarks eq 'Y')             {$dconstr_in_remarks = 'YES'}
-	elsif($constr_in_remarks eq 'YES')           {$dconstr_in_remarks = 'YES'}
-	elsif($constr_in_remarks eq 'P')             {$dconstr_in_remarks = 'PREFERENCE'}
+	if($constr_in_remarks    eq 'N')         {$dconstr_in_remarks = 'NO'}
+	elsif($constr_in_remarks eq 'NO')        {$dconstr_in_remarks = 'NO'}
+	elsif($constr_in_remarks eq 'Y')         {$dconstr_in_remarks = 'YES'}
+	elsif($constr_in_remarks eq 'YES')       {$dconstr_in_remarks = 'YES'}
+	elsif($constr_in_remarks eq 'P')         {$dconstr_in_remarks = 'PREFERENCE'}
 	elsif($constr_in_remarks eq 'PREFERENCE')    {$dconstr_in_remarks = 'PREFERENCE'}
 
 	if($phase_constraint_flag    eq 'NULL')      {$dphase_constraint_flag = 'NULL'}
-	elsif($phase_constraint_flag eq 'N')         {$dphase_constraint_flag = 'NONE'}
-	elsif($phase_constraint_flag eq 'NO')        {$dphase_constraint_flag = 'NONE'}
-	elsif($phase_constraint_flag eq 'Y')         {$dphase_constraint_flag = 'CONSTRAINT'}
+	elsif($phase_constraint_flag eq 'N')     {$dphase_constraint_flag = 'NONE'}
+	elsif($phase_constraint_flag eq 'NO')    {$dphase_constraint_flag = 'NONE'}
+	elsif($phase_constraint_flag eq 'Y')     {$dphase_constraint_flag = 'CONSTRAINT'}
 	elsif($phase_constraint_flag eq 'CONSTRAINT'){$dphase_constraint_flag = 'CONSTRAINT'}
-	elsif($phase_constraint_flag eq 'P')         {$dphase_constraint_flag = 'PREFERENCE'}
+	elsif($phase_constraint_flag eq 'P')     {$dphase_constraint_flag = 'PREFERENCE'}
 	elsif($phase_constraint_flag eq 'PREFERENCE'){$dphase_constraint_flag = 'PREFERENCE'}
 
-        if($monitor_flag    eq 'NULL')               {$dmonitor_flag = 'NULL'; 
+    if($monitor_flag    eq 'NULL')           {$dmonitor_flag = 'NULL'; 
 							$monitor_flag = 'N'}
-        elsif($monitor_flag eq '')                   {$dmonitor_flag = 'NULL'}
-        elsif($monitor_flag eq 'Y')                  {$dmonitor_flag = 'YES'}
-        elsif($monitor_flag eq 'YES')                {$dmonitor_flag = 'YES'; 
+    elsif($monitor_flag eq '')           {$dmonitor_flag = 'NULL'}
+    elsif($monitor_flag eq 'Y')          {$dmonitor_flag = 'YES'}
+    elsif($monitor_flag eq 'YES')        {$dmonitor_flag = 'YES'; 
 							$monitor_flag = 'Y'}
-        elsif($monitor_flag eq 'N')                  {$dmonitor_flag = 'NO'}
-        elsif($monitor_flag eq 'NO')                 {$dmonitor_flag = 'NO'; 
+    elsif($monitor_flag eq 'N')          {$dmonitor_flag = 'NO'}
+    elsif($monitor_flag eq 'NO')         {$dmonitor_flag = 'NO'; 
 							$monitor_flag = 'N'}
 
 #
@@ -1183,196 +1183,196 @@ sub pass_param {
 	if($phase_constraint_flag =~ /N/i 
 		&& $phase_constraint_flag !~ /CONSTRAINT/i 
 		&& $phase_constraint_flag !~ /PREFERENCE/i){
-		$phase_epoch        = '';
+		$phase_epoch    = '';
 		$phase_period       = '';
-		$phase_start        = '';
+		$phase_start    = '';
 		$phase_start_margin = '';
-		$phase_end          = '';
+		$phase_end      = '';
 		$phase_end_margin   = '';
 	}
 
-	if($multitelescope    eq 'Y')         {$dmultitelescope = 'YES'}
+	if($multitelescope    eq 'Y')     {$dmultitelescope = 'YES'}
 	elsif($multitelescope eq 'YES')       {$dmultitelescope = 'YES'}
-	elsif($multitelescope eq 'N')         {$dmultitelescope = 'NO'}
-	elsif($multitelescope eq 'NO')        {$dmultitelescope = 'NO'}
-	elsif($multitelescope eq 'P')         {$dmultitelescope = 'PREFERENCE'}
+	elsif($multitelescope eq 'N')     {$dmultitelescope = 'NO'}
+	elsif($multitelescope eq 'NO')    {$dmultitelescope = 'NO'}
+	elsif($multitelescope eq 'P')     {$dmultitelescope = 'PREFERENCE'}
 	elsif($multitelescope eq 'PREFERENCE'){$dmultitelescope = 'PREFERENCE'}
 
 
 	if($hrc_zero_block    eq 'NULL')      {$dhrc_zero_block = 'NULL'}
-	elsif($hrc_zero_block eq '')          {$dhrc_zero_block = 'NO'; $hrc_zero_block = 'N';}
-	elsif($hrc_zero_block eq 'Y')         {$dhrc_zero_block = 'YES'}
+	elsif($hrc_zero_block eq '')      {$dhrc_zero_block = 'NO'; $hrc_zero_block = 'N';}
+	elsif($hrc_zero_block eq 'Y')     {$dhrc_zero_block = 'YES'}
 	elsif($hrc_zero_block eq 'YES')       {$dhrc_zero_block = 'YES'}
-	elsif($hrc_zero_block eq 'N')         {$dhrc_zero_block = 'NO'}
-	elsif($hrc_zero_block eq 'NO')        {$dhrc_zero_block = 'NO'}
+	elsif($hrc_zero_block eq 'N')     {$dhrc_zero_block = 'NO'}
+	elsif($hrc_zero_block eq 'NO')    {$dhrc_zero_block = 'NO'}
 
 	if($most_efficient    eq 'NULL')      {$dmost_efficient = 'NULL'}
-	elsif($most_efficient eq '')          {$dmost_efficient = 'NULL'}
-	elsif($most_efficient eq 'Y')         {$dmost_efficient = 'YES'}
+	elsif($most_efficient eq '')      {$dmost_efficient = 'NULL'}
+	elsif($most_efficient eq 'Y')     {$dmost_efficient = 'YES'}
 	elsif($most_efficient eq 'YES')       {$dmost_efficient = 'YES'}
-	elsif($most_efficient eq 'N')         {$dmost_efficient = 'NO'}
-	elsif($most_efficient eq 'NO')        {$dmost_efficient = 'NO'}
+	elsif($most_efficient eq 'N')     {$dmost_efficient = 'NO'}
+	elsif($most_efficient eq 'NO')    {$dmost_efficient = 'NO'}
 
-	if($ccdi0_on    eq 'NULL')            {$dccdi0_on = 'NULL'}
-	elsif($ccdi0_on eq 'Y')               {$dccdi0_on = 'YES'}
-	elsif($ccdi0_on eq 'YES')             {$dccdi0_on = 'YES'}
-	elsif($ccdi0_on eq 'N')               {$dccdi0_on = 'NO'}
-	elsif($ccdi0_on eq 'NO')              {$dccdi0_on = 'NO'}
-	elsif($ccdi0_on eq 'OPT1')             {$dccdi0_on = 'OPT1'}
-	elsif($ccdi0_on eq 'OPT2')            {$dccdi0_on = 'OPT2'}
-	elsif($ccdi0_on eq 'OPT3')            {$dccdi0_on = 'OPT3'}
-	elsif($ccdi0_on eq 'OPT4')            {$dccdi0_on = 'OPT4'}
-	elsif($ccdi0_on eq 'OPT5')            {$dccdi0_on = 'OPT5'}
-	if($ccdi0_on eq 'OPT1')               {$ccdi0_on  = 'O1'}
-	elsif($ccdi0_on eq 'OPT2')            {$ccdi0_on  = 'O2'}
-	elsif($ccdi0_on eq 'OPT3')            {$ccdi0_on  = 'O3'}
-	elsif($ccdi0_on eq 'OPT4')            {$ccdi0_on  = 'O4'}
-	elsif($ccdi0_on eq 'OPT5')            {$ccdi0_on  = 'O5'}
+	if($ccdi0_on    eq 'NULL')        {$dccdi0_on = 'NULL'}
+	elsif($ccdi0_on eq 'Y')           {$dccdi0_on = 'YES'}
+	elsif($ccdi0_on eq 'YES')         {$dccdi0_on = 'YES'}
+	elsif($ccdi0_on eq 'N')           {$dccdi0_on = 'NO'}
+	elsif($ccdi0_on eq 'NO')          {$dccdi0_on = 'NO'}
+	elsif($ccdi0_on eq 'OPT1')         {$dccdi0_on = 'OPT1'}
+	elsif($ccdi0_on eq 'OPT2')        {$dccdi0_on = 'OPT2'}
+	elsif($ccdi0_on eq 'OPT3')        {$dccdi0_on = 'OPT3'}
+	elsif($ccdi0_on eq 'OPT4')        {$dccdi0_on = 'OPT4'}
+	elsif($ccdi0_on eq 'OPT5')        {$dccdi0_on = 'OPT5'}
+	if($ccdi0_on eq 'OPT1')           {$ccdi0_on  = 'O1'}
+	elsif($ccdi0_on eq 'OPT2')        {$ccdi0_on  = 'O2'}
+	elsif($ccdi0_on eq 'OPT3')        {$ccdi0_on  = 'O3'}
+	elsif($ccdi0_on eq 'OPT4')        {$ccdi0_on  = 'O4'}
+	elsif($ccdi0_on eq 'OPT5')        {$ccdi0_on  = 'O5'}
 	
 	
-	if($ccdi1_on    eq 'NULL')            {$dccdi1_on = 'NULL'}
-	elsif($ccdi1_on eq 'Y')               {$dccdi1_on = 'YES'}
-	elsif($ccdi1_on eq 'YES')             {$dccdi1_on = 'YES'}
-	elsif($ccdi1_on eq 'N')               {$dccdi1_on = 'NO'}
-	elsif($ccdi1_on eq 'NO')              {$dccdi1_on = 'NO'}
-	elsif($ccdi1_on eq 'OPT1')            {$dccdi1_on = 'OPT1'}
-	elsif($ccdi1_on eq 'OPT2')            {$dccdi1_on = 'OPT2'}
-	elsif($ccdi1_on eq 'OPT3')            {$dccdi1_on = 'OPT3'}
-	elsif($ccdi1_on eq 'OPT4')            {$dccdi1_on = 'OPT4'}
-	elsif($ccdi1_on eq 'OPT5')            {$dccdi1_on = 'OPT5'}
-	if($ccdi1_on eq 'OPT1')               {$ccdi1_on  = 'O1'}
-	elsif($ccdi1_on eq 'OPT2')            {$ccdi1_on  = 'O2'}
-	elsif($ccdi1_on eq 'OPT3')            {$ccdi1_on  = 'O3'}
-	elsif($ccdi1_on eq 'OPT4')            {$ccdi1_on  = 'O4'}
-	elsif($ccdi1_on eq 'OPT5')            {$ccdi1_on  = 'O5'}
+	if($ccdi1_on    eq 'NULL')        {$dccdi1_on = 'NULL'}
+	elsif($ccdi1_on eq 'Y')           {$dccdi1_on = 'YES'}
+	elsif($ccdi1_on eq 'YES')         {$dccdi1_on = 'YES'}
+	elsif($ccdi1_on eq 'N')           {$dccdi1_on = 'NO'}
+	elsif($ccdi1_on eq 'NO')          {$dccdi1_on = 'NO'}
+	elsif($ccdi1_on eq 'OPT1')        {$dccdi1_on = 'OPT1'}
+	elsif($ccdi1_on eq 'OPT2')        {$dccdi1_on = 'OPT2'}
+	elsif($ccdi1_on eq 'OPT3')        {$dccdi1_on = 'OPT3'}
+	elsif($ccdi1_on eq 'OPT4')        {$dccdi1_on = 'OPT4'}
+	elsif($ccdi1_on eq 'OPT5')        {$dccdi1_on = 'OPT5'}
+	if($ccdi1_on eq 'OPT1')           {$ccdi1_on  = 'O1'}
+	elsif($ccdi1_on eq 'OPT2')        {$ccdi1_on  = 'O2'}
+	elsif($ccdi1_on eq 'OPT3')        {$ccdi1_on  = 'O3'}
+	elsif($ccdi1_on eq 'OPT4')        {$ccdi1_on  = 'O4'}
+	elsif($ccdi1_on eq 'OPT5')        {$ccdi1_on  = 'O5'}
 	
-	if($ccdi2_on    eq 'NULL')            {$dccdi2_on = 'NULL'}
-	elsif($ccdi2_on eq 'Y')               {$dccdi2_on = 'YES'}
-	elsif($ccdi2_on eq 'YES')             {$dccdi2_on = 'YES'}
-	elsif($ccdi2_on eq 'N')               {$dccdi2_on = 'NO'}
-	elsif($ccdi2_on eq 'NO')              {$dccdi2_on = 'NO'}
-	elsif($ccdi2_on eq 'OPT1')            {$dccdi2_on = 'OPT1'}
-	elsif($ccdi2_on eq 'OPT2')            {$dccdi2_on = 'OPT2'}
-	elsif($ccdi2_on eq 'OPT3')            {$dccdi2_on = 'OPT3'}
-	elsif($ccdi2_on eq 'OPT4')            {$dccdi2_on = 'OPT4'}
-	elsif($ccdi2_on eq 'OPT5')            {$dccdi2_on = 'OPT5'}
-	if($ccdi2_on eq 'OPT1')               {$ccdi2_on  = 'O1'}
-	elsif($ccdi2_on eq 'OPT2')            {$ccdi2_on  = 'O2'}
-	elsif($ccdi2_on eq 'OPT3')            {$ccdi2_on  = 'O3'}
-	elsif($ccdi2_on eq 'OPT4')            {$ccdi2_on  = 'O4'}
-	elsif($ccdi2_on eq 'OPT5')            {$ccdi2_on  = 'O5'}
+	if($ccdi2_on    eq 'NULL')        {$dccdi2_on = 'NULL'}
+	elsif($ccdi2_on eq 'Y')           {$dccdi2_on = 'YES'}
+	elsif($ccdi2_on eq 'YES')         {$dccdi2_on = 'YES'}
+	elsif($ccdi2_on eq 'N')           {$dccdi2_on = 'NO'}
+	elsif($ccdi2_on eq 'NO')          {$dccdi2_on = 'NO'}
+	elsif($ccdi2_on eq 'OPT1')        {$dccdi2_on = 'OPT1'}
+	elsif($ccdi2_on eq 'OPT2')        {$dccdi2_on = 'OPT2'}
+	elsif($ccdi2_on eq 'OPT3')        {$dccdi2_on = 'OPT3'}
+	elsif($ccdi2_on eq 'OPT4')        {$dccdi2_on = 'OPT4'}
+	elsif($ccdi2_on eq 'OPT5')        {$dccdi2_on = 'OPT5'}
+	if($ccdi2_on eq 'OPT1')           {$ccdi2_on  = 'O1'}
+	elsif($ccdi2_on eq 'OPT2')        {$ccdi2_on  = 'O2'}
+	elsif($ccdi2_on eq 'OPT3')        {$ccdi2_on  = 'O3'}
+	elsif($ccdi2_on eq 'OPT4')        {$ccdi2_on  = 'O4'}
+	elsif($ccdi2_on eq 'OPT5')        {$ccdi2_on  = 'O5'}
 	
-	if($ccdi3_on    eq 'NULL')            {$dccdi3_on = 'NULL'}
-	elsif($ccdi3_on eq 'Y')               {$dccdi3_on = 'YES'}
-	elsif($ccdi3_on eq 'YES')             {$dccdi3_on = 'YES'}
-	elsif($ccdi3_on eq 'N')               {$dccdi3_on = 'NO'}
-	elsif($ccdi3_on eq 'NO')              {$dccdi3_on = 'NO'}
-	elsif($ccdi3_on eq 'OPT1')            {$dccdi3_on = 'OPT1'}
-	elsif($ccdi3_on eq 'OPT2')            {$dccdi3_on = 'OPT2'}
-	elsif($ccdi3_on eq 'OPT3')            {$dccdi3_on = 'OPT3'}
-	elsif($ccdi3_on eq 'OPT4')            {$dccdi3_on = 'OPT4'}
-	elsif($ccdi3_on eq 'OPT5')            {$dccdi3_on = 'OPT5'}
-	if($ccdi3_on eq 'OPT1')               {$ccdi3_on  = 'O1'}
-	elsif($ccdi3_on eq 'OPT2')            {$ccdi3_on  = 'O2'}
-	elsif($ccdi3_on eq 'OPT3')            {$ccdi3_on  = 'O3'}
-	elsif($ccdi3_on eq 'OPT4')            {$ccdi3_on  = 'O4'}
-	elsif($ccdi3_on eq 'OPT5')            {$ccdi3_on  = 'O5'}
+	if($ccdi3_on    eq 'NULL')        {$dccdi3_on = 'NULL'}
+	elsif($ccdi3_on eq 'Y')           {$dccdi3_on = 'YES'}
+	elsif($ccdi3_on eq 'YES')         {$dccdi3_on = 'YES'}
+	elsif($ccdi3_on eq 'N')           {$dccdi3_on = 'NO'}
+	elsif($ccdi3_on eq 'NO')          {$dccdi3_on = 'NO'}
+	elsif($ccdi3_on eq 'OPT1')        {$dccdi3_on = 'OPT1'}
+	elsif($ccdi3_on eq 'OPT2')        {$dccdi3_on = 'OPT2'}
+	elsif($ccdi3_on eq 'OPT3')        {$dccdi3_on = 'OPT3'}
+	elsif($ccdi3_on eq 'OPT4')        {$dccdi3_on = 'OPT4'}
+	elsif($ccdi3_on eq 'OPT5')        {$dccdi3_on = 'OPT5'}
+	if($ccdi3_on eq 'OPT1')           {$ccdi3_on  = 'O1'}
+	elsif($ccdi3_on eq 'OPT2')        {$ccdi3_on  = 'O2'}
+	elsif($ccdi3_on eq 'OPT3')        {$ccdi3_on  = 'O3'}
+	elsif($ccdi3_on eq 'OPT4')        {$ccdi3_on  = 'O4'}
+	elsif($ccdi3_on eq 'OPT5')        {$ccdi3_on  = 'O5'}
 	
-	if($ccds0_on    eq 'NULL')            {$dccds0_on = 'NULL'}
-	elsif($ccds0_on eq 'Y')               {$dccds0_on = 'YES'}
-	elsif($ccds0_on eq 'YES')             {$dccds0_on = 'YES'}
-	elsif($ccds0_on eq 'N')               {$dccds0_on = 'NO'}
-	elsif($ccds0_on eq 'NO')              {$dccds0_on = 'NO'}
-	elsif($ccds0_on eq 'OPT1')            {$dccds0_on = 'OPT1'}
-	elsif($ccds0_on eq 'OPT2')            {$dccds0_on = 'OPT2'}
-	elsif($ccds0_on eq 'OPT3')            {$dccds0_on = 'OPT3'}
-	elsif($ccds0_on eq 'OPT4')            {$dccds0_on = 'OPT4'}
-	elsif($ccds0_on eq 'OPT5')            {$dccds0_on = 'OPT5'}
-	if($ccds0_on eq 'OPT1')               {$ccds0_on  = 'O1'}
-	elsif($ccds0_on eq 'OPT2')            {$ccds0_on  = 'O2'}
-	elsif($ccds0_on eq 'OPT3')            {$ccds0_on  = 'O3'}
-	elsif($ccds0_on eq 'OPT4')            {$ccds0_on  = 'O4'}
-	elsif($ccds0_on eq 'OPT5')            {$ccds0_on  = 'O5'}
+	if($ccds0_on    eq 'NULL')        {$dccds0_on = 'NULL'}
+	elsif($ccds0_on eq 'Y')           {$dccds0_on = 'YES'}
+	elsif($ccds0_on eq 'YES')         {$dccds0_on = 'YES'}
+	elsif($ccds0_on eq 'N')           {$dccds0_on = 'NO'}
+	elsif($ccds0_on eq 'NO')          {$dccds0_on = 'NO'}
+	elsif($ccds0_on eq 'OPT1')        {$dccds0_on = 'OPT1'}
+	elsif($ccds0_on eq 'OPT2')        {$dccds0_on = 'OPT2'}
+	elsif($ccds0_on eq 'OPT3')        {$dccds0_on = 'OPT3'}
+	elsif($ccds0_on eq 'OPT4')        {$dccds0_on = 'OPT4'}
+	elsif($ccds0_on eq 'OPT5')        {$dccds0_on = 'OPT5'}
+	if($ccds0_on eq 'OPT1')           {$ccds0_on  = 'O1'}
+	elsif($ccds0_on eq 'OPT2')        {$ccds0_on  = 'O2'}
+	elsif($ccds0_on eq 'OPT3')        {$ccds0_on  = 'O3'}
+	elsif($ccds0_on eq 'OPT4')        {$ccds0_on  = 'O4'}
+	elsif($ccds0_on eq 'OPT5')        {$ccds0_on  = 'O5'}
 	
-	if($ccds1_on    eq 'NULL')            {$dccds1_on = 'NULL'}
-	elsif($ccds1_on eq 'Y')               {$dccds1_on = 'YES'}
-	elsif($ccds1_on eq 'YES')             {$dccds1_on = 'YES'}
-	elsif($ccds1_on eq 'N')               {$dccds1_on = 'NO'}
-	elsif($ccds1_on eq 'NO')              {$dccds1_on = 'NO'}
-	elsif($ccds1_on eq 'OPT1')            {$dccds1_on = 'OPT1'}
-	elsif($ccds1_on eq 'OPT2')            {$dccds1_on = 'OPT2'}
-	elsif($ccds1_on eq 'OPT3')            {$dccds1_on = 'OPT3'}
-	elsif($ccds1_on eq 'OPT4')            {$dccds1_on = 'OPT4'}
-	elsif($ccds1_on eq 'OPT5')            {$dccds1_on = 'OPT5'}
-	if($ccds1_on eq 'OPT1')               {$ccds1_on  = 'O1'}
-	elsif($ccds1_on eq 'OPT2')            {$ccds1_on  = 'O2'}
-	elsif($ccds1_on eq 'OPT3')            {$ccds1_on  = 'O3'}
-	elsif($ccds1_on eq 'OPT4')            {$ccds1_on  = 'O4'}
-	elsif($ccds1_on eq 'OPT5')            {$ccds1_on  = 'O5'}
+	if($ccds1_on    eq 'NULL')        {$dccds1_on = 'NULL'}
+	elsif($ccds1_on eq 'Y')           {$dccds1_on = 'YES'}
+	elsif($ccds1_on eq 'YES')         {$dccds1_on = 'YES'}
+	elsif($ccds1_on eq 'N')           {$dccds1_on = 'NO'}
+	elsif($ccds1_on eq 'NO')          {$dccds1_on = 'NO'}
+	elsif($ccds1_on eq 'OPT1')        {$dccds1_on = 'OPT1'}
+	elsif($ccds1_on eq 'OPT2')        {$dccds1_on = 'OPT2'}
+	elsif($ccds1_on eq 'OPT3')        {$dccds1_on = 'OPT3'}
+	elsif($ccds1_on eq 'OPT4')        {$dccds1_on = 'OPT4'}
+	elsif($ccds1_on eq 'OPT5')        {$dccds1_on = 'OPT5'}
+	if($ccds1_on eq 'OPT1')           {$ccds1_on  = 'O1'}
+	elsif($ccds1_on eq 'OPT2')        {$ccds1_on  = 'O2'}
+	elsif($ccds1_on eq 'OPT3')        {$ccds1_on  = 'O3'}
+	elsif($ccds1_on eq 'OPT4')        {$ccds1_on  = 'O4'}
+	elsif($ccds1_on eq 'OPT5')        {$ccds1_on  = 'O5'}
 	
-	if($ccds2_on    eq 'NULL')            {$dccds2_on = 'NULL'}
-	elsif($ccds2_on eq 'Y')               {$dccds2_on = 'YES'}
-	elsif($ccds2_on eq 'YES')             {$dccds2_on = 'YES'}
-	elsif($ccds2_on eq 'N')               {$dccds2_on = 'NO'}
-	elsif($ccds2_on eq 'NO')              {$dccds2_on = 'NO'}
-	elsif($ccds2_on eq 'OPT1')            {$dccds2_on = 'OPT1'}
-	elsif($ccds2_on eq 'OPT2')            {$dccds2_on = 'OPT2'}
-	elsif($ccds2_on eq 'OPT3')            {$dccds2_on = 'OPT3'}
-	elsif($ccds2_on eq 'OPT4')            {$dccds2_on = 'OPT4'}
-	elsif($ccds2_on eq 'OPT5')            {$dccds2_on = 'OPT5'}
-	if($ccds2_on eq 'OPT1')               {$ccds2_on  = 'O1'}
-	elsif($ccds2_on eq 'OPT2')            {$ccds2_on  = 'O2'}
-	elsif($ccds2_on eq 'OPT3')            {$ccds2_on  = 'O3'}
-	elsif($ccds2_on eq 'OPT4')            {$ccds2_on  = 'O4'}
-	elsif($ccds2_on eq 'OPT5')            {$ccds2_on  = 'O5'}
+	if($ccds2_on    eq 'NULL')        {$dccds2_on = 'NULL'}
+	elsif($ccds2_on eq 'Y')           {$dccds2_on = 'YES'}
+	elsif($ccds2_on eq 'YES')         {$dccds2_on = 'YES'}
+	elsif($ccds2_on eq 'N')           {$dccds2_on = 'NO'}
+	elsif($ccds2_on eq 'NO')          {$dccds2_on = 'NO'}
+	elsif($ccds2_on eq 'OPT1')        {$dccds2_on = 'OPT1'}
+	elsif($ccds2_on eq 'OPT2')        {$dccds2_on = 'OPT2'}
+	elsif($ccds2_on eq 'OPT3')        {$dccds2_on = 'OPT3'}
+	elsif($ccds2_on eq 'OPT4')        {$dccds2_on = 'OPT4'}
+	elsif($ccds2_on eq 'OPT5')        {$dccds2_on = 'OPT5'}
+	if($ccds2_on eq 'OPT1')           {$ccds2_on  = 'O1'}
+	elsif($ccds2_on eq 'OPT2')        {$ccds2_on  = 'O2'}
+	elsif($ccds2_on eq 'OPT3')        {$ccds2_on  = 'O3'}
+	elsif($ccds2_on eq 'OPT4')        {$ccds2_on  = 'O4'}
+	elsif($ccds2_on eq 'OPT5')        {$ccds2_on  = 'O5'}
 	
-	if($ccds3_on    eq 'NULL')            {$dccds3_on = 'NULL'}
-	elsif($ccds3_on eq 'Y')               {$dccds3_on = 'YES'}
-	elsif($ccds3_on eq 'YES')             {$dccds3_on = 'YES'}
-	elsif($ccds3_on eq 'N')               {$dccds3_on = 'NO'}
-	elsif($ccds3_on eq 'NO')              {$dccds3_on = 'NO'}
-	elsif($ccds3_on eq 'OPT1')            {$dccds3_on = 'OPT1'}
-	elsif($ccds3_on eq 'OPT2')            {$dccds3_on = 'OPT2'}
-	elsif($ccds3_on eq 'OPT3')            {$dccds3_on = 'OPT3'}
-	elsif($ccds3_on eq 'OPT4')            {$dccds3_on = 'OPT4'}
-	elsif($ccds3_on eq 'OPT5')            {$dccds3_on = 'OPT5'}
-	if($ccds3_on eq 'OPT1')               {$ccds3_on  = 'O1'}
-	elsif($ccds3_on eq 'OPT2')            {$ccds3_on  = 'O2'}
-	elsif($ccds3_on eq 'OPT3')            {$ccds3_on  = 'O3'}
-	elsif($ccds3_on eq 'OPT4')            {$ccds3_on  = 'O4'}
-	elsif($ccds3_on eq 'OPT5')            {$ccds3_on  = 'O5'}
+	if($ccds3_on    eq 'NULL')        {$dccds3_on = 'NULL'}
+	elsif($ccds3_on eq 'Y')           {$dccds3_on = 'YES'}
+	elsif($ccds3_on eq 'YES')         {$dccds3_on = 'YES'}
+	elsif($ccds3_on eq 'N')           {$dccds3_on = 'NO'}
+	elsif($ccds3_on eq 'NO')          {$dccds3_on = 'NO'}
+	elsif($ccds3_on eq 'OPT1')        {$dccds3_on = 'OPT1'}
+	elsif($ccds3_on eq 'OPT2')        {$dccds3_on = 'OPT2'}
+	elsif($ccds3_on eq 'OPT3')        {$dccds3_on = 'OPT3'}
+	elsif($ccds3_on eq 'OPT4')        {$dccds3_on = 'OPT4'}
+	elsif($ccds3_on eq 'OPT5')        {$dccds3_on = 'OPT5'}
+	if($ccds3_on eq 'OPT1')           {$ccds3_on  = 'O1'}
+	elsif($ccds3_on eq 'OPT2')        {$ccds3_on  = 'O2'}
+	elsif($ccds3_on eq 'OPT3')        {$ccds3_on  = 'O3'}
+	elsif($ccds3_on eq 'OPT4')        {$ccds3_on  = 'O4'}
+	elsif($ccds3_on eq 'OPT5')        {$ccds3_on  = 'O5'}
 
-	if($ccds4_on    eq 'NULL')            {$dccds4_on = 'NULL'}
-	elsif($ccds4_on eq 'Y')               {$dccds4_on = 'YES'}
-	elsif($ccds4_on eq 'YES')             {$dccds4_on = 'YES'}
-	elsif($ccds4_on eq 'N')               {$dccds4_on = 'NO'}
-	elsif($ccds4_on eq 'NO')              {$dccds4_on = 'NO'}
-	elsif($ccds4_on eq 'OPT1')            {$dccds4_on = 'OPT1'}
-	elsif($ccds4_on eq 'OPT2')            {$dccds4_on = 'OPT2'}
-	elsif($ccds4_on eq 'OPT3')            {$dccds4_on = 'OPT3'}
-	elsif($ccds4_on eq 'OPT4')            {$dccds4_on = 'OPT4'}
-	elsif($ccds4_on eq 'OPT5')            {$dccds4_on = 'OPT5'}
-	if($ccds4_on eq 'OPT1')               {$ccds4_on  = 'O1'}
-	elsif($ccds4_on eq 'OPT2')            {$ccds4_on  = 'O2'}
-	elsif($ccds4_on eq 'OPT3')            {$ccds4_on  = 'O3'}
-	elsif($ccds4_on eq 'OPT4')            {$ccds4_on  = 'O4'}
-	elsif($ccds4_on eq 'OPT5')            {$ccds4_on  = 'O5'}
+	if($ccds4_on    eq 'NULL')        {$dccds4_on = 'NULL'}
+	elsif($ccds4_on eq 'Y')           {$dccds4_on = 'YES'}
+	elsif($ccds4_on eq 'YES')         {$dccds4_on = 'YES'}
+	elsif($ccds4_on eq 'N')           {$dccds4_on = 'NO'}
+	elsif($ccds4_on eq 'NO')          {$dccds4_on = 'NO'}
+	elsif($ccds4_on eq 'OPT1')        {$dccds4_on = 'OPT1'}
+	elsif($ccds4_on eq 'OPT2')        {$dccds4_on = 'OPT2'}
+	elsif($ccds4_on eq 'OPT3')        {$dccds4_on = 'OPT3'}
+	elsif($ccds4_on eq 'OPT4')        {$dccds4_on = 'OPT4'}
+	elsif($ccds4_on eq 'OPT5')        {$dccds4_on = 'OPT5'}
+	if($ccds4_on eq 'OPT1')           {$ccds4_on  = 'O1'}
+	elsif($ccds4_on eq 'OPT2')        {$ccds4_on  = 'O2'}
+	elsif($ccds4_on eq 'OPT3')        {$ccds4_on  = 'O3'}
+	elsif($ccds4_on eq 'OPT4')        {$ccds4_on  = 'O4'}
+	elsif($ccds4_on eq 'OPT5')        {$ccds4_on  = 'O5'}
 	
-	if($ccds5_on    eq 'NULL')            {$dccds5_on = 'NULL'}
-	elsif($ccds5_on eq 'Y')               {$dccds5_on = 'YES'}
-	elsif($ccds5_on eq 'YES')             {$dccds5_on = 'YES'}
-	elsif($ccds5_on eq 'N')               {$dccds5_on = 'NO'}
-	elsif($ccds5_on eq 'NO')              {$dccds5_on = 'NO'}
-	elsif($ccds5_on eq 'OPT1')            {$dccds5_on = 'OPT1'}
-	elsif($ccds5_on eq 'OPT2')            {$dccds5_on = 'OPT2'}
-	elsif($ccds5_on eq 'OPT3')            {$dccds5_on = 'OPT3'}
-	elsif($ccds5_on eq 'OPT4')            {$dccds5_on = 'OPT4'}
-	elsif($ccds5_on eq 'OPT5')            {$dccds5_on = 'OPT5'}
-	if($ccds5_on eq 'OPT1')               {$ccds5_on  = 'O1'}
-	elsif($ccds5_on eq 'OPT2')            {$ccds5_on  = 'O2'}
-	elsif($ccds5_on eq 'OPT3')            {$ccds5_on  = 'O3'}
-	elsif($ccds5_on eq 'OPT4')            {$ccds5_on  = 'O4'}
-	elsif($ccds5_on eq 'OPT5')            {$ccds5_on  = 'O5'}
+	if($ccds5_on    eq 'NULL')        {$dccds5_on = 'NULL'}
+	elsif($ccds5_on eq 'Y')           {$dccds5_on = 'YES'}
+	elsif($ccds5_on eq 'YES')         {$dccds5_on = 'YES'}
+	elsif($ccds5_on eq 'N')           {$dccds5_on = 'NO'}
+	elsif($ccds5_on eq 'NO')          {$dccds5_on = 'NO'}
+	elsif($ccds5_on eq 'OPT1')        {$dccds5_on = 'OPT1'}
+	elsif($ccds5_on eq 'OPT2')        {$dccds5_on = 'OPT2'}
+	elsif($ccds5_on eq 'OPT3')        {$dccds5_on = 'OPT3'}
+	elsif($ccds5_on eq 'OPT4')        {$dccds5_on = 'OPT4'}
+	elsif($ccds5_on eq 'OPT5')        {$dccds5_on = 'OPT5'}
+	if($ccds5_on eq 'OPT1')           {$ccds5_on  = 'O1'}
+	elsif($ccds5_on eq 'OPT2')        {$ccds5_on  = 'O2'}
+	elsif($ccds5_on eq 'OPT3')        {$ccds5_on  = 'O3'}
+	elsif($ccds5_on eq 'OPT4')        {$ccds5_on  = 'O4'}
+	elsif($ccds5_on eq 'OPT5')        {$ccds5_on  = 'O5'}
 	
 	$count_ccd_on = 0;
 	if($ccdi0_on =~ /Y/i){$count_ccd_on++} 
@@ -1415,17 +1415,17 @@ sub pass_param {
 	elsif($eventfilter eq 'N')	{$deventfilter = 'NO'}
 	elsif($eventfilter eq 'NO')	{$deventfilter = 'NO'}
 
-#        if($multiple_spectral_lines    eq 'NULL')       {$dmultiple_spectral_lines = 'NULL'}
-        if($multiple_spectral_lines eq 'Y')          {$dmultiple_spectral_lines = 'YES'}
-        elsif($multiple_spectral_lines eq 'YES')        {$dmultiple_spectral_lines = 'YES'}
-        elsif($multiple_spectral_lines eq 'N')          {$dmultiple_spectral_lines = 'NO'}
-        elsif($multiple_spectral_lines eq 'NO')         {$dmultiple_spectral_lines = 'NO'}
+    if($multiple_spectral_lines    eq 'NULL')       {$dmultiple_spectral_lines = 'NULL'}
+    if($multiple_spectral_lines eq 'Y')         {$dmultiple_spectral_lines = 'YES'}
+    elsif($multiple_spectral_lines eq 'YES')    {$dmultiple_spectral_lines = 'YES'}
+    elsif($multiple_spectral_lines eq 'N')      {$dmultiple_spectral_lines = 'NO'}
+    elsif($multiple_spectral_lines eq 'NO')     {$dmultiple_spectral_lines = 'NO'}
 
-        if($spwindow    eq 'NULL')      {$dspwindow = 'NULL'}
-        elsif($spwindow eq 'Y')         {$dspwindow = 'YES'}
-        elsif($spwindow eq 'YES')       {$dspwindow = 'YES'}
-        elsif($spwindow eq 'N')         {$dspwindow = 'NO'}
-        elsif($spwindow eq 'NO')        {$dspwindow = 'NO'}
+    if($spwindow    eq 'NULL')      {$dspwindow = 'NULL'}
+    elsif($spwindow eq 'Y')     {$dspwindow = 'YES'}
+    elsif($spwindow eq 'YES')       {$dspwindow = 'YES'}
+    elsif($spwindow eq 'N')     {$dspwindow = 'NO'}
+    elsif($spwindow eq 'NO')    {$dspwindow = 'NO'}
 
 	if($spwindow    eq 'NULL')	{$dspwindow = 'NULL'}
 	elsif($spwindow eq 'Y')		{$dspwindow = 'YES'}
@@ -1433,10 +1433,10 @@ sub pass_param {
 	elsif($spwindow eq 'N')		{$dspwindow = 'NO'}
 	elsif($spwindow eq 'NO')	{$dspwindow = 'NO'}
 
-	if($subarray eq 'N')         {$dsubarray = 'NO';
+	if($subarray eq 'N')     {$dsubarray = 'NO';
 				      $subarray  = 'NONE'}
 	elsif($subarray eq 'NO')     {$dsubarray = 'NO';
-			              $subarray  = 'NONE'}
+			          $subarray  = 'NONE'}
 	elsif($subarray eq 'NONE')   {$dsubarray = 'NO'}
 	elsif($subarray eq 'Y')      {$dsubarray = 'YES'}
 	elsif($subarray eq 'YES')    {$dsubarray = 'YES';
@@ -1447,10 +1447,10 @@ sub pass_param {
 #
 #---- added 08/05/11
 #
-        if($extended_src  eq 'NO')    {$dextended_src = 'NO'}
-        elsif($extended_src eq 'N')   {$dextended_src = 'NO'}
-        elsif($extended_src eq 'YES') {$dextended_src = 'YES'}
-        elsif($extended_src eq 'Y')   {$dextended_src = 'YES'}
+    if($extended_src  eq 'NO')    {$dextended_src = 'NO'}
+    elsif($extended_src eq 'N')   {$dextended_src = 'NO'}
+    elsif($extended_src eq 'YES') {$dextended_src = 'YES'}
+    elsif($extended_src eq 'Y')   {$dextended_src = 'YES'}
 
 
 	if($hrc_timing_mode eq 'N'){
@@ -1549,7 +1549,7 @@ sub pass_param {
 		if($chip[$j] =~ /N/i){
 			$lower_threshold[$j] = '';
 			$pha_range[$j]       = '';
-			$sample[$j]          = '';
+			$sample[$j]      = '';
 		}elsif($lower_threshold[$j] > 0.5){
 			$awc_l_th = 1;
 		}
@@ -1559,23 +1559,23 @@ sub pass_param {
 #----- dether params
 #
 	if($y_amp =~ /\d/ || $y_amp_asec =~ /\d/){
-        	$y_amp   = $y_amp_asec/3600;
+    	$y_amp   = $y_amp_asec/3600;
 	}
 	if($z_amp =~ /\d/ || $z_amp_asec =~ /\d/){
-        	$z_amp   = $z_amp_asec/3600;
+    	$z_amp   = $z_amp_asec/3600;
 	}
 
 	if($y_freq =~ /\d/ || $y_freq_asec =~ /\d/){
-        	$y_freq   = $y_freq_asec/3600;
+    	$y_freq   = $y_freq_asec/3600;
 	}
 	if($z_freq =~ /\d/ || $z_freq_asec =~ /\d/){
-        	$z_freq   = $z_freq_asec/3600;
+    	$z_freq   = $z_freq_asec/3600;
 	}
 }
 
 
 ################################################################################
-### sub read_databases: read out values from databases                       ###
+### sub read_databases: read out values from databases               ###
 ################################################################################
 
 sub read_databases{
@@ -1629,7 +1629,7 @@ sub read_databases{
 		mpcat_star_fidlight_file,status,data_rights,tooid,description,
 		total_fld_cnt_rate, extended_src,uninterrupt, multitelescope,observatories,
 		tooid, constr_in_remarks, group_id, obs_ao_str, roll_flag, window_flag, spwindow_flag,
-                multitelescope_interval
+        multitelescope_interval
 	from target where obsid=$obsid));
 	$sqlh1->execute();
     	@targetdata = $sqlh1->fetchrow_array;
@@ -1719,16 +1719,16 @@ sub read_databases{
    		$monitor_flag = "N";
 	
 		$sqlh1 = $dbh1->prepare(qq(select
-        		obsid
+    		obsid
 		from target where group_id = \'$group_id\'));
 		$sqlh1->execute();
 
 		while(@group_obsid = $sqlh1->fetchrow_array){
-        		$group_obsid = join("<td>", @group_obsid);
+    		$group_obsid = join("<td>", @group_obsid);
 			if($usint_on =~ /test/){
-        			@group       = (@group, "<a href=\"$test_http\/ocatdata2html.cgi\?$group_obsid\">$group_obsid<\/a> ");
+    			@group       = (@group, "<a href=\"$test_http\/ocatdata2html.cgi\?$group_obsid\">$group_obsid<\/a> ");
 			}else{
-        			@group       = (@group, "<a href=\"$usint_http\/ocatdata2html.cgi\?$group_obsid\">$group_obsid<\/a> ");
+    			@group       = (@group, "<a href=\"$usint_http\/ocatdata2html.cgi\?$group_obsid\">$group_obsid<\/a> ");
 			}
 		}
 
@@ -1738,7 +1738,7 @@ sub read_databases{
    		foreach (@group){
        			$group_count ++;
        			if(($group_count % 10) == 0){
-	           		@group[$group_count - 1] = "@group[$group_count - 1]<br />";
+	       		@group[$group_count - 1] = "@group[$group_count - 1]<br />";
        			}
    		}
 		$group_cnt    = $group_count;
@@ -1756,16 +1756,16 @@ sub read_databases{
 #---- if monitoring flag is Y, find which ones are monitoring data
 #------------------------------------------------------------------
 
-        if($monitor_flag =~ /Y/i){
-                &series_rev($obsid);
-                &series_fwd($obsid);
-                %seen = ();
-                @uniq = ();
-                foreach $monitor_elem (@monitor_series) {
-                        push(@uniq, $monitor_elem) unless $seen{$monitor_elem}++;
-                }
-                @monitor_series = sort @uniq;
+    if($monitor_flag =~ /Y/i){
+        &series_rev($obsid);
+        &series_fwd($obsid);
+        %seen = ();
+        @uniq = ();
+        foreach $monitor_elem (@monitor_series) {
+            push(@uniq, $monitor_elem) unless $seen{$monitor_elem}++;
         }
+        @monitor_series = sort @uniq;
+    }
 
 #-------------------------------------------------
 #---- updating AO number for the observation
@@ -1773,15 +1773,15 @@ sub read_databases{
 #-------------------------------------------------
 
 	$proposal_id =~ s/\s+//g;
-        $sqlh1 = $dbh1->prepare(qq(select
-                ao_str
-        from prop_info where ocat_propid=$proposal_id ));
+    $sqlh1 = $dbh1->prepare(qq(select
+        ao_str
+    from prop_info where ocat_propid=$proposal_id ));
 
-        $sqlh1->execute();
-        @updatedata   = $sqlh1->fetchrow_array;
-        $sqlh1->finish;
-        $obs_ao_str = $updatedata[0];
-        $obs_ao_str =~ s/\s+//g;
+    $sqlh1->execute();
+    @updatedata   = $sqlh1->fetchrow_array;
+    $sqlh1->finish;
+    $obs_ao_str = $updatedata[0];
+    $obs_ao_str =~ s/\s+//g;
 
 #-----------------------------------------------------------------------
 #------- roll requirement database
@@ -1819,8 +1819,8 @@ sub read_databases{
 		$sqlh1->finish;
 
 		$roll_constraint[$tordr] = $rollreq_data[0];
-		$roll_180[$tordr]        = $rollreq_data[1];
-		$roll[$tordr]            = $rollreq_data[2];
+		$roll_180[$tordr]    = $rollreq_data[1];
+		$roll[$tordr]        = $rollreq_data[2];
 		$roll_tolerance[$tordr]  = $rollreq_data[3];
 	}
 
@@ -1861,8 +1861,8 @@ sub read_databases{
 		$sqlh1->finish;
 
 		$window_constraint[$tordr] = $timereq_data[0];
-		$tstart[$tordr]            = $timereq_data[1];
-		$tstop[$tordr]             = $timereq_data[2];
+		$tstart[$tordr]        = $timereq_data[1];
+		$tstop[$tordr]         = $timereq_data[2];
 	}
 
 #-----------------------------------------------------------------
@@ -1905,10 +1905,10 @@ sub read_databases{
 		$sqlh1->execute();
 		@hrcdata = $sqlh1->fetchrow_array;
 		$sqlh1->finish;
-                
+        
     		$hrc_zero_block      = $hrcdata[0];
     		$hrc_timing_mode     = $hrcdata[1];
-		$hrc_si_mode         = $hrcdata[2];
+		$hrc_si_mode     = $hrcdata[2];
 	} else {
     		$hrc_zero_block      = "N";
     		$hrc_timing_mode     = "N";
@@ -1935,7 +1935,7 @@ sub read_databases{
 		$sqlh1->execute();
 		@acisdata = $sqlh1->fetchrow_array;
 		$sqlh1->finish;
-                
+        
     		$exp_mode 		= $acisdata[0];
     		$ccdi0_on 		= $acisdata[1];
     		$ccdi1_on 		= $acisdata[2];
@@ -1950,19 +1950,19 @@ sub read_databases{
     		$ccds5_on 		= $acisdata[10];
 
     		$bep_pack 		= $acisdata[11];
-    		$onchip_sum          	= $acisdata[12];
+    		$onchip_sum      	= $acisdata[12];
     		$onchip_row_count    	= $acisdata[13];
     		$onchip_column_count 	= $acisdata[14];
-    		$frame_time          	= $acisdata[15];
+    		$frame_time      	= $acisdata[15];
 
-    		$subarray            	= $acisdata[16];
+    		$subarray        	= $acisdata[16];
     		$subarray_start_row  	= $acisdata[17];
     		$subarray_row_count  	= $acisdata[18];
-    		$duty_cycle          	= $acisdata[19];
+    		$duty_cycle      	= $acisdata[19];
     		$secondary_exp_count 	= $acisdata[20];
 
     		$primary_exp_time    	= $acisdata[21];
-    		$eventfilter         	= $acisdata[22];
+    		$eventfilter     	= $acisdata[22];
     		$eventfilter_lower   	= $acisdata[23];
     		$eventfilter_higher  	= $acisdata[24];
     		$most_efficient      	= $acisdata[25];
@@ -1984,24 +1984,24 @@ sub read_databases{
     		$ccds4_on 		= "NULL";
     		$ccds5_on 		= "NULL";
     		$bep_pack 		= "NULL";
-    		$onchip_sum          	= "NULL";
+    		$onchip_sum      	= "NULL";
     		$onchip_row_count    	= "NULL";
     		$onchip_column_count 	= "NULL";
-    		$frame_time          	= "NULL";
-    		$subarray            	= "NONE";
+    		$frame_time      	= "NULL";
+    		$subarray        	= "NONE";
     		$subarray_start_row  	= "NULL";
     		$subarray_row_count  	= "NULL";
     		$subarray_frame_time 	= "NULL";
-    		$duty_cycle          	= "NULL";
+    		$duty_cycle      	= "NULL";
     		$secondary_exp_count 	= "NULL";
     		$primary_exp_time    	= "";
-    		$eventfilter         	= "NULL";
+    		$eventfilter     	= "NULL";
     		$eventfilter_lower   	= "NULL";
     		$eventfilter_higher  	= "NULL";
-    		$spwindow            	= "NULL";
+    		$spwindow        	= "NULL";
     		$most_efficient      	= "NULL";
 		$dropped_chip_count     = "NULL";
-		$multiple_spectral_lines = "N";
+		$multiple_spectral_lines = "NULL";
 		$spectra_max_count       = "NULL";
 	}
 
@@ -2116,9 +2116,9 @@ sub read_databases{
 	$sqlh1->finish;
 
 	$phase_period       = $phasereqdata[0];
-	$phase_epoch        = $phasereqdata[1];
-	$phase_start        = $phasereqdata[2];
-	$phase_end          = $phasereqdata[3];
+	$phase_epoch    = $phasereqdata[1];
+	$phase_start    = $phasereqdata[2];
+	$phase_end      = $phasereqdata[3];
 	$phase_start_margin = $phasereqdata[4];
 	$phase_end_margin   = $phasereqdata[5];
 
@@ -2366,8 +2366,8 @@ sub read_databases{
 
 	for($k = 1; $k <= $roll_ordr; $k++){
 		$roll_constraint[$k] =~ s/\s+//g; 
-		$roll_180[$k]        =~ s/\s+//g; 
-		$roll[$k]            =~ s/\s+//g;
+		$roll_180[$k]    =~ s/\s+//g; 
+		$roll[$k]        =~ s/\s+//g;
 		$roll_tolerance[$k]  =~ s/\s+//g; 
 	}
 
@@ -2377,16 +2377,16 @@ sub read_databases{
 
 	for($k = 0; $k < $aciswin_no; $k++){
 		$aciswin_id[$k]      =~ s/\s+//g;
-		$ordr[$k]            =~ s/\s+//g;
-		$chip[$k]            =~ s/\s+//g;
+		$ordr[$k]        =~ s/\s+//g;
+		$chip[$k]        =~ s/\s+//g;
 		$include_flag[$k]    =~ s/\s+//g;
 		$start_row[$k]       =~ s/\s+//g; 
 		$start_column[$k]    =~ s/\s+//g; 
-		$width[$k]           =~ s/\s+//g; 
-		$height[$k]          =~ s/\s+//g; 
+		$width[$k]       =~ s/\s+//g; 
+		$height[$k]      =~ s/\s+//g; 
 		$lower_threshold[$k] =~ s/\s+//g; 
 		$pha_range[$k]       =~ s/\s+//g; 
-		$sample[$k]          =~ s/\s+//g; 
+		$sample[$k]      =~ s/\s+//g; 
 	}
 
 #-----------------------------------
@@ -2648,7 +2648,7 @@ sub read_databases{
 #
 #---- ACIS subarray setting
 #
-	if($subarray eq '')         {$dsubarray = 'NO'}
+	if($subarray eq '')     {$dsubarray = 'NO'}
 	elsif($subarray eq 'N')     {$dsubarray = 'NO'}
 	elsif($subarray eq 'NONE')  {$dsubarray = 'NO'}
 	elsif($subarray eq 'CUSTOM'){$dsubarray = 'YES'}
@@ -2672,15 +2672,15 @@ sub read_databases{
 	elsif($eventfilter eq 'Y') {$deventfilter = 'YES'}
 	elsif($eventfilter eq 'N') {$deventfilter = 'NO'}
 
-#        if($multiple_spectral_lines eq 'NULL') {$dmultiple_spectral_lines = 'NULL'}
-        if($multiple_spectral_lines eq '')  {$dmultiple_spectral_lines = 'NO'; $multiple_spectral_lines = 'NO'}
-        elsif($multiple_spectral_lines eq 'Y') {$dmultiple_spectral_lines = 'YES'}
-        elsif($multiple_spectral_lines eq 'N') {$dmultiple_spectral_lines = 'NO'}
+    if($multiple_spectral_lines eq 'NULL') {$dmultiple_spectral_lines = 'NULL'}
+    if($multiple_spectral_lines eq '')  {$dmultiple_spectral_lines = 'NULL'; $multiple_spectral_lines = 'NULL'}
+    elsif($multiple_spectral_lines eq 'Y') {$dmultiple_spectral_lines = 'YES'}
+    elsif($multiple_spectral_lines eq 'N') {$dmultiple_spectral_lines = 'NO'}
 
-        if($spwindow eq 'NULL')    {$dspwindow = 'NULL'}
-        elsif($spwindow eq '' )    {$dspwindow = 'NULL'; $spwindow = 'NULL'}
-        elsif($spwindow eq 'Y')    {$dspwindow = 'YES'}
-        elsif($spwindow eq 'N')    {$dspwindow = 'NO'}
+    if($spwindow eq 'NULL')    {$dspwindow = 'NULL'}
+    elsif($spwindow eq '' )    {$dspwindow = 'NULL'; $spwindow = 'NULL'}
+    elsif($spwindow eq 'Y')    {$dspwindow = 'YES'}
+    elsif($spwindow eq 'N')    {$dspwindow = 'NO'}
 
 	if($spwindow eq 'NULL')    {$dspwindow = 'NULL'}
 	elsif($spwindow eq '' )    {$dspwindow = 'NULL'; $spwindow = 'NULL'}
@@ -2688,23 +2688,23 @@ sub read_databases{
 	elsif($spwindow eq 'N')    {$dspwindow = 'NO'}
 
 	if($y_amp =~ /\d/){
-        	$y_amp_asec  = 3600 * $y_amp;
+    	$y_amp_asec  = 3600 * $y_amp;
 	}else{
 		$y_amp_asec  = $y_amp;
 	}
 	if($z_amp =~ /\d/){
-        	$z_amp_asec  = 3600 * $z_amp;
+    	$z_amp_asec  = 3600 * $z_amp;
 	}else{
 		$z_amp_asec  = $z_amp;
 	}
 
 	if($y_freq =~ /\d/){
-        	$y_freq_asec = 3600 * $y_freq;
+    	$y_freq_asec = 3600 * $y_freq;
 	}else{
 		$y_freq_asec = $y_freq;
 	}
 	if($z_freq =~ /\d/){
-        	$z_freq_asec = 3600 * $z_freq;
+    	$z_freq_asec = 3600 * $z_freq;
 	}else{
 		$z_freq_asec = $z_freq;
 	}
@@ -2717,10 +2717,10 @@ sub read_databases{
 #
 #--- added 08/05/11
 #
-        if($extended_src eq 'NULL') {$dextended_src = 'NO'}
-        elsif($extended_src eq '')  {$dextended_src = 'NO'}
-        elsif($extended_src eq 'N') {$dextended_src = 'NO'}
-        elsif($extended_src eq 'Y') {$dextended_src = 'YES'}
+    if($extended_src eq 'NULL') {$dextended_src = 'NO'}
+    elsif($extended_src eq '')  {$dextended_src = 'NO'}
+    elsif($extended_src eq 'N') {$dextended_src = 'NO'}
+    elsif($extended_src eq 'Y') {$dextended_src = 'YES'}
 
 
 #-------------------------------------------------------------
@@ -2750,7 +2750,7 @@ sub read_databases{
 		SUBARRAY,SUBARRAY_START_ROW,SUBARRAY_ROW_COUNT,
 		DUTY_CYCLE,SECONDARY_EXP_COUNT,PRIMARY_EXP_TIME,
 		ONCHIP_SUM,ONCHIP_ROW_COUNT,ONCHIP_COLUMN_COUNT,EVENTFILTER,EVENTFILTER_LOWER,
-		MULTIPLE_SPECTRAL_LINES, SPECTRA_MAX_COUNT,                                             #--- added 03/29/11
+		MULTIPLE_SPECTRAL_LINES, SPECTRA_MAX_COUNT,                         #--- added 03/29/11
 		EVENTFILTER_HIGHER,SPWINDOW,ACISWIN_ID,ORDR, FEP,DROPPED_CHIP_COUNT, BIAS_RREQUEST,
 		TOO_ID,TOO_TRIG,TOO_TYPE,TOO_START,TOO_STOP,TOO_FOLLOWUP,TOO_REMARKS,
 		REMARKS,COMMENTS,
@@ -2781,7 +2781,7 @@ sub read_databases{
 		SUBARRAY,SUBARRAY_START_ROW,SUBARRAY_ROW_COUNT,
 		DUTY_CYCLE,SECONDARY_EXP_COUNT,PRIMARY_EXP_TIME,
 		ONCHIP_SUM,ONCHIP_ROW_COUNT,ONCHIP_COLUMN_COUNT,EVENTFILTER,EVENTFILTER_LOWER,
-		MULTIPLE_SPECTRAL_LINES, SPECTRA_MAX_COUNT,                                             #--- added 03/29/11
+		MULTIPLE_SPECTRAL_LINES, SPECTRA_MAX_COUNT,                         #--- added 03/29/11
 #		EVENTFILTER_HIGHER,SPWINDOW,ACISWIN_ID, ORDR, ACISWINTAG,
 		EVENTFILTER_HIGHER,SPWINDOW,ACISWIN_ID, 
 		REMARKS,COMMENTS, ACISTAG,SITAG,GENERALTAG,
@@ -2907,15 +2907,15 @@ sub read_databases{
 
 	for($j = $proll_ordr; $j < 30; $j++){		# set default values up to order < 30, assuming that
 		$roll_constraint[$j] = 'NULL';		# we do not get the order larger than 29
-		$roll_180[$j]        = 'NULL';
-		$roll[$j]            = '';
+		$roll_180[$j]    = 'NULL';
+		$roll[$j]        = '';
 		$roll_tolerance[$j]  = '';
 	}
 
 	for($j = 1; $j < 30; $j++){			# save them as the original values
 		$orig_roll_constraint[$j] = $roll_constraint[$j];
-		$orig_roll_180[$j]        = $roll_180[$j];
-		$orig_roll[$j]            = $roll[$j];
+		$orig_roll_180[$j]    = $roll_180[$j];
+		$orig_roll[$j]        = $roll[$j];
 		$orig_roll_tolerance[$j]  = $roll_tolerance[$j];
 	}
 
@@ -2943,7 +2943,7 @@ sub read_databases{
 
 	for($j = $aciswin_no; $j < 30; $j++){
 		$aciswin_id[$i]    = '';
-		$ordr[$j]          = '';
+		$ordr[$j]      = '';
 		$chip[$j] 	   = 'NULL';
 		$include_flag[$j]  = 'E';
 		$dinclude_flag[$j] = 'EXCLUDE';
@@ -2951,16 +2951,16 @@ sub read_databases{
 
 	for($j = 0; $j < 30; $j++){
 		$orig_aciswin_id[$j]      = $aciswin_id[$j];
-		$orig_ordr[$j]            = $ordr[$j];
-		$orig_chip[$j]            = $chip[$j];
+		$orig_ordr[$j]        = $ordr[$j];
+		$orig_chip[$j]        = $chip[$j];
 		$orig_include_flag[$j]    = $include_flag[$j];
-                $orig_start_row[$j]       = $start_row[$j];
-                $orig_start_column[$j]    = $start_column[$j];
-                $orig_width[$j]           = $width[$j];
-                $orig_height[$j]          = $height[$j];
-                $orig_lower_threshold[$j] = $lower_threshold[$j];
-                $orig_pha_range[$j]       = $pha_range[$j];
-                $orig_sample[$j]          = $sample[$j];
+        $orig_start_row[$j]       = $start_row[$j];
+        $orig_start_column[$j]    = $start_column[$j];
+        $orig_width[$j]       = $width[$j];
+        $orig_height[$j]      = $height[$j];
+        $orig_lower_threshold[$j] = $lower_threshold[$j];
+        $orig_pha_range[$j]       = $pha_range[$j];
+        $orig_sample[$j]      = $sample[$j];
 
 	}
 #--------------------------------------------
@@ -2975,7 +2975,7 @@ sub read_databases{
 
 
 ########################################################################################
-### data_input_page: create data input page--- Ocat Data Page                        ###
+### data_input_page: create data input page--- Ocat Data Page            ###
 ########################################################################################
 
 sub data_input_page{
@@ -3019,16 +3019,16 @@ print "</p>";
 
 
 if($eventfilter_lower > 0.5 || $awc_l_th == 1){
-        print '<p style="color:red;padding-top:20px;padding-bottom:10px">';
+    print '<p style="color:red;padding-top:20px;padding-bottom:10px">';
 	print '<strong>';
 	if($eventfilter_lower > 0.5 && $awc_l_th == 0){
-        	print 'Energy Filter Lowest Energy is larger than 0.5 keV. ';
+    	print 'Energy Filter Lowest Energy is larger than 0.5 keV. ';
 	}elsif($eventfilter_lower > 0.5 && $awc_l_th == 1){
-        	print 'Energy Filter Lowest Energy and ACIS Window Costraint Lowest Energy are larger than 0.5 keV. ';
+    	print 'Energy Filter Lowest Energy and ACIS Window Costraint Lowest Energy are larger than 0.5 keV. ';
 	}elsif($eventfilter_lower <= 0.5 && $awc_l_th == 1){
-        	print 'ACIS Window Costraint Lowest Energy is larger than 0.5 keV. ';
+    	print 'ACIS Window Costraint Lowest Energy is larger than 0.5 keV. ';
 	}
-        print 'Please check all Spatial Window parameters of each CCD.';
+    print 'Please check all Spatial Window parameters of each CCD.';
 	print '</strong>';
 	print '</p>';
 }
@@ -3169,8 +3169,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	@dtemp = split(/:/, $dec);
 	$dec = $ddec;
        	if ($dec < 0) { 			# set sign
-               	$sign = "-";
-             	$dec *= -1;
+           	$sign = "-";
+         	$dec *= -1;
        	}
        	else
        	{$sign = "+"}
@@ -3180,12 +3180,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
        	$ss = 60 * ($mm - int($mm));
        	$secrollover = sprintf("%02f", $ss);
        	if ($secrollover == 60) {
-               	$ss = abs($ss - 60);
-               	$mm = ($mm +1 );
+           	$ss = abs($ss - 60);
+           	$mm = ($mm +1 );
        	}
        	if ($mm == 60) {
-               	$mm = ($mm - 60);
-         	$hh = ($dd + 1);
+           	$mm = ($mm - 60);
+     	$hh = ($dd + 1);
        	}
   	$tdec = sprintf("%.1s%02d:%02d:%06.4f", $sign, $dd, $mm, $ss);
 
@@ -3193,7 +3193,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '16:22:04.8  -27:43:04.0), or as decimal degrees.  The original OBSCAT decimal ';
 	print ' degree values are provided below the update boxes .';
 
-        $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
+    $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
 	print 'If you like to see the current viewing orientation, open: ';
 
 	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='_blank'>RASS</a>, ";
@@ -3223,8 +3223,8 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		$roll_obsr ='';
 	}
 
-        print '<th>Roll Observed:</th>';
-        print '<td style="text-align:left">',"$roll_obsr";
+    print '<th>Roll Observed:</th>';
+    print '<td style="text-align:left">',"$roll_obsr";
 	print "<input type=\"hidden\" name=\"ROLL_OBSR\" value=\"$roll_obsr\">";
 	print '</td>';
 	print '</tr></table>';
@@ -3271,11 +3271,11 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #
 #--- added 08/05/11
 #
-        print '</td><td>&#160;</td>';
-        print '<th>Extended SRC:</th><td>';
-        print popup_menu(-name=>'EXTENDED_SRC', -value=>['NO','YES'],
-                        -default=>"$dextended_src",-override=>1000);
-        print '</td></tr>';
+    print '</td><td>&#160;</td>';
+    print '<th>Extended SRC:</th><td>';
+    print popup_menu(-name=>'EXTENDED_SRC', -value=>['NO','YES'],
+            -default=>"$dextended_src",-override=>1000);
+    print '</td></tr>';
 
 
 	print '<tr><th>Solar System Object:</th><td>';
@@ -3284,7 +3284,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '</td><th>Object:</th><td>';
 	print popup_menu(-name=>'OBJECT', 
 	 		-value=>['NONE','NEW','COMET','EARTH','JUPITER','MARS','MOON','NEPTUNE',
-	          		'PLUTO','SATURN','URANUS','VENUS'],
+	      		'PLUTO','SATURN','URANUS','VENUS'],
 	 		-default=>"$object", -override=>10000);
 	print '</tr><tr>';
 	
@@ -3326,15 +3326,15 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<td style="text-align:left"><input type="text" name="Y_PHASE" value="',"$y_phase",'" size="8"></td>';
 	print '</tr>';
 #---
-        print '<tr><td>&#160;</td><th>y_amp (in degrees):</th>';
-        print '<td style="text-align:left">',"$y_amp",'</td>';
+    print '<tr><td>&#160;</td><th>y_amp (in degrees):</th>';
+    print '<td style="text-align:left">',"$y_amp",'</td>';
 
-        print '<th>y_freq(in degree/sec)</th>';
-        print '<td style="text-align:left">',"$y_freq",'</td>';
+    print '<th>y_freq(in degree/sec)</th>';
+    print '<td style="text-align:left">',"$y_freq",'</td>';
 
-        print '<th>&#160;</th>';
-        print '<td style="text-align:left">&#160;</td>';
-        print '</tr>';
+    print '<th>&#160;</th>';
+    print '<td style="text-align:left">&#160;</td>';
+    print '</tr>';
 #----
 	
 	print '<tr><td>&#160;</td><th>z_amp (in arcsec):</th>';
@@ -3348,15 +3348,15 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '</tr>';
 
 #---
-        print '<tr><td>&#160;</td><th>z_amp (in degrees):</th>';
-        print '<td style="text-align:left">',"$z_amp",'</td>';
+    print '<tr><td>&#160;</td><th>z_amp (in degrees):</th>';
+    print '<td style="text-align:left">',"$z_amp",'</td>';
  
-        print '<th>z_freq(in degree/sec)</th>';
-        print '<td style="text-align:left">',"$z_freq",'</td>';
+    print '<th>z_freq(in degree/sec)</th>';
+    print '<td style="text-align:left">',"$z_freq",'</td>';
  
-        print '<th>&#160;&#160;</th>';
-        print '<td>&#160;</td>';
-        print '</tr>';
+    print '<th>&#160;&#160;</th>';
+    print '<td>&#160;</td>';
+    print '</tr>';
 #----
 	
 	print '</table>';
@@ -3465,25 +3465,25 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			$tstart_month = 'START_MONTH'."$k";
 	
 			print popup_menu(-name=>"$tstart_month",
-                				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-                				-default=>"$start_month[$k]",-override=>100000);
+        				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        				-default=>"$start_month[$k]",-override=>100000);
 			print '</td><td>';
 			
 			$tstart_date = 'START_DATE'."$k";
 	
 			print popup_menu(-name=>"$tstart_date",
-                				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
-                                				'11','12','13','14','15','16','17','18','19','20',
-                                				'21','22','23','24','25','26','27','28','29','30', '31'],
-                				-default=>"$start_date[$k]", -override=>10000);
+        				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
+                				'11','12','13','14','15','16','17','18','19','20',
+                				'21','22','23','24','25','26','27','28','29','30', '31'],
+        				-default=>"$start_date[$k]", -override=>10000);
 			print '</td><td>';
 	
 			$tstart_year = 'START_YEAR'."$k";
 	
 			print popup_menu(-name=>"$tstart_year",
-                				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
-                               			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017','2018', '2019', '2020'],
-                				-default=>"$start_year[$k]",-override=>1000000);
+        				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
+                   			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017','2018', '2019', '2020'],
+        				-default=>"$start_year[$k]",-override=>1000000);
 			print '</td><td>';
 
 			$tstart_time = 'START_TIME'."$k";
@@ -3497,25 +3497,25 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			$tend_month = 'END_MONTH'."$k";
 	
 			print popup_menu(-name=>"$tend_month",
-                				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-                				-default=>"$end_month[$k]",-override=>10000);
+        				-value=>['NULL','Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        				-default=>"$end_month[$k]",-override=>10000);
 			print '</td><td>';
 	
 			$tend_date = 'END_DATE'."$k";
 	
 			print popup_menu(-name=>"$tend_date",
-                				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
-                                				'11','12','13','14','15','16','17','18','19','20',
-                                				'21','22','23','24','25','26','27','28','29','30', '31'],
-                				-default=>"$end_date[$k]",-override=>1000000);
+        				-value=>['NULL','01','02','03','04','05','06','07','08','09','10',
+                				'11','12','13','14','15','16','17','18','19','20',
+                				'21','22','23','24','25','26','27','28','29','30', '31'],
+        				-default=>"$end_date[$k]",-override=>1000000);
 			print '</td><td>';
 	
 			$tend_year = 'END_YEAR'."$k";
 	
 			print popup_menu(-name=>"$tend_year",
-                				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
-                               			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017','2018', '2019', '2020'],
-                				-default=>"$end_year[$k]", -override=>100000);
+        				-value=>['NULL','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008',
+                   			'2009','2010','2011','2012','2013','2014', '2015', '2016', '2017','2018', '2019', '2020'],
+        				-default=>"$end_year[$k]", -override=>100000);
 			print '</td><td>';
 	
 			$tend_time = 'END_TIME'."$k";
@@ -3531,10 +3531,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 #---- Roll Constraint Case starts here
 #-------------------------------------
 
-        print '<h2 style="padding-bottom:20px">Roll Constraints </h2>';
+    print '<h2 style="padding-bottom:20px">Roll Constraints </h2>';
 
 	
-        $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
+    $target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
 	
 	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
@@ -3622,7 +3622,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	<td style="text-align:left">';
 	
 	print " $dphase_constraint_flag";
-        print "<input type=\"hidden\" name=\"PHASE_CONSTRAINT_FLAG\" value=\"$dphase_constraint_flag\">";
+    print "<input type=\"hidden\" name=\"PHASE_CONSTRAINT_FLAG\" value=\"$dphase_constraint_flag\">";
 
 
 #	if($sp_user eq 'yes' || $dphase_constraint_flag =~ /CONSTRAINT/i){
@@ -3669,9 +3669,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	}
 
        if($monitor_flag =~ /Y/i){
-               	%seen = ();
-               	@uniq = ();
-               	foreach $monitor_elem (@monitor_series) {
+           	%seen = ();
+           	@uniq = ();
+           	foreach $monitor_elem (@monitor_series) {
 			$schk = 0;
 			OUTER3:
 			foreach $echk (@schdulable_list){
@@ -3683,13 +3683,13 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 			if($schk > 0){
 				if($usint_on =~ /test/){
-                              			push(@uniq, "<a href=\"$test_http/ocatdata2html.cgi\?$monitor_elem.$pass.$submitter\">$monitor_elem<\/a> ") unless $seen{$monitor_elem}++;
+                  			push(@uniq, "<a href=\"$test_http/ocatdata2html.cgi\?$monitor_elem.$pass.$submitter\">$monitor_elem<\/a> ") unless $seen{$monitor_elem}++;
 				}else{
-                              			push(@uniq, "<a href=\"$usint_http/ocatdata2html.cgi\?$monitor_elem.$pass.$submitter\">$monitor_elem<\/a> ") unless $seen{$monitor_elem}++;
+                  			push(@uniq, "<a href=\"$usint_http/ocatdata2html.cgi\?$monitor_elem.$pass.$submitter\">$monitor_elem<\/a> ") unless $seen{$monitor_elem}++;
 				}
 			}
-               	}
-               	@monitor_series_list  = sort @uniq;
+           	}
+           	@monitor_series_list  = sort @uniq;
        }
 
 	print '<table style="border-width:0px">';
@@ -3712,10 +3712,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	if($sp_user eq 'yes' && ($dmonitor_flag =~ /Y/i || $dmonitor_flag == '') 
 			     && ($group_id =~ /\s+/ || $group_id eq '')){
 		print popup_menu(-name=>'MONITOR_FLAG', -values=>['NO','YES','NULL'],
-                       	-default=>"$dmonitor_flag",-override=>10000);
+               	-default=>"$dmonitor_flag",-override=>10000);
 	}elsif($sp_user eq 'yes' && $dmonitor_flag =~ /Y/i && $group_id =~ /\w/ ){
 		print popup_menu(-name=>'MONITOR_FLAG', -values=>['NO','YES','NULL'],
-                       	-default=>"$dmonitor_flag",-override=>10000);
+               	-default=>"$dmonitor_flag",-override=>10000);
 	}
 	print '</td>';
 
@@ -3771,9 +3771,9 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<th>Observatories:</th>';
 	print '<td style="text-align:left"><input type="text" name="OBSERVATORIES" value=';
 	print "\"$observatories\"",' size="12"></td>';
-        print '</tr>';
+    print '</tr>';
 
-        print '<tr>';
+    print '<tr>';
 	print '<th>Max Coordination Offset:</th>';
 	print '<td style="text-align:left"><input type="text" name="MULTITELESCOPE_INTERVAL" value=';
 	print "\"$multitelescope_interval\"",' size="12"></td>';
@@ -3857,7 +3857,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 
 	print '<th>FEP:</th><td>';
-                      print "$fep";
+              print "$fep";
 	print '</td><td></td><td></td>';
 	print '<th>Dropped Chip Count:</th><td>';
 	print "$dropped_chip_count";
@@ -3999,7 +3999,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<tr> ';
 	print '<th>Multiple Spectral Lines:</th>';
 	print '<td style="text-align:left">';
-	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
+	print popup_menu(-name=>'MULTIPLE_SPECTRAL_LINES', -value=>['NULL','NO','YES'], -default=>"$dmultiple_spectral_lines",-override=>10000);
 	print '</td>';
 	print '<th>Spectra Max Count:</th>';
 	print '<td style="text-align:left"><input type="text" name="SPECTRA_MAX_COUNT" value="';
@@ -4410,16 +4410,16 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	}else{
 		print "<h3>No ACIS Window Constraints</h3>";
-               for($k = 0; $k < $aciswin_no; $k++){
+           for($k = 0; $k < $aciswin_no; $k++){
 
 			$taciswin_id      = 'ACISWIN_ID'."$k";
-			$tordr	          = 'ORDR'."$k";
-			$tchip	          = 'CHIP'."$k";
-#		        $tinclude_flag    = 'INCLUDE_FLAG'."$k";
+			$tordr	      = 'ORDR'."$k";
+			$tchip	      = 'CHIP'."$k";
+#		    $tinclude_flag    = 'INCLUDE_FLAG'."$k";
 			$tstart_row       = 'START_ROW'."$k";
 			$tstart_column    = 'START_COLUMN'."$k";
 			$theight	  = 'HEIGHT'."$k";
-			$twidth	          = 'WIDTH'."$k";
+			$twidth	      = 'WIDTH'."$k";
 			$tlower_threshold = 'LOWER_THRESHOLD'."$k";
 			$tpha_range       = 'PHA_RANGE'."$k";
 			$tsample	  = 'SAMPLE'."$k";
@@ -4640,12 +4640,12 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 		print '</tr></table>';
 
-		print '<input type="hidden" name="OBSID"        '," value=\"$orig_obsid\">";
+		print '<input type="hidden" name="OBSID"    '," value=\"$orig_obsid\">";
 		print '<input type="hidden" name="ACISID"       '," value=\"$orig_acisid\">";
-		print '<input type="hidden" name="HRCID"        '," value=\"$orig_hrcid\">";
+		print '<input type="hidden" name="HRCID"    '," value=\"$orig_hrcid\">";
 		print '<input type="hidden" name="SI_MODE"      '," value=\"$si_mode\">";
 		print '<input type="hidden" name="access_ok"    '," value=\"yes\">";
-		print '<input type="hidden" name="pass"         '," value=\"$pass\">";
+		print '<input type="hidden" name="pass"     '," value=\"$pass\">";
 		print '<input type="hidden" name="sp_user"      '," value=\"$sp_user\">";
 		print '<input type="hidden" name="email_address"'," value=\"$email_address\">";
 
@@ -4693,7 +4693,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 }
 
 ##################################################################################
-### prep_submit: preparing the data for submission                             ###
+### prep_submit: preparing the data for submission                 ###
 ##################################################################################
 
 sub prep_submit{
@@ -4810,7 +4810,7 @@ sub prep_submit{
 		elsif($roll_constraint[$j] eq 'NULL')      {$roll_constraint[$j] = 'NULL'}
 		elsif($roll_constraint[$j] eq 'CONSTRAINT'){$roll_constraint[$j] = 'Y'}
 		elsif($roll_constraint[$j] eq 'PREFERENCE'){$roll_constraint[$j] = 'P'}
-		elsif($roll_constraint[$j] eq '')          {$roll_constraint[$j] = 'NULL'}
+		elsif($roll_constraint[$j] eq '')      {$roll_constraint[$j] = 'NULL'}
 
 		if($roll_180[$j]    eq 'NULL'){$roll_180[$j] = 'NULL'}
 		elsif($roll_180[$j] eq 'NO')  {$roll_180[$j] = 'N'}
@@ -4831,129 +4831,15 @@ sub prep_submit{
 #----------- find database values for them
 #----------------------------------------------------------------
 	
-	if($proposal_joint    eq 'NULL')	{$proposal_joint = 'NULL'}
-	elsif($proposal_joint eq 'YES') 	{$proposal_joint = 'Y'}
-	elsif($proposal_joint eq 'NO')  	{$proposal_joint = 'N'}
-	
-	if($roll_flag    eq 'NULL')      	{$roll_flag = 'NULL'}
-	elsif($roll_flag eq 'YES')       	{$roll_flag = 'Y'}
-	elsif($roll_flag eq 'NO')        	{$roll_flag = 'N'}
-	elsif($roll_flag eq 'PREFERENCE')	{$roll_flag = 'P'}
-	
-	if($window_flag    eq 'NULL')      	{$window_flag = 'NULL'}
-	elsif($window_flag eq 'YES')       	{$window_flag = 'Y'}
-	elsif($window_flag eq 'NO')        	{$window_flag = 'N'}
-	elsif($window_flag eq 'PREFERENCE')	{$window_flag = 'P'}
-	
-	if($dither_flag    eq 'NULL')		{$dither_flag = 'NULL'}
-	elsif($dither_flag eq 'YES') 		{$dither_flag = 'Y'}
-	elsif($dither_flag eq 'NO')  		{$dither_flag = 'N'}
-	
-	if($uninterrupt    eq 'NULL')      	{$uninterrupt = 'NULL'}
-	elsif($uninterrupt eq 'NO')        	{$uninterrupt ='N'}
-	elsif($uninterrupt eq 'YES')       	{$uninterrupt ='Y'}
-	elsif($uninterrupt eq 'PREFERENCE')	{$uninterrupt = 'P'}
-	
-	if($photometry_flag    eq 'NULL')	{$photometry_flag = 'NULL'}
-	elsif($photometry_flag eq 'YES') 	{$photometry_flag = 'Y'}
-	elsif($photometry_flag eq 'NO')  	{$photometry_flag = 'N'}
+    @dname_list = ('proposal_joint', 'roll_flag', 'window_flag', 'dither_flag', 'uninterrupt', 'photometry_flag', 'multitelescope', 'hrc_zero_block',
+        'hrc_timing_mode', 'most_efficient', 'onchip_sum', 'duty_cycle', 'eventfilter', 'multiple_spectral_lines', 'spwindow', 'extended_src', 
+        'phase_constraint_flag', 'window_constrint', 'constr_in_remarks', 'ccdi0_on', 'ccdi1_on', 'ccdi2_on', 'ccdi3_on', 'ccds0_on', 'ccds1_on', 
+        'ccds2_on', 'ccds3_on', 'ccds4_on', 'ccds5_on');
 
-	if($multitelescope    eq 'NO')		{$multitelescope = 'N'}
-	elsif($multitelescope eq 'YES')		{$multitelescope = 'Y'}
-	elsif($multitelescope eq 'PREFERENCE')	{$multitelescope = 'P'}
-	
-	if($hrc_zero_block    eq 'NULL')	{$hrc_zero_block = 'NULL'}
-	elsif($hrc_zero_block eq 'YES') 	{$hrc_zero_block = 'Y'}
-	elsif($hrc_zero_block eq 'NO')  	{$hrc_zero_block = 'N'}
-	
-	if($hrc_timing_mode    eq 'NULL')	{$hrc_timing_mode = 'NULL'}
-	elsif($hrc_timing_mode eq 'YES')	{$hrc_timing_mode = 'Y'}
-	elsif($hrc_timing_mode eq 'NO')		{$hrc_timing_mode = 'N'}
-	
-	if($most_efficient    eq 'NULL')	{$most_efficient = 'NULL'}
-	elsif($most_efficient eq 'YES')		{$most_efficient = 'Y'}
-	elsif($most_efficient eq 'NO')		{$most_efficient = 'N'}
-	
-	if($onchip_sum    eq 'NULL')		{$onchip_sum = 'NULL'}
-	elsif($onchip_sum eq 'YES')		{$onchip_sum = 'Y'}
-	elsif($onchip_sum eq 'NO')		{$onchip_sum = 'N'}
-	
-	if($duty_cycle    eq 'NULL')		{$duty_cycle = 'NULL'}
-	elsif($duty_cycle eq 'YES')		{$duty_cycle = 'Y'}
-	elsif($duty_cycle eq 'NO') 		{$duty_cycle = 'N'}
-	
-	if($eventfilter    eq 'NULL')		{$eventfilter = 'NULL'}
-	elsif($eventfilter eq 'YES')		{$eventfilter = 'Y'}
-	elsif($eventfilter eq 'NO')		{$eventfilter  = 'N'}
+    foreach $d_name (@dname_list){
+        adjust_o_values();
+    }
 
-#       	if($multiple_spectral_lines    eq 'NULL')       {$multiple_spectral_lines = 'NULL'}
-        if($multiple_spectral_lines eq 'YES')        {$multiple_spectral_lines = 'Y'}
-        elsif($multiple_spectral_lines eq 'NO')         {$multiple_spectral_lines = 'N'}
-
-	if($spwindow    eq 'NULL')		{$spwindow = 'NULL'}
-	elsif($spwindow eq 'YES')		{$spwindow = 'Y'}
-	elsif($spwindow eq 'NO')		{$spwindow = 'N'}
-	
-#
-#--- added 08/05/11
-#
-        if($extended_src    eq 'YES') {$extended_src = 'Y'}
-        elsif($extended_src eq 'NO')  {$extended_src = 'N'}
-
-	if($phase_constraint_flag    eq 'NULL')		{$phase_constraint_flag = 'NULL'}
-	elsif($phase_constraint_flag eq 'NONE')		{$phase_constraint_flag = 'N'}
-	elsif($phase_constraint_flag eq 'CONSTRAINT')	{$phase_constraint_flag = 'Y'}
-	elsif($phase_constraint_flag eq 'PREFERENCE')	{$phase_constraint_flag = 'P'}
-	
-	if($window_constrint    eq 'NONE')	{$window_constrint = 'N'}
-	elsif($window_constrint eq 'NULL')	{$window_constrint = 'NULL'}
-	elsif($window_constrint eq 'CONSTRAINT'){$window_constrint = 'Y'}
-	elsif($window_constrint eq 'PREFERENCE'){$window_constrint = 'P'}
-	
-	if($constr_in_remarks    eq 'YES')	 {$constr_in_remarks = 'Y'}
-	elsif($constr_in_remarks eq 'PREFERENCE'){$constr_in_remarks = 'P'}
-	elsif($constr_in_remarks eq 'NO')	 {$constr_in_remarks = 'N'}
-	
-	if($ccdi0_on    eq 'NULL'){$ccdi0_on = 'NULL'}
-	elsif($ccdi0_on eq 'YES') {$ccdi0_on = 'Y'}
-	elsif($ccdi0_on eq 'NO')  {$ccdi0_on = 'N'}
-	
-	if($ccdi1_on    eq 'NULL'){$ccdi1_on = 'NULL'}
-	elsif($ccdi1_on eq 'YES') {$ccdi1_on = 'Y'}
-	elsif($ccdi1_on eq 'NO')  {$ccdi1_on = 'N'}
-	
-	if($ccdi2_on    eq 'NULL'){$ccdi2_on = 'NULL'}
-	elsif($ccdi2_on eq 'YES') {$ccdi2_on = 'Y'}
-	elsif($ccdi2_on eq 'NO')  {$ccdi2_on = 'N'}
-	
-	if($ccdi3_on    eq 'NULL'){$ccdi3_on = 'NULL'}
-	elsif($ccdi3_on eq 'YES') {$ccdi3_on = 'Y'}
-	elsif($ccdi3_on eq 'NO')  {$ccdi3_on = 'N'}
-	
-	if($ccds0_on    eq 'NULL'){$ccds0_on = 'NULL'}
-	elsif($ccds0_on eq 'YES') {$ccds0_on = 'Y'}
-	elsif($ccds0_on eq 'NO')  {$ccds0_on = 'N'}
-	
-	if($ccds1_on    eq 'NULL'){$ccds1_on = 'NULL'}
-	elsif($ccds1_on eq 'YES') {$ccds1_on = 'Y'}
-	elsif($ccds1_on eq 'NO')  {$ccds1_on = 'N'}
-	
-	if($ccds2_on    eq 'NULL'){$ccds2_on = 'NULL'}
-	elsif($ccds2_on eq 'YES') {$ccds2_on = 'Y'}
-	elsif($ccds2_on eq 'NO')  {$ccds2_on = 'N'}
-	
-	if($ccds3_on    eq 'NULL'){$ccds3_on = 'NULL'}
-	elsif($ccds3_on eq 'YES') {$ccds3_on = 'Y'}
-	elsif($ccds3_on eq 'NO')  {$ccds3_on = 'N'}
-	
-	if($ccds4_on    eq 'NULL'){$ccds4_on = 'NULL'}
-	elsif($ccds4_on eq 'YES') {$ccds4_on = 'Y'}
-	elsif($ccds4_on eq 'NO')  {$ccds4_on = 'N'}
-	
-	if($ccds5_on    eq 'NULL'){$ccds5_on = 'NULL'}
-	elsif($ccds5_on eq 'YES') {$ccds5_on = 'Y'}
-	elsif($ccds5_on eq 'NO')  {$ccds5_on = 'N'}
-	
 	read_user_name();					# read registered user name
 	
 	$usr_ind      = 0;
@@ -4982,7 +4868,7 @@ sub prep_submit{
 }
 
 ############################################################################################################
-### chk_entry: calling entry_test to check input value range and restrictions                            ###
+### chk_entry: calling entry_test to check input value range and restrictions                ###
 ############################################################################################################
 
 sub chk_entry{
@@ -5128,14 +5014,14 @@ sub chk_entry{
 			}
 		}
 
-        	if($ccd_warning == 1){
+    	if($ccd_warning == 1){
 			if($header_chk == 0){
-                		print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
+        		print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
 			}
-                	print '<table border=1>';
-                	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-                	print "<tr><th>CCD Option Selection</th>";
-                	print "<td style='color:red'>";
+        	print '<table border=1>';
+        	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+        	print "<tr><th>CCD Option Selection</th>";
+        	print "<td style='color:red'>";
 			
 			$chk = $o_cnt + $no_yes;
 			if($chk == 0){
@@ -5152,9 +5038,9 @@ sub chk_entry{
 				}
 			}
 			print "</td>";
-                	print "<td style='color:green'>$line</td></tr>";
-                	print '</table>';
-        	}
+        	print "<td style='color:green'>$line</td></tr>";
+        	print '</table>';
+    	}
 	}
 
 
@@ -5302,9 +5188,9 @@ sub chk_entry{
 				$lname2   = lc ($in_name);
 				${$lname} = ${$lname2}[$j];
 
-                                if($name =~ /PHA_RANGE/i && ${$lname} > 13){
-                                        $chk_pha_range++;
-                                }
+                if($name =~ /PHA_RANGE/i && ${$lname} > 13){
+                    $chk_pha_range++;
+                }
 
 			}
 	
@@ -5327,10 +5213,10 @@ sub chk_entry{
 #
 #--- added 08/04/11
 #
-                        if($chk_pha_range > 0){
-                                print "<h3 style='color:fuchsia;padding-bottom:10px'> Warning: PHA_RANGE > 13:<br />";
-                                print "In many configurations, an Energy Range above 13 keV will risk telemetry saturation.</h3>";
-                        }
+            if($chk_pha_range > 0){
+                print "<h3 style='color:fuchsia;padding-bottom:10px'> Warning: PHA_RANGE > 13:<br />";
+                print "In many configurations, an Energy Range above 13 keV will risk telemetry saturation.</h3>";
+            }
 
 
 			if($range_ind > 0){			# write html page about bad news
@@ -5355,44 +5241,44 @@ sub chk_entry{
 				}
 				print '</table>';
 
-                        }elsif($eventfilter_lower  > 0.5 || $awc_l_th == 1){
+            }elsif($eventfilter_lower  > 0.5 || $awc_l_th == 1){
 
 #------------------------------------------------------------------------------------
 #--- this is a special case that ACIS energy fileter lowest energy is set > 0.5 keV.
 #--- in this case, you need to fill ACIS window constraints
 #------------------------------------------------------------------------------------
 
-                                $ocnt = 0;
-                                for($m = 0; $m < 4; $m++){
-                                        $name = 'ccdi'."$m".'_on';
-                                        if(${$name} =~ /Y/i || ${$name} =~ /OPT/i){
-                                                $ocnt++;
-                                        }
-                                }
-                                for($m = 0; $m < 6; $m++){
-                                        $name = 'ccds'."$m".'_on';
-                                        if(${$name} =~ /Y/i || ${$name} =~ /OPT/i){
-                                                $ocnt++;
-                                        }
-                                }
-                                if($ocnt > $aciswin_no){
-                                        if($header_chk == 0){
-                                                print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
-                                        }
-                                        $header_chk++;
+                $ocnt = 0;
+                for($m = 0; $m < 4; $m++){
+                    $name = 'ccdi'."$m".'_on';
+                    if(${$name} =~ /Y/i || ${$name} =~ /OPT/i){
+                        $ocnt++;
+                    }
+                }
+                for($m = 0; $m < 6; $m++){
+                    $name = 'ccds'."$m".'_on';
+                    if(${$name} =~ /Y/i || ${$name} =~ /OPT/i){
+                        $ocnt++;
+                    }
+                }
+                if($ocnt > $aciswin_no){
+                    if($header_chk == 0){
+                        print "<h2 style='color:red;padding-bottom:10px'> Following values are out of range.</h2>";
+                    }
+                    $header_chk++;
 
 					if($do_not_repeat != 1){
-                                        	print '<table border=1>';
-                                        	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-                                        	print "<tr><th>Energy Filter Lowest Energy</th>";
-                                        	print "<td style='color:red'>0.5 keV </td>";
-                                        	print "<td style='color:green'>Spatial Window param  must be filled";
-                                        	print "<br />(just click PREVIOUS PAGE)</td>";
-                                        	print '</table>';
+                    	print '<table border=1>';
+                    	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+                    	print "<tr><th>Energy Filter Lowest Energy</th>";
+                    	print "<td style='color:red'>0.5 keV </td>";
+                    	print "<td style='color:green'>Spatial Window param  must be filled";
+                    	print "<br />(just click PREVIOUS PAGE)</td>";
+                    	print '</table>';
 						$do_not_repeat = 1;
 					}
-                                }
-                        }
+                }
+            }
 
 			if(($lower_threshold[$j] < $eventfilter_lower) && ($lower_threshold[$j] ne '')){
 				if($header_chk == 0){
@@ -5522,7 +5408,7 @@ sub chk_entry{
 }
 
 ###########################################################################################################
-### entry_test: check input value range and restrictions                                               ####
+### entry_test: check input value range and restrictions                           ####
 ###########################################################################################################
 
 sub entry_test{
@@ -5722,35 +5608,35 @@ sub entry_test{
 				$subarray_start_row  = '';
 				$subarray_row_count  = '';
 				$subarray_frame_time = '';
-				$duty_cycle          = 'NULL';
+				$duty_cycle      = 'NULL';
 				$secondary_exp_count = '';
 				$primary_exp_time    = '';
 				$secondary_exp_time  = '';
-				$onchip_sum          = 'NULL';
+				$onchip_sum      = 'NULL';
 				$onchip_row_count    = '';
 				$onchip_column_count = '';
-				$eventfilter         = 'NULL';
+				$eventfilter     = 'NULL';
 				$eventfilter_lower   = '';
 				$eventfilter_higher  = '';
 				$multiple_spectral_lines = '';
 				$spectra_max_count       = '';	
-				$bias                = '';
-				$frequency           = '';
-				$bias_after          = '';
-				$spwindow            = 'NULL';
+				$bias        = '';
+				$frequency       = '';
+				$bias_after      = '';
+				$spwindow        = 'NULL';
 
 				for($n = 0; $n < $aciswin_no; $n++){
 					$aciswin_id[$n]      = '';
-					$ordr[$n]            = '';
-					$chip[$n]            = 'NULL';
+					$ordr[$n]        = '';
+					$chip[$n]        = 'NULL';
 					$include_flag[$n]    = 'I';
 					$start_row[$n]       = '';
 					$start_column[$n]    = '';
-					$height[$n]          = '';
-					$width[$n]           = '';
+					$height[$n]      = '';
+					$width[$n]       = '';
 					$lower_threshold[$n] = '';
 					$pha_range[$n]       = '';
-					$sample[$n]          = '';
+					$sample[$n]      = '';
 				}
 #---------------------------
 #---- set aciswin_no to 0
@@ -5809,7 +5695,7 @@ sub entry_test{
 
 				@{same.$name}      = @{condition.$name};
 				@{condition.$name} = ("<span style='color:red'>Has CDO approved this instrument change? (All HRC params are NULLed)<br />$warning_line</span>");
-				$line              = "$name<->${$uname}<->@{condition.$name}";
+				$line          = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
 				$rchk++;
@@ -5834,7 +5720,7 @@ sub entry_test{
 			if($orig_grating ne $grating){
 				@{same.$name}      = @{condition.$name};
 				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
-				$line              = "$name<->${$uname}<->@{condition.$name}";
+				$line          = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
 				$rchk++;
@@ -5858,7 +5744,7 @@ sub entry_test{
 			if($orig_obj_flag ne $obj_flag){
 				@{same.$name}      = @{condition.$name};
 				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
-				$line              = "$name<->${$uname}<->@{condition.$name}";
+				$line          = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
 				$rchk++;
@@ -5939,7 +5825,7 @@ sub entry_test{
 			if($orig_multitelescope ne $multitelescope){
 				@{same.$name}      = @{condition.$name};
 				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
-				$line              = "$name<->${$uname}<->@{condition.$name}";
+				$line          = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name} = @{same.$name};
 				$rchk++;
@@ -5964,7 +5850,7 @@ sub entry_test{
 			if($orig_observatories ne $observatories){
 				@{same.$name}      = @{condition.$name};
 				@{condition.$name} = ("<span style='color:red'>CDO approval is required </span>");
-				$line              = "$name<->${$uname}<->@{condition.$name}";
+				$line          = "$name<->${$uname}<->@{condition.$name}";
 				push(@out_range,$line);
 				@{condition.$name}= @{same.$name};
 				$rchk++;
@@ -6109,7 +5995,7 @@ sub restriction_check{
 
 
 ###################################################################
-### read_range: read conditions                                ####
+### read_range: read conditions                ####
 ###################################################################
 
 sub read_range{
@@ -6190,20 +6076,20 @@ sub read_range{
 }
 
 ####################################################################################
-### read_user_name: reading authorized user names                                ###
+### read_user_name: reading authorized user names                ###
 ####################################################################################
 
 sub read_user_name{
 	open(FH, "<$pass_dir/.htgroup");
-        while(<FH>){
-                chomp $_;
-                @user_name = split(/\s/,$_);
-        }
-        shift(@user_name);
+    while(<FH>){
+        chomp $_;
+        @user_name = split(/\s/,$_);
+    }
+    shift(@user_name);
 }
 
 ###################################################################################
-### user_warning: warning a user, a user name mistake                           ###
+### user_warning: warning a user, a user name mistake               ###
 ###################################################################################
 
 sub user_warning {
@@ -6212,18 +6098,18 @@ sub user_warning {
 	if($submitter eq ''){
 		print "<strong>No user name is typed in. </strong>";
 	}else{
-        	print "<strong> The user: <span style='color:magenta'>$submitter</span> is not in our database. </strong>";
+    	print "<strong> The user: <span style='color:magenta'>$submitter</span> is not in our database. </strong>";
 	}
 	print "<strong> Please go back and enter a correct one (use the Back button on the browser).</strong>";
 	print "</div>";
 
-#        print "</form>";
-#        print "</body>";
-#        print "</html>";
+#    print "</form>";
+#    print "</body>";
+#    print "</html>";
 }
 
 ###################################################################################
-### submit_entry: check and submitting the modified input values                ###
+### submit_entry: check and submitting the modified input values        ###
 ###################################################################################
 
 sub submit_entry{
@@ -6240,8 +6126,8 @@ sub submit_entry{
 #-----------------------------
 
 	foreach $ent (@paramarray){
-               $new_entry = lc ($ent);
-               $new_value = ${$new_entry};
+           $new_entry = lc ($ent);
+           $new_value = ${$new_entry};
 
 		unless($ent =~ /TSTART/ || $ent =~ /TSTOP/ || $ent =~ /WINDOW_CONSTRAINT/
 				|| $ent =~ /ACISTAG/ || $ent =~ /ACISWINTAG/ || $ent =~ /SITAG/ || $ent =~ /GENERALTAG/
@@ -6353,7 +6239,7 @@ sub submit_entry{
     	if($asis eq "ASIS"){
     		print FILE "VERIFIED OK AS IS\n";
     	}elsif($asis eq "REMOVE") {
-        	print FILE "VERIFIED  REMOVED\n";
+    	print FILE "VERIFIED  REMOVED\n";
     	}
 
     	print FILE "\n------------------------------------------------------------------------------------------\n";
@@ -6361,14 +6247,14 @@ sub submit_entry{
 	print FILE " values submitted from the form.  If there is no value in column 3,\nthen this is an unchangable";
 	print FILE " parameter on the form.\nNote that new RA and Dec will be slightly off due to rounding errors in";
 	print FILE " double conversion.\n\n";
-    	print FILE "PARAM NAME                  ORIGINAL VALUE                REQUESTED VALUE             ";
+    	print FILE "PARAM NAME          ORIGINAL VALUE        REQUESTED VALUE         ";
     	print FILE "\n------------------------------------------------------------------------------------------\n";
 	
     	close FILE;
  
 	format PARAMLINE =
 	@<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        	$nameagain $old_value $current_entry
+    	$nameagain $old_value $current_entry
 .
    
 	open (PARAMLINE, ">>$temp_dir/$obsid.$sf");
@@ -6490,10 +6376,10 @@ sub submit_entry{
 					$current_entry = $sample[$j];
 					write(PARAMLINE);
 				}
-        		}else{
-                		$current_entry = ${$old_name};
-        			write (PARAMLINE);
-        		}
+    		}else{
+        		$current_entry = ${$old_name};
+    			write (PARAMLINE);
+    		}
     		}
 	}
 	close PARAMLINE;
@@ -6503,32 +6389,32 @@ sub submit_entry{
 #-----------------------------------------------------------
 
     	if($asis eq "ASIS"){
-	        $wrong_si = 0;
-        	if($si_mode =~ /blank/i || $si_mode =~ /NULL/i || $si_mode eq '' || $si_mode =~ /\s+/){
-                	$wrong_si = 9999;
-                	print "<p><strong style='color:red;padding-bottom:20px'>";
-                	print "Warning, an obsid, may not be approved without an SI_mode.";
-                	print 'Please contact "acisdude" or and HRC contact as appropriate';
-                	print "and request they enter an SI-mode befor proceding.";
-                	print "</strong></p>";
-        	}else{
+	    $wrong_si = 0;
+    	if($si_mode =~ /blank/i || $si_mode =~ /NULL/i || $si_mode eq '' || $si_mode =~ /\s+/){
+        	$wrong_si = 9999;
+        	print "<p><strong style='color:red;padding-bottom:20px'>";
+        	print "Warning, an obsid, may not be approved without an SI_mode.";
+        	print 'Please contact "acisdude" or and HRC contact as appropriate';
+        	print "and request they enter an SI-mode befor proceding.";
+        	print "</strong></p>";
+    	}else{
     			print "<p><strong>You have checked that this obsid ($obsid) is ready for flight.";
 			print "  Any parameter changes you made will not be submitted with this request.</strong></p>";
 		}
     	}elsif($asis eq "REMOVE") {
-        	print "<p><strong>You have requested this obsid ($obsid) to be removed from the \"ready to go\" list.";
+    	print "<p><strong>You have requested this obsid ($obsid) to be removed from the \"ready to go\" list.";
  		print " Any parameter changes you made will not be submitted with this request.</strong></p>";
     	}
 
     	if($asis eq "ASIS"){
-        	print "<input type=\"hidden\" name=\"ASIS\" value=\"ASIS\">";
+    	print "<input type=\"hidden\" name=\"ASIS\" value=\"ASIS\">";
     	}elsif($asis eq "REMOVE") {
-        	print "<input type=\"hidden\" name=\"ASIS\" value=\"REMOVE\">";
+    	print "<input type=\"hidden\" name=\"ASIS\" value=\"REMOVE\">";
     	}
 
-        print "<input type=\"hidden\" name=\"access_ok\" value=\"yes\">";
-        print "<input type=\"hidden\" name=\"pass\" value=\"$pass\">";
-        print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
+    print "<input type=\"hidden\" name=\"access_ok\" value=\"yes\">";
+    print "<input type=\"hidden\" name=\"pass\" value=\"$pass\">";
+    print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
 	print "<input type=\"hidden\" name=\"email_address\" value=\"$email_address\">";
 
 	print '<br />';
@@ -6571,14 +6457,14 @@ sub submit_entry{
 	print FILE " values submitted from the form.  If there is no value in column 3,\nthen this is an unchangable";
 	print FILE " parameter on the form.\nNote that new RA and Dec will be slightly off due to rounding errors in";
 	print FILE " double conversion.\n\n";
-    	print FILE "PARAM NAME                  ORIGINAL VALUE                REQUESTED VALUE             ";
+    	print FILE "PARAM NAME          ORIGINAL VALUE        REQUESTED VALUE         ";
     	print FILE "\n------------------------------------------------------------------------------------------\n";
 	
     	close FILE;
  
 	format PARAMLINE =
 	@<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        	$nameagain $old_value $current_entry
+    	$nameagain $old_value $current_entry
 .
    
 	open (PARAMLINE, ">>$temp_dir/$obsid.$sf");
@@ -6695,13 +6581,13 @@ sub submit_entry{
 					$current_entry = $sample[$j];
 					write(PARAMLINE);
 				}
-        		}elsif(${$lc_name} ne ''){
-                		$current_entry = ${$lc_name};
-        			write (PARAMLINE);
-        		}else{
-                		$current_entry = ${$old_name};
-        			write (PARAMLINE);
-        		}
+    		}elsif(${$lc_name} ne ''){
+        		$current_entry = ${$lc_name};
+    			write (PARAMLINE);
+    		}else{
+        		$current_entry = ${$old_name};
+    			write (PARAMLINE);
+    		}
     		}
 	}
 		close PARAMLINE;
@@ -6728,9 +6614,9 @@ sub submit_entry{
 	print "<input type=\"hidden\" name=\"CLONE\" value=\"CLONE\">";
 	print '<br />';
 
-        print "<input type=\"hidden\" name=\"access_ok\" value=\"yes\">";
-        print "<input type=\"hidden\" name=\"pass\" value=\"$pass\">";
-        print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
+    print "<input type=\"hidden\" name=\"access_ok\" value=\"yes\">";
+    print "<input type=\"hidden\" name=\"pass\" value=\"$pass\">";
+    print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
 	print "<input type=\"hidden\" name=\"email_address\" value=\"$email_address\">";
 	print "<input type=\"hidden\" name=\"asis\" value=\"ARCOPS\">";
 
@@ -7218,7 +7104,7 @@ sub submit_entry{
 	if($orig_est_cnt_rate    ne $est_cnt_rate)   {$si_mode = 'NULL'}
 	if($orig_forder_cnt_rate ne $forder_cnt_rate){$si_mode = 'NULL'}
 	if($orig_raster_scan     ne $raster_scan)    {$si_mode = 'NULL'}
-	if($orig_grating	 ne $grating)        {$si_mode = 'NULL'}
+	if($orig_grating	 ne $grating)    {$si_mode = 'NULL'}
 	if($orig_instrument      ne $instrument)     {$si_mode = 'NULL'}
 	if($orig_dither_flag     ne $dither_flag)    {$si_mode = 'NULL'}
 
@@ -7268,7 +7154,7 @@ sub submit_entry{
 	print FILE "USER NAME =  $submitter\n";
 
 	if($asis =~ /\w/){
-        	print FILE "VERIFIED AS $asis\n";
+    	print FILE "VERIFIED AS $asis\n";
 		if($asis =~ /ARCOPS/i){
 			print FILE "Obsid: $obsid will be approved once ARCOPS signs off this submittion.\n";
 		}
@@ -7307,9 +7193,9 @@ sub submit_entry{
 			|| ($name =~/GENERALTAG/) || ($name =~/SITAG/) || ($name eq "RA") || ($name eq "DEC")
 			|| ($name eq 'ASIS')){
 
-			$a         = 0;
-			$aw        = 0;
-			$g         = 0;
+			$a     = 0;
+			$aw    = 0;
+			$g     = 0;
 			$new_entry = lc($name);
 			$new_value = ${$new_entry};
 			$old_entry = 'orig_'."$new_entry";
@@ -7438,7 +7324,7 @@ sub submit_entry{
 	print FILE " values submitted from the form.  If there is no value in column 3,\nthen this is an unchangable";
 	print FILE " parameter on the form.\nNote that new RA and Dec will be slightly off due to rounding errors in";
 	print FILE " double conversion.\n\n";
-    	print FILE "PARAM NAME                  ORIGINAL VALUE                REQUESTED VALUE             ";
+    	print FILE "PARAM NAME          ORIGINAL VALUE        REQUESTED VALUE         ";
     	print FILE "\n------------------------------------------------------------------------------------------\n";
 	
 	close FILE;
@@ -7449,7 +7335,7 @@ sub submit_entry{
 
 	format PARAMLINE =
 	@<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        	$nameagain $old_value $current_entry
+    	$nameagain $old_value $current_entry
 .
    
 	open (PARAMLINE, ">>$temp_dir/$obsid.$sf");
@@ -7576,13 +7462,13 @@ sub submit_entry{
 					$old_value     = $orig_sample[$j];
 					write(PARAMLINE);
 				}
-        		}elsif($lc_name =~ /\w/){
-                		$current_entry = ${$lc_name};
-        			write (PARAMLINE);
-        		}else{
-                		$current_entry = ${$old_name};
-        			write (PARAMLINE);
-        		}
+    		}elsif($lc_name =~ /\w/){
+        		$current_entry = ${$lc_name};
+    			write (PARAMLINE);
+    		}else{
+        		$current_entry = ${$old_name};
+    			write (PARAMLINE);
+    		}
 
 #----------------------------------------
 #----  devisions between different groups
@@ -7831,18 +7717,18 @@ sub oredit{
 	}
 
 
-	$test = `ls $temp_dir/*`;               #--- testing whether the data actually exits.
+	$test = `ls $temp_dir/*`;           #--- testing whether the data actually exits.
 
 	if($test =~ /$obsid.$sf/){
-        	oredit_sub();
+    	oredit_sub();
 	}
 
 #----------------------------------------------
 #----  if it hasn't died yet, then close nicely
 #----------------------------------------------
 
-        print "<p><strong>Thank you.  Your request has been submitted.";
-        print "Approvals occur immediately, changes may take 48 hours. </strong></p>";
+    print "<p><strong>Thank you.  Your request has been submitted.";
+    print "Approvals occur immediately, changes may take 48 hours. </strong></p>";
 
 
 	if($usint_on =~ /test/){
@@ -7856,7 +7742,7 @@ sub oredit{
 }
 
 #####################################################################################
-### mod_time_format: convert and devide input data format                         ###
+### mod_time_format: convert and devide input data format             ###
 #####################################################################################
 
 sub mod_time_format{
@@ -7873,18 +7759,18 @@ sub mod_time_format{
 	}elsif($tentry[$ttcnt-1] eq 'AM' || $tentry[$ttcnt-1] eq'am'){
 		$ttcnt--;
 	}elsif($tentry[$ttcnt-1] =~/PM/){
-		$hr_add           = 12;
-		@tatemp           = split(/PM/, $tentry[$ttcnt-1]);
+		$hr_add       = 12;
+		@tatemp       = split(/PM/, $tentry[$ttcnt-1]);
 		$tentry[$ttcnt-1] = $tatemp[0];
 	}elsif($tentry[$ttcnt-1] =~/pm/){
-		$hr_add           = 12;
-		@tatemp           = split(/pm/, $tentry[$ttcnt-1]);
+		$hr_add       = 12;
+		@tatemp       = split(/pm/, $tentry[$ttcnt-1]);
 		$tentry[$ttcnt-1] = $tatemp[0];
 	}elsif($tentry[$ttcnt-1] =~ /AM/){
-		@tatemp           = split(/AM/, $tentry[$ttcnt-1]);
+		@tatemp       = split(/AM/, $tentry[$ttcnt-1]);
 		$tentry[$ttcnt-1] = $tatemp[0];
 	}elsif($tentry[$ttcnt-1] =~ /am/){
-		@tatemp           = split(/AM/, $tentry[$ttcnt-1]);
+		@tatemp       = split(/AM/, $tentry[$ttcnt-1]);
 		$tentry[$ttcnt-1] = $tatemp[0];
 	}
 	
@@ -7998,7 +7884,7 @@ sub mod_time_format{
 }
 
 #########################################################################
-### lts_date_check:   check ltd_date is in 30 days or not            ####
+### lts_date_check:   check ltd_date is in 30 days or not        ####
 #########################################################################
 
 sub lts_date_check{
@@ -8009,42 +7895,42 @@ sub lts_date_check{
 		@ttemp = split(/\s+/, $lts_lt_plan);
 
        		if($ttemp[1]     =~ /Jan/i){
-               		$month = '1';
+           		$month = '1';
 			$add = 0;
-        	}elsif($ttemp[0] =~ /Feb/i){
-               		$month = '2';
+    	}elsif($ttemp[0] =~ /Feb/i){
+           		$month = '2';
 			$add = 31;
-        	}elsif($ttemp[0] =~ /Mar/i){
-               		$month = '3';
+    	}elsif($ttemp[0] =~ /Mar/i){
+           		$month = '3';
 			$add = 59;
-        	}elsif($ttemp[0] =~ /Apr/i){
-               		$month = '4';
+    	}elsif($ttemp[0] =~ /Apr/i){
+           		$month = '4';
 			$add = 90;
-        	}elsif($ttemp[0] =~ /May/i){
-               		$month = '5';
+    	}elsif($ttemp[0] =~ /May/i){
+           		$month = '5';
 			$add = 120;
-        	}elsif($ttemp[0] =~ /Jun/i){
-               		$month = '6';
+    	}elsif($ttemp[0] =~ /Jun/i){
+           		$month = '6';
 			$add = 151;
-        	}elsif($ttemp[0] =~ /Jul/i){
-               		$month = '7';
+    	}elsif($ttemp[0] =~ /Jul/i){
+           		$month = '7';
 			$add = 181;
-        	}elsif($ttemp[0] =~ /Aug/i){
-               		$month = '8';
+    	}elsif($ttemp[0] =~ /Aug/i){
+           		$month = '8';
 			$add = 212;
-        	}elsif($ttemp[0] =~ /Sep/i){
-               		$month = '9';
+    	}elsif($ttemp[0] =~ /Sep/i){
+           		$month = '9';
 			$add = 243;
-        	}elsif($ttemp[0] =~ /Oct/i){
-               		$month = '10';
+    	}elsif($ttemp[0] =~ /Oct/i){
+           		$month = '10';
 			$add = 273;
-        	}elsif($ttemp[0] =~ /Nov/i){
-               		$month = '11';
+    	}elsif($ttemp[0] =~ /Nov/i){
+           		$month = '11';
 			$add = 304;
-        	}elsif($ttemp[0] =~ /Dec/i){
-               		$month = '12';
+    	}elsif($ttemp[0] =~ /Dec/i){
+           		$month = '12';
 			$add = 334;
-        	}
+    	}
 
 		$ychk = 4.0 * int(0.25 * $ttemp[2]);		# a leap year check
 		if($ttemp[2] == $ychk){
@@ -8119,7 +8005,7 @@ sub lts_date_check{
 }
 
 ####################################################################
-### series_rev: getting mointoring observation things           ####
+### series_rev: getting mointoring observation things       ####
 ####################################################################
 
 sub series_rev{
@@ -8132,24 +8018,24 @@ sub series_rev{
      	push @monitor_series, $_[0];
      	my @partial_series;
      	$sqlh1 = $dbh1->prepare(qq(select
-              	pre_id from target where obsid = $_[0]));
+          	pre_id from target where obsid = $_[0]));
      	$sqlh1->execute();
      	my $row;
 	
      	while ($row = $sqlh1->fetchrow){
 	  	return if (! $row =~ /\d+/);
-          	push @partial_series, $row;
-          	$sqlh2 = $dbh1->prepare(qq(select
-                   	obsid from target where pre_id = $row));
-          	$sqlh2->execute();
-          	my $new_row;
+      	push @partial_series, $row;
+      	$sqlh2 = $dbh1->prepare(qq(select
+           	obsid from target where pre_id = $row));
+      	$sqlh2->execute();
+      	my $new_row;
 
-          	while ($new_row = $sqlh2->fetchrow){
-              		if ($new_row != $_[0]){
-                  		&series_fwd($new_row);
-              		}
-          	}
-          	$sqlh2->finish;
+      	while ($new_row = $sqlh2->fetchrow){
+          		if ($new_row != $_[0]){
+          		&series_fwd($new_row);
+          		}
+      	}
+      	$sqlh2->finish;
      	}
      	$sqlh1->finish;
 
@@ -8157,91 +8043,91 @@ sub series_rev{
      	OUTER:
      	foreach $ent (@monitor_series){
        		foreach $comp (@partial_series){
-               		if($ent == $comp){
-                       		$skip = 1;
-                       		last OUTER;
-               		}
+           		if($ent == $comp){
+               		$skip = 1;
+               		last OUTER;
+           		}
        		}
      	}
 
 
      	if($skip == 0){
      		foreach $monitor_elem (@partial_series) {
-          		&series_rev($monitor_elem);
+      		&series_rev($monitor_elem);
      		}
      	}
 }
 
 ####################################################################
-### series_fwd: getting monitoring observation things           ####
+### series_fwd: getting monitoring observation things       ####
 ####################################################################
 
 sub series_fwd{
      	push @monitor_series, $_[0];
      	my @partial_series;
      	$sqlh1 = $dbh1->prepare(qq(select
-              	obsid from target where pre_id = $_[0]));
+          	obsid from target where pre_id = $_[0]));
      	$sqlh1->execute();
      	my $row;
 
      	while ($row = $sqlh1->fetchrow){
-          	push @partial_series, $row;
-          	$sqlh2 = $dbh1->prepare(qq(select
-                   	pre_id from target where obsid = $row));
-          	$sqlh2->execute();
-          	my $new_row;
+      	push @partial_series, $row;
+      	$sqlh2 = $dbh1->prepare(qq(select
+           	pre_id from target where obsid = $row));
+      	$sqlh2->execute();
+      	my $new_row;
 
-          	while ($new_row = $sqlh2->fetchrow){
-              		if ($new_row != $_[0]){
-                  		&series_rev($new_row);
-              		}
-          	}
-          	$sqlh2->finish;
+      	while ($new_row = $sqlh2->fetchrow){
+          		if ($new_row != $_[0]){
+          		&series_rev($new_row);
+          		}
+      	}
+      	$sqlh2->finish;
      	}
      	$sqlh1->finish;
 
      	$skip = 0;
      	OUTER:
      	foreach $ent (@monitor_series){
-        	foreach $comp (@partial_series){
-                	if($ent == $comp){
-                        	$skip = 1;
-                        	last OUTER;
-                	}
+    	foreach $comp (@partial_series){
+        	if($ent == $comp){
+            	$skip = 1;
+            	last OUTER;
         	}
+    	}
      	}
 
      	if($skip == 0){
-        	foreach $monitor_elem (@partial_series) {
-                	&series_fwd($monitor_elem);
-        	}
+    	foreach $monitor_elem (@partial_series) {
+        	&series_fwd($monitor_elem);
+    	}
      	}
 }
 
 ######################################################################
-### find_planned_roll: get planned roll from mp web page          ####
+### find_planned_roll: get planned roll from mp web page      ####
 ######################################################################
 
 sub find_planned_roll{
 
-        open(PFH, "$obs_ss/mp_long_term");
-        OUTER:
-        while(<PFH>){
+    open(PFH, "$obs_ss/mp_long_term");
+    OUTER:
+    while(<PFH>){
 		chomp $_;
 		@ptemp = split(/:/, $_);
-        	%{planned_roll.$ptemp[0]} = (planned_roll =>["$ptemp[1]"]);
+    	%{planned_roll.$ptemp[0]} = (planned_roll =>["$ptemp[1]"]);
 
-        }
-        close(PFH);
+    }
+    close(PFH);
 }
 
 #####################################################################
-### rm_from_approved_list: remove entry from approved list        ###
+### rm_from_approved_list: remove entry from approved list    ###
 #####################################################################
 
 sub rm_from_approved_list{
 
-        @temp_app = ();
+    @temp_app = ();
 
 	open(FH, "$ocat_dir/approved");
 
@@ -8249,17 +8135,17 @@ sub rm_from_approved_list{
 #---- read data, store it except the one which we need to remove
 #---------------------------------------------------------------
 
-        OUTER:
-        while(<FH>){
-                chomp $_;
-                @atemp = split(/\t/,$_);
-                if($atemp[0] =~ /$obsid/){
-                        next OUTER;
-                }else{
-                        push(@temp_app, $_);
-                }
+    OUTER:
+    while(<FH>){
+        chomp $_;
+        @atemp = split(/\t/,$_);
+        if($atemp[0] =~ /$obsid/){
+            next OUTER;
+        }else{
+            push(@temp_app, $_);
         }
-        close(FH);
+    }
+    close(FH);
 
 	system("mv $ocat_dir/approved $ocat_dir/approved~");
 
@@ -8269,16 +8155,16 @@ sub rm_from_approved_list{
 
 	open(AOUT, ">$ocat_dir/approved");
 
-        foreach $ent (@temp_app){
-                print AOUT "$ent\n";
-        }
-        close(AOUT);
-        system("chmod 644 $ocat_dir/approved");
+    foreach $ent (@temp_app){
+        print AOUT "$ent\n";
+    }
+    close(AOUT);
+    system("chmod 644 $ocat_dir/approved");
 }
 
 
 ######################################################################################
-### send_mail_to_usint: sending out full support request email to USINT            ###
+### send_mail_to_usint: sending out full support request email to USINT        ###
 ######################################################################################
 
 sub send_mail_to_usint{
@@ -8293,20 +8179,20 @@ sub send_mail_to_usint{
 #----  say thank you to submit email to USINT.
 #
 
-        print "<p style='padding-top:20px;padding-bottom:20px'><strong>Thank you.  Your request has been submitted.<br /><br />";
+    print "<p style='padding-top:20px;padding-bottom:20px'><strong>Thank you.  Your request has been submitted.<br /><br />";
 	print "If you have any quesitons, please contact: <a href=\"mailto:$usint_mail\">$usint_mail</a>.</strong></p>";
 
-        if($usint_on =~ /test/){
-                print "<A HREF=\"$obs_ss_http/search.html\">Go Back to the Search Page</A>";
-        }else{
-                print "<A HREF=\"$chandra_http\">Chandra Observatory Page</a>";
-        }
-#        print "</body>";
-#        print "</html>";
+    if($usint_on =~ /test/){
+        print "<A HREF=\"$obs_ss_http/search.html\">Go Back to the Search Page</A>";
+    }else{
+        print "<A HREF=\"$chandra_http\">Chandra Observatory Page</a>";
+    }
+#    print "</body>";
+#    print "</html>";
 }
 
 #####################################################################################
-### mail_out_to_usint: sending email to USINT                                     ###
+### mail_out_to_usint: sending email to USINT                     ###
 #####################################################################################
 
 sub mail_out_to_usint{
@@ -8331,12 +8217,12 @@ sub mail_out_to_usint{
 	$uyear = 1900 + $year;
 	
 	if($mon < 10){
-        	$mon = '0'."$mon";
+    	$mon = '0'."$mon";
 	}
 	
 	$mon++;
 	if($mday < 10){
-        	$mday = '0'."$mday";
+    	$mday = '0'."$mday";
 	}
 	
 	$date = "$mon/$mday/$uyear";
@@ -8361,7 +8247,7 @@ sub mail_out_to_usint{
 
 
 #######################################################################################
-###send_email_to_mp: sending email to MP if the obs is in an active OR list         ###
+###send_email_to_mp: sending email to MP if the obs is in an active OR list     ###
 #######################################################################################
 
 sub send_email_to_mp{
@@ -8373,14 +8259,14 @@ sub send_email_to_mp{
 	@vsave = ();
 	$vcnt  = 0;
 	while(<UIN>){
-        	chomp $_;
-        	if($_ =~ /$obsid/){
-                	@utemp = split(/\s+/, $_);
-                	@vtemp = split(/\./, $utemp[0]);
-                	$i_val = int ($vtemp[1]);
-                	push(@vsave, $i_val);
-                	$vcnt++;
-        	}
+    	chomp $_;
+    	if($_ =~ /$obsid/){
+        	@utemp = split(/\s+/, $_);
+        	@vtemp = split(/\./, $utemp[0]);
+        	$i_val = int ($vtemp[1]);
+        	push(@vsave, $i_val);
+        	$vcnt++;
+    	}
 	}
 	close(UIN);
 	
@@ -8389,9 +8275,9 @@ sub send_email_to_mp{
 	$rev++;
 
 	if ($rev < 10){
-        	$rev = "00$rev";
+    	$rev = "00$rev";
 	} elsif (($rev >= 10) && ($rev < 100)){
-        	$rev = "0$rev";
+    	$rev = "0$rev";
 	}
 
 #
@@ -8425,12 +8311,12 @@ sub send_email_to_mp{
 	$uyear = 1900 + $year;
 	
 	if($mon < 10){
-        	$mon = '0'."$mon";
+    	$mon = '0'."$mon";
 	}
 	
 	$mon++;
 	if($mday < 10){
-        	$mday = '0'."$mday";
+    	$mday = '0'."$mday";
 	}
 	
 	$date = "$mon/$mday/$uyear";
@@ -8471,36 +8357,36 @@ sub send_email_to_mp{
 ###############################################################################
 
 sub find_usint {
-        if($targname    =~ /CAL/i){
-                $usint_mail  = 'ldavid@cfa.harvard.edu';
-        }elsif($grating =~ /LETG/i){
-                $usint_mail  = 'jdrake@cfa.harvard.edu bwargelin@cfa.harvard.edu';
-        }elsif($grating =~ /HETG/i){
-                $usint_mail  = 'nss@space.mit.edu  hermanm@spce.mit.edu';
-        }elsif($inst    =~ /HRC/i){
-                $usint_mail  = 'juda@cfa.harvard.edu vkashyap@cfa.harvard.edu';
-        }else{
-                if($seq_nbr < 290000){
-                        $usint_mail = 'swolk@cfa.harvard.edu';
-                }elsif($seq_nbr > 300000 && $seq_nbr < 490000){
-                        $usint_mail = 'nadams@cfa.harvard.edu';
-                }elsif($seq_nbr > 500000 && $seq_nbr < 590000){
-                        $usint_mail = 'plucinsk@cfa.harvard.edu';
-                }elsif($seq_nbr > 600000 && $seq_nbr < 690000){
-                        $usint_mail = 'jdepasquale@cfa.harvard.edu';
-                }elsif($seq_nbr > 700000 && $seq_nbr < 790000){
-                        $usint_mail = 'emk@cfa.harvard.edu';
-                }elsif($seq_nbr > 800000 && $seq_nbr < 890000){
-                        $usint_mail = 'maxim@cfa.harvard.edu';
-                }elsif($seq_nbr > 900000 && $seq_nbr < 990000){
-                        $usint_mail = 'das@cfa.harvard.edu';
-                }
+    if($targname    =~ /CAL/i){
+        $usint_mail  = 'ldavid@cfa.harvard.edu';
+    }elsif($grating =~ /LETG/i){
+        $usint_mail  = 'jdrake@cfa.harvard.edu bwargelin@cfa.harvard.edu';
+    }elsif($grating =~ /HETG/i){
+        $usint_mail  = 'nss@space.mit.edu  hermanm@spce.mit.edu';
+    }elsif($inst    =~ /HRC/i){
+        $usint_mail  = 'juda@cfa.harvard.edu vkashyap@cfa.harvard.edu';
+    }else{
+        if($seq_nbr < 290000){
+            $usint_mail = 'swolk@cfa.harvard.edu';
+        }elsif($seq_nbr > 300000 && $seq_nbr < 490000){
+            $usint_mail = 'nadams@cfa.harvard.edu';
+        }elsif($seq_nbr > 500000 && $seq_nbr < 590000){
+            $usint_mail = 'plucinsk@cfa.harvard.edu';
+        }elsif($seq_nbr > 600000 && $seq_nbr < 690000){
+            $usint_mail = 'jdepasquale@cfa.harvard.edu';
+        }elsif($seq_nbr > 700000 && $seq_nbr < 790000){
+            $usint_mail = 'emk@cfa.harvard.edu';
+        }elsif($seq_nbr > 800000 && $seq_nbr < 890000){
+            $usint_mail = 'maxim@cfa.harvard.edu';
+        }elsif($seq_nbr > 900000 && $seq_nbr < 990000){
+            $usint_mail = 'das@cfa.harvard.edu';
         }
+    }
 }
 
 
 ####################################################################################
-### oredit_sub: external part of oredit; a part ocatdata2html.cgi                ###
+### oredit_sub: external part of oredit; a part ocatdata2html.cgi        ###
 ####################################################################################
 
 sub oredit_sub{
@@ -8865,5 +8751,55 @@ sub oredit_sub{
 
 #	system("chmod 777 $temp_dir/*");
 
-        system("chmod 775 $ocat_dir/updates_table.list*");
+    system("chmod 775 $ocat_dir/updates_table.list*");
 }
+
+
+##################################################################################
+### adjust_o_values: adjust output letter values to a correct one              ###
+##################################################################################
+
+sub adjust_o_values{
+
+    $orig_name = 'orig_'."$d_name";            #--- original value is kept here
+
+    if(${$d_name} =~ /CONSTRAINT/i){
+        ${$d_name} = 'Y';
+    }elsif(${$d_name} =~ /PREFERENCE/i){
+        ${$d_name} = 'P';
+    }elsif(${$d_name} =~ /INCLUDE/i){
+        ${$d_name} = 'I';
+    }elsif(${$d_name} =~ /EXCLUDE/i){
+        ${$d_name} = 'E';
+    }elsif(${$d_name} =~ /YES/i){
+        ${$d_name} = 'Y';
+
+    }elsif(${$d_name} =~ /NO/i){
+        if(${$orig_name} eq 'NO'){
+            ${$d_name} = 'NO';
+        }elsif(${$orig_name} eq ''){
+            ${$d_name} = '';
+        }else{
+            ${$d_name} = 'N';
+        }
+
+
+    }elsif(${$d_name} =~ /NULL/i){
+        if(${$orig_name} eq 'N'){
+            ${$d_name} = 'N';
+        }elsif(${$orig_name} eq ''){
+            ${$d_name} = '';
+        }
+
+    }elsif(${$d_name} =~ /NONE/i){
+        if(${$orig_name} eq 'NO'){
+            ${$d_name} = 'NO';
+        }elsif(${$orig_name} eq 'N'){
+            ${$d_name} = 'N';
+        }elsif(${$orig_name} eq ''){
+            ${$d_name} = '';
+        }
+    }
+}
+
+

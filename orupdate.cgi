@@ -77,6 +77,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # T. Isobe Nov 06, 2012									#
 #    html 5 conformed									#
 #											#
+# T. Isobe Nov 28, 2012									#
+#    flock bug fixed									#
+#											#
 #########################################################################################
 
 
@@ -828,7 +831,7 @@ $cj      = 0;		#--- counter for the color table 0 - 10.
 		$cname = 'cnt'."$ent";			#--- cname has # of opened revisions of the obsid
 
 		if(${$cname} <= 1){
-			${$color} = '#FFFFFF';		#--- if it is the newest, just white background
+			${$color} = '#FFFFE0';		#--- if it is the newest, just white background
 		}else{
 			${$color} = $color_table[$cj];
 			$cj++;
@@ -1984,7 +1987,7 @@ sub update_info {
 
 	        OUTER:
 	        while($lpass == 0){
-	                open(my $update, '>>', $efile) or die "Locked";
+	                open(my $update, '+<', $efile) or die "Locked";
 	                if($@){
 #
 #--- wait 2 cpu seconds before attempt to check in another round

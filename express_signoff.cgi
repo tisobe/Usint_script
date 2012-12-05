@@ -13,7 +13,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: Oct 31, 2012	           				#
+#	last update: Nov 28, 2012	           				#
 #										#
 #################################################################################
 
@@ -2839,7 +2839,7 @@ sub oredit{
         my $efile = "$ocat_dir/updates_table.list";
         OUTER:
         while($lpass == 0){
-                open(my $update, '>>', $efile) or die "Locked";
+                open(my $update, '+<', $efile) or die "Locked";
                 if($@){
 #
 #--- wait 2 cpu seconds before attempt to check in another round
