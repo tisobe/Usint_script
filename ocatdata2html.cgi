@@ -203,6 +203,8 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # ocat data value conversion problem corrected (line starting 9140 as of Nov 29, 2012)
 # (Nov 29, 2012)
 #
+# window_flag/roll_flag bug fixed
+# (Dec 06, 2012)
 #
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -6545,7 +6547,7 @@ if($sp_user eq 'no'){
 
 	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
-	if($dwindow_flag =~ /N/i){
+	if($dwindow_flag =~ /NO/i || $dwindow_flag =~ /NULL/i){
                 print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. Do You Need To Add? ";
                 print popup_menu(-name=>"WINDOW_FLAG", -value=>['NO', 'YES'], -default=>"$dwindow_flag", -override=>100000);
                 print '<input type="submit" name="Check" value="Update">';
@@ -6792,7 +6794,7 @@ if($sp_user eq 'no'){
 
 	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
-	if($droll_flag =~ /N/i){
+	if($droll_flag =~ /NO/i || $droll_flag =~ /NULL/i){
                 print '<h3 style="padding-bottom:40px">There Is No Roll Constraint. Do You Need To Add? ';
                 print popup_menu(-name=>"ROLL_FLAG", -value=>['NO', 'YES'], -default=>"$droll_flag", -override=>100000);
                 print '<input type="submit" name="Check" value="Update">';

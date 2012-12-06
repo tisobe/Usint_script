@@ -14,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Nov 29, 2012
+#		last update: Dec 06, 2012
 #  
 ###############################################################################
 
@@ -3371,7 +3371,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 
 	print "<input type=\"hidden\" name=\"TIME_ORDR\" value=\"$time_ordr\">";
 
-	if($dwindow_flag =~ /N/i){
+	if($dwindow_flag =~ /NO/i || $dwindow_flag =~ /NULL/i){
 		print "<h3 style='padding-bottom:40px'>There Is No Time Constraints. Do You Need To Add? ";
 		print popup_menu(-name=>"WINDOW_FLAG", -value=>['NO', 'YES'], -default=>"$dwindow_flag", -override=>100000);
 		print '<input type="submit" name="Check" value="Update">';
@@ -3538,7 +3538,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print "<input type=\"hidden\" name=\"ROLL_ORDR\" value=\"$roll_ordr\">";
 
-	if($droll_flag =~ /N/i){
+	if($droll_flag =~ /NO/i || $droll_flag =~ /NULL/i){
 		print '<h3 style="padding-bottom:40px">There Is No Roll Constraint. Do You Need To Add? ';
 		print popup_menu(-name=>"ROLL_FLAG", -value=>['NO', 'YES'], -default=>"$droll_flag", -override=>100000);
 		print '<input type="submit" name="Check" value="Update">';
