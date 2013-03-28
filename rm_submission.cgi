@@ -1,4 +1,10 @@
 #!/soft/ascds/DS.release/ots/bin/perl
+
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+} 
+
 use CGI qw/:standard :netscape /;
 
 use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
@@ -8,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # rm_submission.cgi: remove an accidental submission from database			#
 #											#
 # 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
-#		Last Update: Nov  28, 2012 						#
+#		Last Update: Mar  27, 2013 						#
 # This script removes an obsid from database.    	                            	#
 #											#
 #########################################################################################
@@ -17,9 +23,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-#$usint_on = 'yes';                     ##### USINT Version
+$usint_on = 'yes';                     ##### USINT Version
 #$usint_on = 'no';                      ##### USER Version
-$usint_on = 'test_yes';                 ##### Test Version USINT
+#$usint_on = 'test_yes';                 ##### Test Version USINT
 #$usint_on = 'test_no';                 ##### Test Version USER
 
 
@@ -27,7 +33,10 @@ $usint_on = 'test_yes';                 ##### Test Version USINT
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -298,12 +307,12 @@ sub remve_submission{
 
 	print "<h3 style='color:red;padding-bottom:10px'>If it is once removed, the change is permanent; be careful to select a correct one</h3>";
 ########
-#	print "<B><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/index.html\">Verification Page ";
+#	print "<B><A HREF=\"https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/index.html\">Verification Page ";
 #
 #	print "Support Observation Search Form</A></B><BR>";
 #	print "<B><A HREF=\"http://asc.harvard.edu/~mta/CUS/\">Chandra Uplink Support Organizational Page";
 	print '<p>';
-	print "<strong><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form</a></strong>";
+	print "<strong><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form</a></strong>";
 	print '</p>';
 ########
 
@@ -311,9 +320,9 @@ sub remve_submission{
 	open (FILE, "< $ocat_dir/updates_table.list");
 	@revisions = <FILE>;
 	close (FILE);
-	print "<form name=\"update\" Method=\"post\" action=\"https://icxc.harvard.edu/mta/CUS/Usint/rm_submission.cgi\">";
+	print "<form name=\"update\" Method=\"post\" action=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/rm_submission.cgi\">";
 #	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"http://asc.harvard.edu/cgi-gen/mta/Obscat/rm_submission.cgi\">";
-#	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"https://icxc.harvard.edu/cgi-bin/obs_ss/rm_submission.cgi\">";
+#	print "<FORM NAME=\"update\" METHOD=\"post\" ACTION=\"https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/rm_submission.cgi\">";
 #####
 
 	print "<div style='text-align:center;margin-left:auto;margin-right;auto;'>";
@@ -417,8 +426,8 @@ sub remve_submission{
 				print "<TR>";
 			}
 ##########
-#			print "<TD><A HREF=\"https://icxc.harvard.edu/cgi-bin/obs_ss/chkupdata.cgi";
-			print "<td><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/chkupdata.cgi";
+#			print "<TD><A HREF=\"https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/chkupdata.cgi";
+			print "<td><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi";
 ##########
 			print "\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 

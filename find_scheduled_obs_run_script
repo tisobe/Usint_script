@@ -5,7 +5,7 @@ source /home/mta/bin/reset_param
 setenv PFILES "${PDIRS}" 
 set path = (/home/ascds/DS.release/bin/  $path)
 
-perl /proj/web-icxc/cgi-bin/obs_ss/find_scheduled_obs.perl
+perl /data/mta4/obs_ss/find_scheduled_obs.perl
 
 rm -rf param
-chgrp mtagroup /proj/web-icxc/cgi-bin/obs_ss/*
+chgrp mtagroup /data/mta4/obs_ss/*

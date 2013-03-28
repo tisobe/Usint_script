@@ -7,7 +7,7 @@ use CGI qw/:standard :netscape /;
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Feb 28, 2011									#
+#		last update: Mar 27, 2013									#
 #														#
 #################################################################################################################
 
@@ -17,7 +17,10 @@ use CGI qw/:standard :netscape /;
 
 
 #open(IN, '/data/udoc1/ocat/Info_save/dir_list');
-open(IN, '/data/udoc1/ocat/Test/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Test/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -103,7 +106,7 @@ print  "<h2 style='background-color:blue; color:#FAEBD7; margin-right:4em;'>Sche
 
 
 print '<div style="text-align:right;padding-right:8em">';
-print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
+print '<a href="https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
 print '<strong><em style="background-color:red;color:yellow;">Back to USINT TOO Point of Contact</em></strong></a>',"\n";
 print '</div>';
 
@@ -1421,7 +1424,7 @@ print hidden(-name=>'total', -value=>"$total");
 print '<input type="submit" name="submit" value="Submit Updates">',"\n";
 
 print  '<br /><br />',"\n";
-print '<a href="https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
+print '<a href="https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html">';
 print '<strong><em style="background-color:red;color:yellow;">Back to USINT TOO Point of Contact</em></strong></a>',"\n";
 print '<br />',"\n";
 
@@ -1679,9 +1682,9 @@ sub update_database{
 			print OUT "ORIGINAL: $modified[$k]\n";
 			print OUT "NEW:      $new[$k]\n\n";
 			print OUT "Please check:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
 			print OUT "or go to:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
 			print OUT "and re-adjust the schedule, if needed.\n\n";
 			print OUT "This change was made by $ntemp[7].\n\n";
 			print OUT "If you have any quesitons about the scheduling, please contact\n";
@@ -1731,9 +1734,9 @@ sub update_database{
 			print OUT "TOO contact schedule was updated, and you are assigned to:\n";
 			print OUT "          $newassign[$k]\n\n";
 			print OUT "Please check:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
 			print OUT "or go to:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
 			print OUT "and re-adjust the schedule, if needed.\n\n";
 			print OUT "This assignment was made by $mtemp[7].\n\n";
 			print OUT "If you have any quesitons about the scheduling, please contact\n";
@@ -1876,9 +1879,9 @@ sub cut_line_on_database{
 			print OUT "TOO contact schedule was updated, and your assignment for: \n";
 			print OUT "          $cut_affected[$m]\n\n";
 			print OUT "was canceled, and removed from the schedule. Please check:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html',"\n";
 			print OUT "or go to:\n";
-			print OUT ' https://icxc.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
+			print OUT ' https://cxc.cfa.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
 			print OUT "and re-adjust the schedule, if needed.\n\n";
 			print OUT "This assignment was made by $mtemp[7].\n\n";
 			print OUT "If you have any quesitons about the scheduling, please contact\n";

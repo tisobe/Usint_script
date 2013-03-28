@@ -7,7 +7,7 @@
 #										#
 #		author: t. isobe (tisobe@cfa.harvard.edu)			#
 #										#
-#		last update Mar 04, 2011					#
+#		last update Mar 27, 2013					#
 #										#
 #################################################################################
 
@@ -15,7 +15,7 @@
 #---- set directory paths : updated to read from a file (02/25/2011) --- this is user: mta version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);

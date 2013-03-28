@@ -9,7 +9,7 @@
 #												#
 #	author: T. Isobe (tisobe@cfa.harvard.edu)						#
 #	Oct 1, 2003   --- first version								#
-#	Last Update: Oct 25, 2012								#
+#	Last Update: Mar 27, 2013								#
 #												#
 #################################################################################################	
 
@@ -27,7 +27,10 @@ $usint_on = 'yes';                      ##### USINT Version
 #---- set directory paths : updated to read from a file (02/25/2011)	this is user: mta version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -119,9 +122,9 @@ while(<FH>){
 			print  OUT "$line\n";
 			print  OUT "Please remember you still need to approve the observation at: \n";
 			if($usint_on =~ /no/){
-				print  OUT 'https://icxc.harvard.edu/cgi-bin/obs_ss/ocatdata2html.cgi?';
+				print  OUT 'https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/ocatdata2html.cgi?';
 			}else{
-				print  OUT 'https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?';
+				print  OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?';
 			}
 			print  OUT "$obsid\n\n";
 			print  OUT "unless the last submission was the \"approved\" submission.\n";

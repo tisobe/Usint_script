@@ -6,7 +6,7 @@
 #                                                                                                               #
 #           author: t. isobe (tisobe@cfa.harvard.edu)                                                           #
 #                                                                                                               #
-#           last update: Aug 29, 2012                                                                           #
+#           last update: Mar 26, 2013                                                                           #
 #                                                                                                               #
 #################################################################################################################
 
@@ -22,7 +22,9 @@ import getpass
 #
 
 #path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
-path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list'                                #---- live directory list path
+#path = '/data/mta4/CUS/www/Usint/TOO_Obs/too_dir_list'                                #---- live directory list path
+#path = '/data/udoc1/ocat/Info_save/too_dir_list_py'
+path = '/data/mta4/CUS/www/Usint/ocat/Info_save/too_dir_list_py'
 
 f    = open(path, 'r')
 data = [line.strip() for line in f.readlines()]
@@ -93,8 +95,10 @@ def read_ddt_too_from_email(tooList, ddtList):
 
             if m2 is not None: 
 
-                m3 = re.search('is a TOO which has recently', ent)
-                m4 = re.search('is a DDT which has recently', ent)
+#                m3 = re.search('is a TOO which has recently', ent)
+#                m4 = re.search('is a DDT which has recently', ent)
+                m3 = re.search('is a TOO',   ent)
+                m4 = re.search('is a DDT',   ent)
 
                 if m3 is not None:
                     obsid = getObsid(ent)

@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Oct 02, 2012									#
+#		last update: Mar 27, 2013									#
 #														#
 #################################################################################################################
 
@@ -16,16 +16,9 @@ $temp_dir = '/data/mta4/www/CUS/Usint/Temp/';            #--- a temporary file i
 #---- set directory paths : updated to read from a file (02/25/2011)	this is user: cus version
 #
 
-#$test_run  = 0;                                                                # live run
-$test_run  = 1;                                                                 # tst run case  
-
-if($test_run == 1){
-        $d_path = "/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/";           # test directory list path
-}else{  
-        $d_path = "/data/udoc1/ocat/Info_save/";                               # live directory list path
-}
-
-open(IN, "$d_path/dir_list");
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
 
 while(<IN>){
         chomp $_;
@@ -131,16 +124,14 @@ if($new > 0){
 	print OUT2 "Hi\n";
 	print OUT2 "According to TOO-POC schedule, ";
 	print OUT2 "your TOO point of contact duty is starting tomorrow at mid-night (0:00 hr, local time). Pleaes check the schedule: \n\n";
-	print OUT2 "\thttps://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html\n\n";
+	print OUT2 "\thttps://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html\n\n";
 	print OUT2 "If there are any schedule conflicts or schedule mistakes, please contact ";
 	print OUT2 "Scott Wolk (swolk\@head.cfa.harvard.edu) as soon as possible.\n";
 	close(OUT2);
 
         system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification:$too_poc\n\" isobe\@head.cfa.harvard.edu");
 
-	if($test_run == 0){
-        	system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification\n\" -ccus\@head.cfa.harvard.edu $too_poc");
-	}
+        system("cat $temp_dir/temp_email2 | mailx -s\"Subject:  TOO Point of Contact Duty Notification\n\" -ccus\@head.cfa.harvard.edu $too_poc");
 	system("rm $temp_dir/temp_email2");
 }
 	

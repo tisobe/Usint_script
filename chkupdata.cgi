@@ -1,5 +1,10 @@
 #!/home/ascds/DS.release/ots/bin/perl
 
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+}
+
 use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
@@ -13,19 +18,20 @@ use CGI qw/:standard :netscape /;
 #											#
 #	10/31/01:	first version							#
 #	07/22/02:	uninterrupt added						#
-#	last update	Nov 01, 2012							#
+#	last update	Mar 27, 2013							#
 #											#
 #########################################################################################
 
 $obsid = $ARGV[0];
 chomp $obsid;
 
-
 #
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -45,7 +51,6 @@ while(<IN>){
         }
 }
 close(IN);
-
 
 ###############################
 $dtest = 0;
@@ -852,7 +857,7 @@ foreach $ent (@paramarray2){
 
 html_print();
 
-print "<p  style='text-align:right'><a href=\"https://icxc.harvard.edu/cgi-bin/obs_ss/orupdate.cgi\">Back to Target Parameter Update Status Form</a></p>";
+print "<p  style='text-align:right'><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi\">Back to Target Parameter Update Status Form</a></p>";
 
 print "</body>";
 print "</html>";
@@ -917,7 +922,14 @@ sub check_update_datebase {
 #--- if the file is created this year, the format is slightly different from that of the past years
 #
 	if($ctemp[7] =~ /:/){
-		$pyear = $this_year;
+		conv_lmon_to_ydate($ctemp[5]);
+		if($mydate < 0){
+			$pyear = $this_year -1;
+		}elsif($mydate > $lyday){
+			$pyear = $this_year -1;
+		}else{
+			$pyear = $this_year;
+		}
 	}else{
 		$pyear = $ctemp[7];
 	}
@@ -3442,3 +3454,38 @@ if($j < 3){
         }
 }
 
+
+###################################################################################
+###################################################################################
+###################################################################################
+
+sub conv_lmon_to_ydate{
+	($lmon) = @_;
+	if($lmon =~ /Jan/i){
+		$mydate = 1;
+	}elsif($lmon =~ /Feb/i){
+		$mydate = 32;
+	}elsif($lmon =~ /Mar/i){
+		$mydate = 60;
+	}elsif($lmon =~ /Apr/i){
+		$mydate = 91;
+	}elsif($lmon =~ /May/i){
+		$mydate = 121;
+	}elsif($lmon =~ /Jun/i){
+		$mydate = 152;
+	}elsif($lmon =~ /Jul/i){
+		$mydate = 182;
+	}elsif($lmon =~ /Aug/i){
+		$mydate = 213;
+	}elsif($lmon =~ /Sep/i){
+		$mydate = 244;
+	}elsif($lmon =~ /Oct/i){
+		$mydate = 274;
+	}elsif($lmon =~ /Nov/i){
+		$mydate = 305;
+	}elsif($lmon =~ /Dec/i){
+		$mydate = 335;
+	}else{
+		$mydate = -999;
+	}
+}

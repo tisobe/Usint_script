@@ -1,5 +1,10 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+} 
+
 use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
@@ -13,7 +18,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: Nov 28, 2012	           				#
+#	last update: Mar 25, 2013	           				#
 #										#
 #################################################################################
 
@@ -26,9 +31,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #--- a few settings ....
 ############################
 
-#$usint_on = 'yes';                     ##### USINT Version
+$usint_on = 'yes';                     ##### USINT Version
 #$usint_on = 'no';                      ##### USER Version
-$usint_on = 'test_yes';                 ##### Test Version USINT
+#$usint_on = 'test_yes';                 ##### Test Version USINT
 #$usint_on = 'test_no';                 ##### Test Version USER
 
 #
@@ -51,7 +56,10 @@ $test_email = 'isobe@head.cfa.harvard.edu';
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -87,15 +95,15 @@ if($usint_on =~ /test/i){
 #--- set html pages
 #
 
-$usint_home   = 'https://icxc.harvard.edu/cus/';                #--- USINT page
-$usint_http   = 'https://icxc.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
-$obs_ss_http  = 'https://icxc.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
+$usint_home   = 'https://cxc.cfa.harvard.edu/cus/';                #--- USINT page
+$usint_http   = 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
+$obs_ss_http  = 'https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
 $test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';  #--- web site for test
-$test_http    = 'https://icxc.harvard.edu/mta/CUS/Usint/Linux_test/'; #--- web site for test
+$test_http    = 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/Linux_test/'; #--- web site for test
 
 $mp_http      = 'http://asc.harvard.edu/';                      #--- web site for mission planning related
 $chandra_http = 'http://cxc.harvard.edu/';                      #--- chandra main web site
-$cdo_http     = 'https://icxc.harvard.edu/cgi-bin/cdo/';        #--- CDO web site
+$cdo_http     = 'https://icxc.cfa.harvard.edu/cgi-bin/cdo/';        #--- CDO web site
 
 ############################
 #----- end of settings
@@ -2839,7 +2847,7 @@ sub oredit{
         my $efile = "$ocat_dir/updates_table.list";
         OUTER:
         while($lpass == 0){
-                open(my $update, '+<', $efile) or die "Locked";
+                open(my $update, '>>', $efile) or die "Locked";
                 if($@){
 #
 #--- wait 2 cpu seconds before attempt to check in another round
@@ -2926,11 +2934,11 @@ $send_email = 'yes';
 
 			if($unint_on =~ /test/){
 
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
+#mail#				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
 
 			}else{
 
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address cus\@head-cfa.harvard.edu");
+#mail#				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address cus\@head-cfa.harvard.edu");
 
 			}
 
@@ -2940,12 +2948,12 @@ $send_email = 'yes';
 
 			if($unint_on =~ /test/){
 
-				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address");
-				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
+#mail#				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address");
+#mail#				system("cat $temp_dir/asis.tmp |mailx -s\"Subject: $obsid is approved\n\"  $email_address");
 
 			}else{
 
-				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address  cus\@head.cfa.harvard.edu");
+#mail#				system("cat $temp_dir/ormail_$obsid.tmp |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $email_address  cus\@head.cfa.harvard.edu");
 
 			}
 		}
@@ -3393,9 +3401,9 @@ sub send_email_to_mp{
         $mp_email = "$mp_contact".'@head.cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
-        	system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\"  $test_email");
+#mail#        	system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\"  $test_email");
 	}else{
-		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
+#mail#		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
 	}
 
         system("rm $temp_file");

@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Oct 05, 2012									#
+#		last update: Mar 27, 2013									#
 #														#
 #################################################################################################################
 
@@ -14,7 +14,10 @@
 #---- set directory paths : updated to read from a file (02/25/2011): this is user cus version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -277,9 +280,9 @@ for($i = 0; $i < $scnt; $i++){
 print OUT "</table>","\n";
 
 print OUT '<br />',"\n";
-print OUT '<a href="https://icxc.harvard.edu/mta/CUS/Usint/insert_person.cgi" style="color:red">Update Contact List</a>',"\n";
+print OUT '<a href="https://cxc.cfa.harvard.edu/mta/CUS/Usint/insert_person.cgi" style="color:red">Update Contact List</a>',"\n";
 print OUT '<br />',"\n";
-print OUT '<a href="https://icxc.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi" style="color:red">Update Schedule</a>',"\n";
+print OUT '<a href="https://cxc.cfa.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi" style="color:red">Update Schedule</a>',"\n";
 print OUT '<br />',"\n";
 
 
@@ -382,7 +385,7 @@ if($alert > 1 && $send_alert > 0){
 	print OUT "TOO Point of Contact for the following period has not been assigned yet.\n\n";
 	print OUT "\t$mstart[$alert] $dstart[$alert] - $mend[$alert] $dend[$alert]\n\n";
 	print OUT "Please assign a person using: \n\n";
-	print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
+	print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/schedule_submitter.cgi',"\n\n";
 	print OUT "as soon as possible.\n";
 	close(OUT);
 
@@ -427,7 +430,7 @@ if($cemail !~ /$too_poc/){
 	open(OUT2, "> $temp_dir/temp_email2");
 	print OUT2 "Hi\n";
 	print OUT2 "Your TOO point of contact duty just started. Please check the schedule: \n\n";
-	print OUT2 "\thttps://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html\n\n";
+	print OUT2 "\thttps://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html\n\n";
 	print OUT2 "If you have any questions, please contact: Scott Wolk (swolk\@head.cfa.harvard.edu) as soon as possible.\n";
 	close(OUT2);
 

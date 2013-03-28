@@ -1,5 +1,10 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+}
+
 use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
@@ -80,8 +85,10 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # T. Isobe Nov 28, 2012									#
 #    flock bug fixed									#
 #											#
+# T. Isobe Mar 27, 2013									#
+#    linux transition and https://icxc ---> https://cxc					#
+#											#
 #########################################################################################
-
 
 #print "Content-type: text/html\n\n";	# start html setting
 
@@ -93,9 +100,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-#$usint_on = 'yes';                     ##### USINT Version
+$usint_on = 'yes';                     ##### USINT Version
 #$usint_on = 'no';                      ##### USER Version
-$usint_on = 'test_yes';                 ##### Test Version USINT
+#$usint_on = 'test_yes';                 ##### Test Version USINT
 #$usint_on = 'test_no';                 ##### Test Version USER
 
 #
@@ -124,7 +131,10 @@ $sot_contact = 'swolk@head.cfa.harvard.edu';
 #---- set directory pathes
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -159,10 +169,10 @@ if($usint_on =~ /test/i){
 #--- set html pages
 #
 
-$usint_http   = 'https://icxc.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
-#$main_http    = 'https://icxc.harvard.edu/mta/CUS/';            #--- USINT page
-$main_http    = 'https://icxc.harvard.edu/cus/index.html';      #--- USINT page
-$obs_ss_http  = 'https://icxc.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
+$usint_http   = 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/';      #--- web site for usint users
+#$main_http    = 'https://cxc.cfa.harvard.edu/mta/CUS/';            #--- USINT page
+$main_http    = 'https://cxc.cfa.harvard.edu/cus/index.html';      #--- USINT page
+$obs_ss_http  = 'https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/';     #--- web site for none usint users (GO Expert etc)
 $test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';   #--- web site for test
 
 ############################
@@ -1587,7 +1597,7 @@ sub update_info {
 #						print OUT "Editing of General entries of $newobsrev ";
 #						print OUT "were finished and signed off. ";
 #						print OUT "Please  update ACIS entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off ACIS Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1607,14 +1617,14 @@ sub update_info {
 							print OUT "Editing of General entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  update SI Mode entries, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off SI Mode Status.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/too_gen_change");
 
@@ -1625,14 +1635,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/too_gen_change");
 
@@ -1651,7 +1661,7 @@ sub update_info {
 #						print OUT "Editing of ACIS entries of $newobsrev ";
 #						print OUT "were finished and signed off, but General entries are not yet. ";
 #						print OUT "Please  update General entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off General Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1671,14 +1681,14 @@ sub update_info {
 							print OUT "Editing of ACIS entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  update SI Mode entries, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off SI Mode Status.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/too_gen_change");
 
@@ -1689,14 +1699,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/too_gen_change");
 
@@ -1715,7 +1725,7 @@ sub update_info {
 #						print OUT "Editing of SI entries of $newobsrev ";
 #						print OUT "were finished and signed off, but General entries are not yet. ";
 #						print OUT "Please  update General entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off General Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1735,7 +1745,7 @@ sub update_info {
 #							print OUT "Editing of SI Mode entries of $newobsrev ";
 #							print OUT "were finished and signed off, but ACIS entires are not. ";
 #							print OUT "Please  update ACIS entries, then go to: ";
-#							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #							print OUT "and sign off ACIS Status.\n";
 #	
 #							if($usint_on =~ /test/){
@@ -1754,14 +1764,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/too_gen_change|mailx -s\"Subject: TOO Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/too_gen_change");
 
@@ -1790,7 +1800,7 @@ sub update_info {
 #						print OUT "Editing of General entries of $newobsrev ";
 #						print OUT "were finished and signed off. ";
 #						print OUT "Please  update ACIS entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off ACIS Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1810,14 +1820,14 @@ sub update_info {
 							print OUT "Editing of General entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  update SI Mode entries, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off SI Mode Status.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/ddt_gen_change");
 
@@ -1828,14 +1838,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/ddt_gen_change");
 
@@ -1854,7 +1864,7 @@ sub update_info {
 #						print OUT "Editing of ACIS entries of $newobsrev ";
 #						print OUT "were finished and signed off, but General entries are not yet. ";
 #						print OUT "Please  update General entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off General Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1874,14 +1884,14 @@ sub update_info {
 							print OUT "Editing of ACIS entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  update SI Mode entries, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off SI Mode Status.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu acisdude\@head.cfa.harvard.edu");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT SI Status Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/ddt_gen_change");
 
@@ -1892,14 +1902,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/ddt_gen_change");
 
@@ -1918,7 +1928,7 @@ sub update_info {
 #						print OUT "Editing of SI entries of $newobsrev ";
 #						print OUT "were finished and signed off, but General entries are not yet. ";
 #						print OUT "Please  update General entries, then go to: ";
-#						print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#						print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #						print OUT "and sign off General Status.\n";
 #
 #						if($usint_on =~ /test/){
@@ -1938,7 +1948,7 @@ sub update_info {
 #							print OUT "Editing of SI Mode entries of $newobsrev ";
 #							print OUT "were finished and signed off, but ACIS entires are not. ";
 #							print OUT "Please  update ACIS entries, then go to: ";
-#							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+#							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 #							print OUT "and sign off ACIS Status.\n";
 #	
 #							if($usint_on =~ /test/){
@@ -1957,14 +1967,14 @@ sub update_info {
 							print OUT "Editing of all entries of $newobsrev ";
 							print OUT "were finished and signed off. ";
 							print OUT "Please  verify it, then go to: ";
-							print OUT 'https://icxc.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
+							print OUT 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/orupdate.cgi ';
 							print OUT "and sign off 'Verified By' column.\n";
 	
 							if($usint_on =~ /test/){
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu  $test_email");
 							}else{
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
-								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu $email_address");
+#mail#								system("cat $temp_dir/ddt_gen_change|mailx -s\"Subject: DDT Verification Signed Off Request: OBSID: $newobsid\n\" -rcus\@head.cfa.harvard.edu $test_email");
 							}
 							system("rm $temp_dir/ddt_gen_change");
 
@@ -2078,7 +2088,7 @@ sub update_info {
 #							system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
 						}else{
 							if($acis_status =~ /NULL/){
-                                  				system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
+#mail#                                  				system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  juda\@head.cfa.harvard.edu");
 								}else{
 #                                  			system("cat $temp_dir/si_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -ccus\@head.cfa.harvard.edu  acisdude\@head.cfa.harvard.edu");
 							}
@@ -2091,10 +2101,10 @@ sub update_info {
                         		if(${last_sign.$e_id} > 0 ){
 						if($usint_on =~ /test/){
 ##### 	                                		system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  $test_email");
-                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
+#mail#                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
 						}else{
-                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -c  cus\@head.cfa.harvard.edu  $email_address");
-                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
+#mail#                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu -c  cus\@head.cfa.harvard.edu  $email_address");
+#mail#                                       			system("cat $temp_dir/dutysci_mail.$e_id.tmp |mailx -s\"Subject: Signed Off Notice\n\" -rcus\@head.cfa.harvard.edu  isobe\@head.cfa.harvard.edu");
 						}
                                 		system("rm $temp_dir/dutysci_mail.$e_id.tmp");
                         		}

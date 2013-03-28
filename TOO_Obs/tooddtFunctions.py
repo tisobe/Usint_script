@@ -6,7 +6,7 @@
 #                                                                                                                   #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                                   #
 #                                                                                                                   #
-#       last update: Aug 30, 2012                                                                                   #
+#       last update: Mar 27, 2013                                                                                   #
 #                                                                                                                   #
 #####################################################################################################################
 
@@ -21,7 +21,9 @@ import getpass
 #
 
 #path = '/proj/web-cxc/cgi-gen/mta/Obscat/ocat/Info_save/dir_list_new'           #---- test directory list path
-path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list'                                #---- live directory list path
+#path = '/data/mta4/CUS/www/Usint/TOO_Obs/dir_list'
+#path = '/data/udoc1/ocat/Info_save/too_dir_list_py'                                #---- live directory list path
+path = '/data/mta4/CUS/www/Usint/ocat/Info_save/too_dir_list_py'
 
 f    = open(path, 'r')
 data = [line.strip() for line in f.readlines()]
@@ -38,6 +40,7 @@ for ent in data:
 #
 
 sys.path.append(bin_dir)
+sys.path.append(mta_dir)
 
 import convertTimeFormat as tcnv
 import readSQL           as tdsql
@@ -230,8 +233,12 @@ def match_usint_person(type, grating, seq, instrument, target):
         poc = 'hrc'
     elif seq >= 100000 and seq < 300000:
         poc = 'sjw'
-    elif seq >= 300000 and seq < 500000:
-        poc = 'nraw'
+    elif seq >= 300000 and seq <390000:
+	poc = 'sjw'
+    elif seq >= 400000 and seq <490000:
+	poc = 'sjw'
+#    elif seq >= 300000 and seq < 500000:
+#        poc = 'nraw'
     elif seq >= 500000 and seq < 600000:
         poc = 'jeanconn'
     elif seq >= 600000 and seq < 700000:
@@ -378,17 +385,21 @@ def read_too_ddt_html(ddtList, tooList):
                 m8 = re.search('scheduled',  ent)
                 m9 = re.search('unobserved', ent)
                 if (m7 is not None) or (m8 is not None) or (m9 is not None):
-                    if type == 'ddt':
-                        if obsid < 100000 and obsid > 0:
-                            ddt_list.append(obsid)
-                            app   = -1
-                            obsid =  0
-
-                    elif type == 'too':
-                        if obsid < 100000 and obsid > 0:
-                            too_list.append(obsid)
-                            app   = -1
-                            obsid =  0
+		    try:
+		    	mtest = int(obsid)
+                    	if type == 'ddt':
+                            if obsid < 100000 and obsid > 0:
+                               ddt_list.append(obsid)
+                               app   = -1
+                               obsid =  0
+	
+                    	elif type == 'too':
+                       	    if obsid < 100000 and obsid > 0:
+                                too_list.append(obsid)
+                                app   = -1
+                                obsid =  0
+		    except:
+		        pass
 
 #
 #--- pass to the outside of the world
@@ -610,7 +621,7 @@ def send_email(type, list, tempdir='NA'):
             f = open(tempfile, 'w')
             line  = '\nA new ' + type.upper() + ' observation (OBSID: ' + obsid + ') is assigned to you. Please check:\n\n'
             f.write(line)
-            line =  'https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?' + obsid + '\n\n'
+            line =  'https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?' + obsid + '\n\n'
             f.write(line)
             line = 'for more information.\n\n'
             f.write(line)
@@ -625,8 +636,8 @@ def send_email(type, list, tempdir='NA'):
             os.system(cmd)
 
             subject = 'Subject: New ' + type.upper() + ' Observation '
-            cmd = 'cat ' + tempfile + ' | mailx -s"' + subject + '"  ' + email + ' -c"swolk@head.cfa.harvard.edu cus@head.cfa.harvard.edu" ' 
-            os.system(cmd)
+##            cmd = 'cat ' + tempfile + ' | mailx -s"' + subject + '"  ' + email + ' -c"swolk@head.cfa.harvard.edu cus@head.cfa.harvard.edu" ' 
+##            os.system(cmd)
 
             cmd = 'rm ' + tempfile
             os.system(cmd)
@@ -683,7 +694,7 @@ def read_monitor_too_ddt():
 #--- update_monitor_list: update monitor_too_ddt                                                     --
 #------------------------------------------------------------------------------------------------------
 
-def update_monitor_list(new_ddt_too_list, new_ddt_too_person):
+def update_monitor_list(new_ddt_too_list, new_ddt_too_person, tempdir='NA'):
 
     """
     update monitor_too_ddt. input: lists of: new_ddt_too_list and new_ddt_too_person (obsid list and poc list)
@@ -811,7 +822,7 @@ def update_monitor_list(new_ddt_too_list, new_ddt_too_person):
 
             f.close()
 
-            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry" -rcus@head.cfa.harvard.edu isobe@head.cfa.harvard.edu'
+            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry" isobe@head.cfa.harvard.edu'
             os.system(cmd)
 
 

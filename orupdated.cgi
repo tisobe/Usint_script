@@ -3,7 +3,7 @@
 # This script generates a dynamic webpage for keeping track of updates to
 # target parameters.  
 #
-# last udpated Oct. 31, 2012 (t. isobe: tisobe@cfa.harvard.edu)
+# last udpated Mar. 27, 2013 (t. isobe: tisobe@cfa.harvard.edu)
 #
 #
 
@@ -29,13 +29,20 @@ read(STDIN,$newinfo,$ENV{'CONTENT_LENGTH'});
 
 print "<h1>Updated Targets List</h1>";
 print "<p>This list contains all targets which have been verified as updated.</p>";
-print "<p><strong><a href=\"https://icxc.harvard.edu/cgi-bin/usg/search.html\">Chandra Uplink Support Observation Search Form</a></strong></p>";
-print "<p><strong><a href=\"https://icxc.harvard.edu/cus/\">Chandra Uplink Support Organizational Page</a></strong></p>";
+print "<p><strong><a href=\"https://cxc.cfa.harvard.edu/cgi-bin/target_search/search.html\">Chandra Uplink Support Observation Search Form</a></strong></p>";
+print "<p><strong><a href=\"https://cxc.cfa.harvard.edu/cus/\">Chandra Uplink Support Organizational Page</a></strong></p>";
+
+
 #####
-open (FILE, "</data/udoc1/ocat/updates_table.list");
+#open (FILE, "</data/udoc1/ocat/updates_table.list");
+#open (FILE, "</proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/updates_table.list");
+open (FILE, "</data/mta4/CUS/www/Usint/ocat/updates_table.list");
 @revisions = <FILE>;
 close (FILE);
 #####
+
+
+
 print "<table border=1>";
 print "<tr><th>OBSID.revision</th><th>general obscat edits by</th><th>ACIS obscat edits by</th><th>SI MODE edits by</th><th>Verified by</th></tr>";
 
@@ -53,7 +60,7 @@ foreach $line (@revisions){
     $dutysci_status = $values[4];
     $seqnum = $values[5];
     $user = $values[6];
-    ($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) = stat "/data/udoc1/ocat/updates/$obsrev";
+    ($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) = stat "/data/mta4/CUS/www/Usint/ocat/updates/$obsrev";
     ($t0,$t1,$t2,$t3,$t4,$t5,$t6,$t7,$t8) = localtime($mtime);
     $month = $t4 + 1;
     $day = $t3;
@@ -61,8 +68,8 @@ foreach $line (@revisions){
     $ftime ="$month/$day/$year";
     unless ($dutysci_status =~/NA/){
 	print "<tr>";
-#	print "<td><a href=\"http://icxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
-	print "<td><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/chkupdata.cgi\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+#	print "<td><a href=\"http://cxc.cfa.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+	print "<td><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 	print "<td>$general_status</td><td>$acis_status</td><td>$si_mode_status</td><td><span style='color:#005C00'>$dutysci_status</span></td></tr>";
 
     }

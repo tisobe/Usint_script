@@ -1,5 +1,10 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+}
+
 use DBI;
 use DBD::Sybase;
 use CGI qw/:standard :netscape /;
@@ -14,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Dec 06, 2012
+#		last update: Mar 27, 2013
 #  
 ###############################################################################
 
@@ -26,8 +31,8 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-#$usint_on = 'yes';			##### USINT Version
-$usint_on = 'test_yes';			##### Test Version USINT
+$usint_on = 'yes';			##### USINT Version
+#$usint_on = 'test_yes';			##### Test Version USINT
 
 #
 #---- set a name and email address of a test person
@@ -47,7 +52,10 @@ $cus_email   = 'cus@head.cfa.harvard.edu';
 #---- set directory pathes 
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
     chomp $_;
     @atemp    = split(/:/, $_);
@@ -72,23 +80,24 @@ close(IN);
 #--- if this is a test case, use the first directory, otherwise use the real one
 #
 
-if($usint_on =~ /test/i){
-	$ocat_dir = $test_dir;
-}else{
+#if($usint_on =~ /test/i){
+#	$ocat_dir = $test_dir;
+#}else{
+#	$ocat_dir = $real_dir;
+#}
 	$ocat_dir = $real_dir;
-}
 
 #
 #--- set html pages
 #
 
-$usint_http   = 'https://icxc.harvard.edu/mta/CUS/Usint/';	#--- web site for usint users
-$obs_ss_http  = 'https://icxc.harvard.edu/cgi-bin/obs_ss/';	#--- web site for none usint users (GO Expert etc)
+$usint_http   = 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/';	#--- web site for usint users
+$obs_ss_http  = 'https://cxc.cfa.harvard.edu/cgi-bin/obs_ss/';	#--- web site for none usint users (GO Expert etc)
 $test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';	#--- web site for test
 
 $mp_http      = 'http://asc.harvard.edu/';			#--- web site for mission planning related
 $chandra_http = 'http://cxc.harvard.edu/';			#--- chandra main web site
-$cdo_http     = 'https://icxc.harvard.edu/cgi-bin/cdo/';	#--- CDO web site
+$cdo_http     = 'https://cxc.cfa.harvard.edu/cgi-bin/cdo/';	#--- CDO web site
 
 ############################
 #----- end of settings
@@ -3000,8 +3009,8 @@ if($status !~ /scheduled/i && $status !~ /unobserved/i){
 
 print ' <p><strong>This version does not support parameter explanations and ';
 print ' a few other things may behave differently from the full version. If you like to use ';
-print " a full version, please go to <a href='https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid'>";
-print "https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid</a>. ";
+print " a full version, please go to <a href='https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid'>";
+print "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html_full.cgi?$obsid</a>. ";
 print 'If you like to see explanations of parameters, please click "here" in the line below.</strong> </p>';
 
 print '<p>A brief description of the listed parameters is given ';
@@ -3057,7 +3066,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<table style="border-width:0px">';
 	print '<tr><td>&#160;</td>';
 	print "<th>Sequence Number:";
-	print "</th><td><a href='https://icxc.harvard.edu/cgi-bin/mp/target.cgi?$seq_nbr' target='_blank'>$seq_nbr</a></td>";
+	print "</th><td><a href='https://cxc.cfa.harvard.edu/cgi-bin/mp/target.cgi?$seq_nbr' target='_blank'>$seq_nbr</a></td>";
 	print '<th>Status:';
 	print "</th><td>$status</td>";
 	print '<th>ObsID #:';
@@ -7734,7 +7743,7 @@ sub oredit{
 	if($usint_on =~ /test/){
 		print "<A HREF=\"$obs_ss_http/search.html\">Go Back to the Search Page</A>";
 	}else{
-		print "<A HREF=\"https://icxc.harvard.edu/cgi-bin/target_search/search.html\">Go Back to Search  Page</a>";
+		print "<A HREF=\"https://cxc.cfa.harvard.edu/cgi-bin/target_search/search.html\">Go Back to Search  Page</a>";
 	}
 
 #	print "</body>";
@@ -8207,7 +8216,7 @@ sub mail_out_to_usint{
 	print ZOUT "The observer's email address is: $email_address\n\n";
 	
 	print ZOUT "Its Ocat Data Page is:\n";
-	print ZOUT "https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n";
 	
 #
 #--- today's date
@@ -8293,12 +8302,12 @@ sub send_email_to_mp{
 	print ZOUT "The contact email_address address is: $email_address\n\n";
 	
 	print ZOUT "Its Ocat Data Page is:\n";
-	print ZOUT "https://icxc.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
 
 	print ZOUT "If you like to see what were changed:\n";
 
 	$file_name = "$obsid".'.'."$rev";
-	print ZOUT "https://icxc.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
 
 	print ZOUT "If you have any question about this email, please contact ";
 	print ZOUT "swolk\@head.cfa.harvard.edu.","\n\n\n";

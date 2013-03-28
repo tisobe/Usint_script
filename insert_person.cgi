@@ -8,7 +8,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Oct 30, 2012   	 						#
+#		last update: Mar 27, 2013   	 						#
 #												#
 #################################################################################################
 
@@ -16,7 +16,10 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Test/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 
 while(<IN>){
         chomp $_;
@@ -431,7 +434,7 @@ close(FH);
 print '</table>';
 
 print '<p style="padding-top:20px;padding-bottom:10px">';
-print "<a href='https://icxc.harvard.edu/mta/CUS/Usint/too_contact_schedule.html'>";
+print "<a href='https://cxc.cfa.harvard.edu/mta/CUS/Usint/too_contact_schedule.html'>";
 print "<strong><em style='background-color:red;color:yellow;'>Back to USINT TOO Point of Contact</em></strong></a>";
 print '</p>';
 

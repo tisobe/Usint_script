@@ -10,7 +10,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Oct  30, 2012							#
+#		last update: Mar  27, 2013							#
 #												#
 #################################################################################################
 
@@ -22,7 +22,10 @@ use CGI qw/:standard :netscape /;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -203,8 +206,8 @@ print  '<body style="background-color:#FAEBD7; font-family:serif, sans-serif;fon
 
 print '<h2 style="background-color:blue; color:#FAEBD7">A List Of Observations For A Given POC ID</h2>';
 
-print '<div style="text-align:right"><a href="https://icxc.harvard.edu/cus/"><strong>Back to USINT Page</strong></a></div>';
-print '<div style="text-align:right"><a href="https://icxc.harvard.edu/mta/CUS/Usint/obsid_usint_list.cgi">';
+print '<div style="text-align:right"><a href="https://cxc.cfa.harvard.edu/cus/"><strong>Back to USINT Page</strong></a></div>';
+print '<div style="text-align:right"><a href="https://cxc.cfa.harvard.edu/mta/CUS/Usint/obsid_usint_list.cgi">';
 print '<strong>Go to "USINT Contact For A Given OBSID/Sequence Number" Page</strong></a></div>';
 
 
@@ -439,7 +442,7 @@ sub match_usint_person{
 	}elsif($seqno >= 100000 && $seqno < 300000){
 		$mup = 'sjw';
 	}elsif($seqno >= 300000 && $seqno < 500000){
-		$mup = 'nraw';
+		$mup = 'sjw';
 	}elsif($seqno >= 500000 && $seqno < 600000){
 		$mup = 'ppp';
 	}elsif($seqno >= 600000 && $seqno < 700000){

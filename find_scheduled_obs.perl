@@ -6,7 +6,7 @@
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: Nov 26, 2012								#
+#	last update: Mar 26, 2013								#
 #												#
 #################################################################################################
 
@@ -39,7 +39,10 @@ $test_email = 'isobe@head.cfa.harvard.edu';
 #---- set directory paths : updated to read from a file (02/25/2011) --- this is user: mta version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -457,7 +460,7 @@ if($cnt_sign_off > 0){
 		@atemp = split(/\s+/, $ent);
 		$obsid = $atemp[1];
 
-		if($obsid !~ /\d/){					#---- if obsid is not digit, something wrong. get out
+		if($obsid !~ /\d/){
 			next OUTER;
 		}
 		$chk = 0;
@@ -514,9 +517,9 @@ if($cnt_sign_off > 0){
 				
 
 		if($usint_on =~ /test/){
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\"  $test_email");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\" -rcus\@head.cfa.harvard.edu  $test_email");
 		}else{
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\"  $usint $test_email cus\@head.cfa.harvard.edu");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\" -rcus\@head.cfa.harvard.edu $usint $test_email cus\@head.cfa.harvard.edu");
 		}	
 
 		system("rm $temp_dir/temp_email");

@@ -1,4 +1,4 @@
-#!/proj/DS.ots/perl-5.10.0.SunOS5.8/bin/perl
+#!/soft/ascds/DS.release/ots/bin/perl
 
 #########################################################################################################
 #													#
@@ -15,13 +15,12 @@
 #		in which the script deposit a rosat gif file.						#
 #													#
 #	author: T. Isobe (tisobe@cfa.harvard.edu)							#
-#	Last Update: May 19, 2008									#
+#	Last Update: Feb 28. 2011									#
 #													#
 #########################################################################################################
 
 
 use CGI qw/:standard :netscape /;
-BEGIN { $ENV{'SYBASE'} = "/soft/SYBASE_OCS15"; }
 
 use DBI;
 use DBD::Sybase;
@@ -53,6 +52,33 @@ use MP::LTS;
 use MP::FOV;
 use MP::SkyView;
 use MP::Visibility;
+
+#
+#---- set directory paths : updated to read from a file (02/25/2011)
+#
+
+open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+while(<IN>){
+        chomp $_;
+        @atemp    = split(/:/, $_);
+        $atemp[0] =~ s/\s+//g;
+        if($atemp[0] =~ /obs_ss/){
+                $obs_ss   = $atemp[1];
+        }elsif($atemp[0]  =~ /pass_dir/){
+                $pass_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /htemp_dir/){
+                $temp_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /too_dir/){
+                $data_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /ocat_dir/){
+                $real_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /test_dir/){
+                $test_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /cus_dir/){
+                $cus_dir  = $atemp[1];
+        }
+}
+close(IN);
 
 #
 #---- set values
@@ -249,11 +275,14 @@ my $TargPtrColor=2;
 my $NEWPOOL = './CYCLE5-POOL.lst';
 
 our $MPDIR   = '/data/mp1/SEQNBR';
-$TI_CDODIR = '/data/mta4/www/CUS/Usint/Temp_pspc_dir/';
+$TI_CDODIR = '/data/mta4/www/CUS/Usint/PSPC_page/Temp_pspc_dir';
 @SURVEYS = qw(dss pspc rass);
 
 $obsid = $ARGV[0];
 
+@obsidarray = ();
+
+if($obsid =~ /\d/){
 #
 #--- open sybase
 #
@@ -261,36 +290,17 @@ $obsid = $ARGV[0];
       read_database();
 
 #
-#--- read roll angle from MP table
-#
-
-#`ls /data/mp1/SEQNBR/$seq_nbr/*.datavis > zline`;
-#open(FH, './zline');
-#while(<FH>){
-#        chomp $_;
-#        $input_line = $_;
-#}
-#close(FH);
-#
-#open(FH, "$input_line");
-#OUTER:
-#while(<FH>){
-#        chomp $_;
-#        if($_ =~ /\#/){
-#                next OUTER;
-#        }
-#        @atemp = split(/\s+/, $_);
-#        $roll = $atemp[4];
-#}
-#close(FH);
-
-#
 #--- sub to read a long term schedule roll value
 #
-find_planned_roll();
-$roll = ${planned_roll.$obsid}{planned_roll}[0];
-
-push(@obsidarray,$obsid);
+	find_planned_roll();
+	$roll = ${planned_roll.$obsid}{planned_roll}[0];
+	$in_roll = $roll;
+	if($roll eq ''){
+		$in_roll = $roll_obsr;
+		$roll    = $roll_obsr;
+	}
+	push(@obsidarray,$obsid);
+}
 
 
 ###################################################################
@@ -303,17 +313,32 @@ print header(-cookie=>[$user_cookie, $pass_cookie], -type => 'text/html');
 
 print start_html(-bgcolor=>"white");            # this says that we are starting w html page
 
-
 $check = '';
 
 print start_form();
 
-$tin_ra     = param("RA");
-$tin_dec    = param("DEC");
-$in_roll    = param("ROLL");
-$in_yoffset = param("YOFFSET");
-$in_zoffset = param("ZOFFSET");
-$check      = param("Check");
+if($obsid !~ /\d/){
+	$obsid      = param("OBSID");
+}
+if($obsid  =~ /\d/){
+	read_database();
+	find_planned_roll();
+	$roll = ${planned_roll.$obsid}{planned_roll}[0];
+	$in_roll = $roll;
+	if($roll eq ''){
+		$in_roll = $roll_obsr;
+		$roll    = $roll_obsr;
+	}
+}
+$test = param("RA");
+if($test ne '' || $test eq '00:00:00:00'){
+	$tin_ra     = $test;
+	$tin_dec    = param("DEC");
+	$in_roll    = param("ROLL");
+	$in_yoffset = param("YOFFSET");
+	$in_zoffset = param("ZOFFSET");
+	$check      = param("Check");
+}
 @ra_ent = split(/:/,$tin_ra);
 $in_ra = hms2deg($ra_ent[0], $ra_ent[1], $ra_ent[2]);
 @dec_ent = split(/:/, $tin_dec);
@@ -322,7 +347,29 @@ $in_dec = dms2deg($dec_ent[0], $dec_ent[1], $dec_end[2]);
 #
 #--- when a user gets into the page, s/he sees this part.
 #
-if($check ne 'Submit'){
+if($obsid !~ /\d/){
+        ($hh,$mm,$ss) = deg2hms($ra);
+        $disp_ra  = "$hh:$mm:$ss";
+        ($dd,$mm,$ss) = deg2dms($dec);
+        $disp_dec = "$dd:$mm:$ss";
+
+        print "<h2>Viewing Orientation Visualizer on a ROSAT Image</h2>";
+        print '<h3>Please type in OBSID  and press "Submit." The computation may take several seconds.</h3>';
+
+        print '<table boder=0 cellpadding=5>';
+        print '<tr>';
+        print '<th>OBSID:</th><td><INPUT TYPE="text" NAME="OBSID" VALUE="',"$obsid",'" SIZE="12"></td>';
+        print '</tr><tr>';
+        print '<td><INPUT TYPE="submit" NAME="Check"  VALUE="Submit"></td>';
+        print '</table>';
+
+	$in_ra      = $ra;
+	$in_dec     = $dec;
+        $in_roll    = $roll;
+        $in_yoffset = $y_det_offset;
+        $in_zoffset = $z_det_offset;
+
+}elsif($check ne 'Submit'){
 	($hh,$mm,$ss) = deg2hms($ra);
 	$disp_ra  = "$hh:$mm:$ss";
 	($dd,$mm,$ss) = deg2dms($dec);
@@ -331,6 +378,7 @@ if($check ne 'Submit'){
 	print "<h2>Viewing Orientation Visualizer on a ROSAT Image</h2>";
 	print "<h3>OBSID: $obsid Seq #: $seq_nbr</h3>";
 	print '<h3>Please type in new values and press "Submit." The computation may take several seconds.</h3>';
+	print '<td><INPUT TYPE="hidden" NAME="OBSID" VALUE="',"$obsid",'"></td>';
 
 	print '<table boder=0 cellpadding=5>';
 	print '<tr>';
@@ -367,24 +415,27 @@ if($check ne 'Submit'){
 	print '<h4>Note: The roll value is from a current MP table, and it could be different from that in the database.</h4>';
 	print '<br><br>';
 	
-	$in_ra      = $ra;
-	$in_dec     = $dec;
+	@ra_ent = split(/:/,$disp_ra);
+	$in_ra = hms2deg($ra_ent[0], $ra_ent[1], $ra_ent[2]);
+	@dec_ent = split(/:/, $disp_dec);
+	$in_dec = dms2deg($dec_ent[0], $dec_ent[1], $dec_end[2]);
+
 	$in_roll    = $roll;
 	$in_yoffset = $y_det_offset;
 	$in_zoffset = $z_det_offset;
 
+	@rollarray = ();
+	@obsidarray = ();
 	push(@rollarray, $in_roll);
+	push(@obsidarray,$obsid);
 #
 #----- here is the sub script to plot the rosat plot
 #
+	push(@rollarray, $in_roll);
 	mta_ltsoverlay(\@obsidarray,\@rollarray);
 
-	$out_http = 'https://icxc.harvard.edu/mta/CUS/Usint/Temp_pspc_dir/'."$seq_nbr".'/'."$seq_nbr".'.'."$obsid".'.pspc.gif';
+	$out_http = 'https://icxc.harvard.edu/mta/CUS/Usint/PSPC_page/Temp_pspc_dir/'."$seq_nbr".'/'."$seq_nbr".'.'."$obsid".'.pspc.gif';
 	print '<img src="',"$out_http",'">';
-
-#	$pspc_http = 'http://asc.harvard.edu/targets/'."$seq_nbr".'/'."$seq_nbr".'.0'."$obsid".'.pspc.gif';
-#	print '<img src="',"$pspc_http",'">';
-
 
 }else{
 #
@@ -393,7 +444,7 @@ if($check ne 'Submit'){
 #
 #---- first remove old plots
 #
-	system("rm -rf /data/mta4/www/CUS/Usint/Temp_pspc_dir/*");
+	system("rm -rf $cus_dir/PSPC_page/Temp_pspc_dir/*");
 	($hh,$mm,$ss) = deg2hms($ra);
 	$disp_ra  = "$hh:$mm:$ss";
 	($dd,$mm,$ss) = deg2dms($dec);
@@ -403,6 +454,8 @@ if($check ne 'Submit'){
 	print "<h2>Viewing Orientation Visualizer on a ROSAT Image</h2>";
 	print "<h3>OBSID: $obsid Seq #: $seq_nbr</h3>";
 	print '<h3>Please type in new values and press "Submit." The computation may take several seconds.</h3>';
+
+	print '<td><INPUT TYPE="hidden" NAME="OBSID" VALUE="',"$obsid",'"></td>';
 
 	print '<table boder=0 cellpadding=5>';
 	print '<tr>';
@@ -424,6 +477,12 @@ if($check ne 'Submit'){
 	print "<td></td>";
 	print '</tr>';
 
+	if($tin_ra eq '' ){$tin_ra = $disp_ra}
+	if($tin_dec eq ''){$tin_dec = $disp_dec}
+	if($in_roll eq ''){$in_roll = $roll}
+	if($in_yoffset eq ''){$in_yoffset = $y_det_offset}
+	if($in_zoffset eq ''){$in_zoffset = $z_det_offset}
+
 	print '<tr>';
 	print '<th>New Values</th>';
 	print '<td><INPUT TYPE="text" NAME="RA" VALUE="',"$tin_ra",'" SIZE="12"></td>';
@@ -438,14 +497,22 @@ if($check ne 'Submit'){
 	print "<br>";
 	print '<h4>Note: The roll value is from a current MP table, and it could be different from that in the database.</h4>';
 	print '<br><br>';
+	
+	@ra_ent = split(/:/,$tin_ra);
+	$in_ra = hms2deg($ra_ent[0], $ra_ent[1], $ra_ent[2]);
+	@dec_ent = split(/:/, $tin_dec);
+	$in_dec = dms2deg($dec_ent[0], $dec_ent[1], $dec_end[2]);
 
 #
 #----- ploting routine
 #
+	@rollarray = ();
+	@obsidarray = ();
 	push(@rollarray, $in_roll);
+	push(@obsidarray,$obsid);
 	mta_ltsoverlay(\@obsidarray,\@rollarray);
 
-	$out_http = 'https://icxc.harvard.edu/mta/CUS/Usint/Temp_pspc_dir/'."$seq_nbr".'/'."$seq_nbr".'.'."$obsid".'.pspc.gif';
+	$out_http = 'https://icxc.harvard.edu/mta/CUS/Usint/PSPC_page/Temp_pspc_dir/'."$seq_nbr".'/'."$seq_nbr".'.'."$obsid".'.pspc.gif';
 	print '<img src="',"$out_http",'">';
 }
 
@@ -538,7 +605,7 @@ sub offset{
 
         $YFLIP = 1.0;
         $ZFLIP = -1.0;
-        $TARG_OFFSET = "/proj/web-cxc/cgi-gen/mta/Obscat/PSPC_page/target_offset";
+        $TARG_OFFSET = "$cus_dir/PSPC_page/target_offset";
 
         $off_coords = `$TARG_OFFSET  $ora $odec $oroll $oyoff $ozoff $YFLIP $ZFLIP`;
        chop($off_coords);
@@ -562,7 +629,6 @@ sub offset{
 #
 
     my %Obsids;
-
 
      $Obsids{$obsid}{RA}  = sprintf "%9.5f", $in_ra;
      $Obsids{$obsid}{dec} = sprintf "%9.5f", $in_dec;
@@ -1417,7 +1483,7 @@ sub find_planned_roll{
 #---- the table below was created by find_planned_roll.perl in the
 #---- same directory. It is run by cron job once a day to update the table.
 #
-        open(PFH, '/proj/web-icxc/cgi-bin/obs_ss/mp_long_term');
+        open(PFH, "$obs_ss/mp_long_term");
         OUTER:
         while(<PFH>){
                 chomp $_;

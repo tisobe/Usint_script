@@ -6,7 +6,7 @@
 #											#
 #		author: t. isobe (tisobe@cfa.harvard.edu)				#
 #											#
-#		last update: Nov 26, 2011						#
+#		last update: Mar 28, 2012						#
 #											#
 #########################################################################################
 
@@ -41,7 +41,7 @@ $test_email = 'isobe@head.cfa.harvard.edu';
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -248,7 +248,7 @@ sub send_mail{
 	if($usint_on =~ /test/){
 		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation ($submitter_email)\" $test_email");
 	}else{
-		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation\" $submitter_email $test_email cus\@head.cfa.harvard.edu");
+		system("cat $temp_dir/arcops_send_email |mailx -s\"Subject: Your Obsid: $ent Is Approved for Observation\"  $submitter_email $test_email cus\@head.cfa.harvard.edu");
 	}
 	system("rm $temp_dir/arcops_send_email");
 }

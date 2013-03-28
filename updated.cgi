@@ -10,7 +10,7 @@ use CGI;
 #		originally written by						#
 # 		R. Kilgard, Jan 30/31 2000					#
 #										#
-#	last update: Oct 31, 2012						#
+#	last update: Mar 27, 2013						#
 #										#
 #										#
 #################################################################################
@@ -20,7 +20,11 @@ use CGI;
 #---- set directory paths : updated to read from a file (02/25/2011)
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, './ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -45,7 +49,7 @@ close(IN);
 
 $ocat_dir = $real_dir;
 
-$html = 'https://icxc.harvard.edu/mta/CUS/Usint/';
+$html = 'https://cxc.cfa.harvard.edu/mta/CUS/Usint/';
 
 #--- set another ...
 
@@ -267,8 +271,8 @@ sub create_main_page{
 	print "</table>";
 
 	print "<p style='padding-top:30px'> <strong>Back to:</strong></p>";
-	print "<ul><li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
-	print "<li><a href=\"https://icxc.harvard.edu/cus/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li></ul>";
+	print "<ul><li><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
+	print "<li><a href=\"https://cxc.cfa.harvard.edu/cus/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li></ul>";
 	print "<hr />";
 	print "<p style='padding-top:10px'><em>If you have any questions about this page, please contact ";
 	print "<a href='mailto:swolk\@head.cfa.harvard.edu'>swolk\@head.cfa.harvard.edu</a>.</em></p>";
@@ -391,11 +395,11 @@ sub print_month_html {
 	print OUT "\n";
 	print OUT "<strong>Back to:</strong> \n";
 	print OUT "<ul>\n";
-	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
+	print OUT "<li><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/search.html\"><strong>Chandra Uplink Support Observation Search Form</strong></a></li>";
 	print OUT "\n";
-	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li>";
+	print OUT "<li><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/\"><strong>Chandra Uplink Support Organizational Page</strong></a></li>";
 	print OUT "\n";
-	print OUT "<li><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\"><strong>Back to Updated Targets List top page</strong></a></li>\n";
+	print OUT "<li><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/updated.cgi\"><strong>Back to Updated Targets List top page</strong></a></li>\n";
 	print OUT "</ul>\n";
 	print OUT "\n";
 	
@@ -414,7 +418,7 @@ sub print_month_html {
     		$seqnum         = $values[5];
     		$user           = $values[6];
 
-	    	($na0, $na1, $na2, $na3, $na4, $na5, $na6, $na7, $na8, $mtime, $na10, $na11, $na12) = stat "/data/udoc1/ocat/updates/$obsrev";
+	    	($na0, $na1, $na2, $na3, $na4, $na5, $na6, $na7, $na8, $mtime, $na10, $na11, $na12) = stat "/data/mta4/CUS/www/Usint/ocat/updates/$obsrev";
     		($t0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8) = localtime($mtime);
     		$mmonth = $t4 + 1;
     		$mday   = $t3;
@@ -424,7 +428,7 @@ sub print_month_html {
     		unless ($dutysci_status =~/NA/){
 			print OUT "<tr>";
 			print OUT "\n";
-			print OUT "<td><a href=\"http://icxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+			print OUT "<td><a href=\"http://cxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 			print OUT "\n";
 			print OUT "<td>$general_status</td><td>$acis_status</td><td>$si_mode_status</td><td style='color=#005C00'>$dutysci_status</td></tr>";
 			print OUT "\n";
@@ -434,7 +438,7 @@ sub print_month_html {
 	print OUT "</table>";
 	print OUT "\n";
 
-	print OUT "<p style='padding-top:20px;padding-bottom:20px'><strong><a href=\"https://icxc.harvard.edu/mta/CUS/Usint/updated.cgi\">Back to Updated Targets List top page</a></strong>";
+	print OUT "<p style='padding-top:20px;padding-bottom:20px'><strong><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/updated.cgi\">Back to Updated Targets List top page</a></strong>";
 	print OUT "\n";
 
 	print OUT "</body></html>";

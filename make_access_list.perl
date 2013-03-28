@@ -9,18 +9,38 @@ use DBD::Sybase;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Apr 26, 2010							#
+#		last update: Mar 27, 2013							#
 #												#
 #################################################################################################
 
 #
-#---- set directory pathes
+#---- set directory paths : updated to read from a file (02/25/2011) --- this is user: mta version
 #
 
-$obs_ss   = '/proj/web-icxc/cgi-bin/obs_ss/';                   #--- none usint user site
-$pass_dir = '/proj/web-icxc/cgi-bin/obs_ss/.Pass_dir/';         #--- a directory contatins user name file etc
-$temp_dir = '/data/mta4/www/CUS/Usint/Temp/';                   #--- a temporary file is created in this directory
-$data_dir = './';
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+while(<IN>){
+        chomp $_;
+        @atemp    = split(/:/, $_);
+        $atemp[0] =~ s/\s+//g;
+        if($atemp[0] =~ /obs_ss/){
+                $obs_ss   = $atemp[1];
+        }elsif($atemp[0]  =~ /pass_dir/){
+                $pass_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /mtemp_dir/){
+                $temp_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /too_dir/){
+                $data_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /ocat_dir/){
+                $real_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /test_dir/){
+                $test_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /cus_dir/){
+                $cus_dir  = $atemp[1];
+        }
+}
+close(IN);
+
+$ocat_dir = $real_dir;
 
 
 #------------------------------------------------

@@ -5,7 +5,7 @@ source /home/mta/bin/reset_param
 setenv PFILES "${PDIRS}" 
 set path = (/home/ascds/DS.release/bin/  $path)
 
-perl /proj/web-icxc/cgi-bin/obs_ss/chk_arcops.perl
+perl /data/mta4/obs_ss/chk_arcops.perl
 
 rm -rf param
 chgrp mtagroup * 
