@@ -151,8 +151,8 @@ where
  * DISPLAY TABLE
  */
 
-select * from #sot_ocat order by seq_nbr; >           /proj/web-icxc/cgi-bin/obs_ss/sot_ocat.out
-select * from #sot_ocat order by ra, dec; >           /proj/web-icxc/cgi-bin/obs_ss/sot_ocat_ra.out
+select * from #sot_ocat order by seq_nbr; >           /data/mta4/obs_ss/sot_ocat.out
+select * from #sot_ocat order by ra, dec; >           /data/mta4/obs_ss/sot_ocat_ra.out
 /*
- *select * from #sot_ocat order by soe_st_sched_date; > /proj/web-icxc/cgi-bin/obs_ss/sot_ocat_date.out
+ *select * from #sot_ocat order by soe_st_sched_date; > /data/mta4/obs_ss/sot_ocat_date.out
  */

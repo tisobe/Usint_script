@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
 use CGI;
 
 #################################################################################
@@ -10,7 +10,7 @@ use CGI;
 #		originally written by						#
 # 		R. Kilgard, Jan 30/31 2000					#
 #										#
-#	last update: Mar 27, 2013						#
+#	last update: May 14, 2013						#
 #										#
 #										#
 #################################################################################

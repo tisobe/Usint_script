@@ -1,1 +1,1 @@
-/bin/tcsh  < /proj/web-icxc/cgi-bin/obs_ss/make_access_list_main
+/bin/tcsh  < /data/mta4/obs_ss/make_access_list_main

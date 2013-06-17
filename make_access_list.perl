@@ -1,5 +1,10 @@
 #!/soft/ascds/DS.release/ots/bin/perl
 
+BEGIN
+{
+    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+}
+
 use DBI;
 use DBD::Sybase;
 
@@ -9,7 +14,7 @@ use DBD::Sybase;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Mar 27, 2013							#
+#		last update: May 14, 2013							#
 #												#
 #################################################################################################
 

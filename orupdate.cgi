@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {

@@ -19,6 +19,8 @@
 # Changing directry structure Mar 01, 2011
 # modify mailx option   Sep 05, 2012
 # modify mailx option   Oct 08, 2012 (same as above)
+# path to the data changed Mar 26, 2013
+# temp path bug fixed
 #
 #########################################################################
 
@@ -26,7 +28,10 @@
 #---- set directory paths : updated to read from a file (02/25/2011)	this is user: cus version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
+
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -35,7 +40,7 @@ while(<IN>){
                 $obs_ss   = $atemp[1];
         }elsif($atemp[0]  =~ /pass_dir/){
                 $pass_dir = $atemp[1];
-        }elsif($atemp[0]  =~ /ctemp_dir/){
+        }elsif($atemp[0]  =~ /mtemp_dir/){
                 $temp_dir = $atemp[1];
         }elsif($atemp[0]  =~ /too_dir/){
                 $data_dir = $atemp[1];
@@ -213,9 +218,9 @@ foreach $ruser (@smuser){
 #
 #--- give the people what they want
 #
-##########		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs --- $ruser\" isobe\@head.cfa.harvard.edu");
+####		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs --- $ruser\" isobe\@head.cfa.harvard.edu");
 
-		system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs\" -c  cus\@head.cfa.harvard.edu  -b isobe\@head.cfa.harvard.edu  $ruser\@head.cfa.harvard.edu");
+	system("cat $temp_dir/$ruser.tmp| mailx -s \"Subject: Verification needed for obsid.revs\" -c  cus\@head.cfa.harvard.edu  -b isobe\@head.cfa.harvard.edu  $ruser\@head.cfa.harvard.edu");
 		system("rm $temp_dir/$ruser.tmp");
     		`/usr/bin/sleep 5`;
 	}

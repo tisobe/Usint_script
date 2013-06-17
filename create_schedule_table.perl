@@ -1,4 +1,4 @@
-#!/opt/local/bin/perl
+#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
 
 #################################################################################################################
 #														#
@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Mar 27, 2013									#
+#		last update: May 14, 2013									#
 #														#
 #################################################################################################################
 
@@ -445,10 +445,10 @@ if($cemail !~ /$too_poc/){
 #--- create a file for Daniel Patnaude use
 #
 
-#system("chmod 777 /home/mta/TOO-POC");
-#open(OUT, ">/home/mta/TOO-POC");
-#print OUT "$too_poc\n";
-#close(OUT);
+system("chmod 777 /home/mta/TOO-POC");
+open(OUT, ">/home/mta/TOO-POC");
+print OUT "$too_poc\n";
+close(OUT);
 
 
 ###################################################################################################r

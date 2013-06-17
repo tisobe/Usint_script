@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
@@ -19,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Mar 27, 2013
+#		last update: May 14, 2013
 #  
 ###############################################################################
 

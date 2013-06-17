@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
 
 #use CGI;
 #use CGI::Carp;

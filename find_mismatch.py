@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.6
+#!/usr/bin/env /proj/sot/ska/bin/python
 
 #########################################################################################################################
 #                                                                                                                       #
@@ -20,8 +20,8 @@ import string
 #
 
 admin_mail = 'isobe@head.cfa.harvard.edu'
-saved_file = '/data/udoc1/ocat/Info_save/past_mismatch'
-temp_file  = '/data/udoc1/ocat/Working_dir/cus/mismatch_check'
+saved_file = '/data/mta4/CUS/www/Usint/ocat/Info_save/past_mismatch'
+temp_file  = '/data/mta4/CUS/www/Usint/ocat/Working_dir/cus/mismatch_check'
 
 #-------------------------------------------------------------------------------------------------------------------------
 #---find_mismatch: check update_table.list and check whether a phantom entry is created in the list                   ----
@@ -30,7 +30,7 @@ temp_file  = '/data/udoc1/ocat/Working_dir/cus/mismatch_check'
 
 def find_mismatch():
     """
-    this script reads /data/udoc1/ocat/updates_table.list and compares files created in /data/udoc1/ocat/updates/
+    this script reads /data/mta4/CUS/www/Usint/ocat/updates_table.list and compares files created in /data/mta4/CUS/www/Usint/ocat/updates/
     if there are any mismatchs, the script reports the fact to admin.
     input: no
     output: email to admin, update saved_file (past mismatched list)
@@ -52,7 +52,7 @@ def find_mismatch():
 #
 #--- read names of files 
 #
-    line = 'ls /data/udoc1/ocat/updates/* > ' + temp_file
+    line = 'ls /data/mta4/CUS/www/Usint/ocat/updates/* > ' + temp_file
     os.system(line)
 
     f = open(temp_file, 'r')
@@ -61,7 +61,7 @@ def find_mismatch():
 
     file_list = []
     for ent in temp_list:
-        atemp =  re.split('/data/udoc1/ocat/updates/', ent)
+        atemp =  re.split('/data/mta4/CUS/www/Usint/ocat/updates/', ent)
         try:
             val = float(atemp[1])
             file_list.append(val)
@@ -76,7 +76,7 @@ def find_mismatch():
 #---- read the names on the list
 #
 
-    f = open('/data/udoc1/ocat/updates_table.list')
+    f = open('/data/mta4/CUS/www/Usint/ocat/updates_table.list')
     list = [line.strip() for line in f.readlines()]
     f.close()
 
@@ -127,7 +127,7 @@ def find_mismatch():
     if len(new_mismatch) > 0:
         f  = open(temp_file,  'w')
         f2 = open(saved_file, 'a')
-        f.write('The following entry in /data/udoc1/ocat/updates_table.list does not have a counter part.\n\n')
+        f.write('The following entry in /data/mta4/CUS/www/Usint/ocat/updates_table.list does not have a counter part.\n\n')
         for ent in mismatch_list:
             f.write(str(ent))
             f.write('\n')

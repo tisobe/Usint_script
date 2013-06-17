@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /data/fido/censka/bin/perl
 
 #################################################################################################	
 #												#
@@ -9,7 +9,7 @@
 #												#
 #	author: T. Isobe (tisobe@cfa.harvard.edu)						#
 #	Oct 1, 2003   --- first version								#
-#	Last Update: Mar 27, 2013								#
+#	Last Update: May 13, 2013								#
 #												#
 #################################################################################################	
 

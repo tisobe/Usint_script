@@ -7,28 +7,35 @@
 #		     planned roll angle.						#
 #											#
 #	Author: T. Isobe (isobe@head.cfa.harvard.edu)					#
-#	Last Update: Mar 14, 2013							#
+#	Last Update: Mar 27, 2013							#
 #											#
 #########################################################################################
-#
-#--- check whether this is a test case
-#
-$comp_test = $ARGV[0];
-chomp $comp_test;
+
 
 #
 #---- set directory paths : updated to read from a file (02/25/2011) --- this is user:mta version
 #
 
-open(IN, '/data/udoc1/ocat/Info_save/dir_list');
+open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
 while(<IN>){
-    	chomp $_;
-    	@atemp = split(/:/, $_);
-	$atemp[0] =~ s/^\s+//;
-	$atemp[0] =~ s/\s+$//;
-	$atemp[1] =~ s/^\s+//;
-	$atemp[1] =~ s/\s+$//;
-    	${$atemp[0]} = $atemp[1];
+        chomp $_;
+        @atemp    = split(/:/, $_);
+        $atemp[0] =~ s/\s+//g;
+        if($atemp[0] =~ /obs_ss/){
+                $obs_ss   = $atemp[1];
+        }elsif($atemp[0]  =~ /pass_dir/){
+                $pass_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /mtemp_dir/){
+                $temp_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /too_dir/){
+                $data_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /ocat_dir/){
+                $real_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /test_dir/){
+                $test_dir = $atemp[1];
+        }elsif($atemp[0]  =~ /cus_dir/){
+                $cus_dir  = $atemp[1];
+        }
 }
 close(IN);
 
@@ -47,13 +54,8 @@ sub find_planned_roll{
 #	getstore("https://icxc.harvard.edu/mp/lts/lts-current.html", "$temp_dir/ztemp_mp");
 #	open(PFH, "$temp_dir/ztemp_mp");
 #
-	if($comp_test =~ /test/i){
-		open(PFH, "/proj/web-icxc/cgi-bin/obs_ss/Usint_test/Test_prep/lts-current.html");
-		open(POUT,">./mp_long_term");
-	}else{
-		open(PFH, "/proj/web-icxc/htdocs/mp/lts/lts-current.html");
-		open(POUT,">$obs_ss/mp_long_term");
-	}
+	open(PFH, " /proj/web-icxc/htdocs/mp/lts/lts-current.html");
+	open(POUT,">$obs_ss/mp_long_term");
 	OUTER:
 	while(<PFH>){
 		chomp $_;

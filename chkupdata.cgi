@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env  /home/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
@@ -18,7 +18,7 @@ use CGI qw/:standard :netscape /;
 #											#
 #	10/31/01:	first version							#
 #	07/22/02:	uninterrupt added						#
-#	last update	Mar 27, 2013							#
+#	last update	May 14, 2013							#
 #											#
 #########################################################################################
 

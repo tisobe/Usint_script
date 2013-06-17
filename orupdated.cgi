@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
 # R. Kilgard, Jan 30/31 2000
 # This script generates a dynamic webpage for keeping track of updates to
 # target parameters.  
