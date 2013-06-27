@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: May 14, 2013									#
+#		last update: Jun 27, 2013									#
 #														#
 #################################################################################################################
 
@@ -442,13 +442,13 @@ if($cemail !~ /$too_poc/){
 }
 	
 #
-#--- create a file for Daniel Patnaude use
+#--- create a file for Daniel Patnaude use .... this function is taken over by write_this_week_too_poc.py
 #
 
-system("chmod 777 /home/mta/TOO-POC");
-open(OUT, ">/home/mta/TOO-POC");
-print OUT "$too_poc\n";
-close(OUT);
+#system("chmod 777 /home/mta/TOO-POC");
+#open(OUT, ">/home/mta/TOO-POC");
+#print OUT "$too_poc\n";
+#close(OUT);
 
 
 ###################################################################################################r
