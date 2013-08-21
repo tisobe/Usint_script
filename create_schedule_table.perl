@@ -6,7 +6,7 @@
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Jun 27, 2013									#
+#		last update: Aug 21, 2013									#
 #														#
 #################################################################################################################
 
@@ -207,6 +207,10 @@ print OUT '</p>',"\n";
 print OUT '<p>',"\n";
 print OUT 'Shifts run midnight plus <em>&#949;</em> on start day to midnight minus <em>&#949;</em> on last day.',"\n";
 print OUT '</p>',"\n";
+
+print OUT '<p>The TOO POC become the responsible scientist for all bare ACIS TOO/DDTs APPROVED DURING their on-duty. ', "\n";
+print OUT 'Grating and HRC observations  are assigned to instrument specialists as are planetary and Crab observations. </p>', "\n";
+
 print OUT '<br />',"\n";
 print OUT '<br />',"\n";
 

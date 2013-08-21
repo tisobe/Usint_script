@@ -16,7 +16,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: May 14, 2013							#
+#		last update: Aug  21, 2013							#
 #												#
 #################################################################################################
 
@@ -452,7 +452,8 @@ if($input_no =~ /\d/){
 		}		
 	}
 }elsif($disp > 0 && $disp < 10){
-	print "<h3>Approved DDT/TOO List </h3>";
+	print "<h3>USINT responsible for approved DDT/TOO </h3>";
+	print "<h4> This is either an instrument specialist or the bare ACIS support person on duty at the time the proposal was APPROVED. </h4>";
 
 	print '<p>Click POC name to display the contact information.</p>';
 
