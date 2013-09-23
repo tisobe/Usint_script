@@ -1,4 +1,4 @@
-#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
+#!/soft/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
@@ -19,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: May 14, 2013
+#		last update: Sep 23, 2013
 #  
 ###############################################################################
 
@@ -97,7 +97,7 @@ $test_http    = 'http://asc.harvard.edu/cgi-gen/mta/Obscat/';	#--- web site for 
 
 $mp_http      = 'http://asc.harvard.edu/';			#--- web site for mission planning related
 $chandra_http = 'http://cxc.harvard.edu/';			#--- chandra main web site
-$cdo_http     = 'https://cxc.cfa.harvard.edu/cgi-bin/cdo/';	#--- CDO web site
+$cdo_http     = 'http://icxc.cfa.harvard.edu/cgi-bin/cdo/';	#--- CDO web site
 
 ############################
 #----- end of settings
@@ -3841,7 +3841,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '</td><th>Event TM Format:</th><td>';
 	
-	print popup_menu(-name=>'BEP_PACK', -value=>['NULL','VF','F','F+B','G'], 
+	print popup_menu(-name=>'BEP_PACK', -value=>['F','VF','F+B','G'], 
 		 	-default=>"$bep_pack", -override=>100000);
 	print '</td>';
 
@@ -8665,20 +8665,20 @@ sub oredit_sub{
 			close(ASIS);
 
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/asis.$sf |mailx -s\"Subject:TEST!!  $obsid is approved\n\" -r$cus_email $test_email");
+				system("cat $temp_dir/asis.$sf |mailx -s\"Subject:TEST!!  $obsid is approved\n\"  $test_email");
 			}else{
-				system("cat $temp_dir/asis.$sf |mailx -s\"Subject: $obsid is approved\n\" -r$cus_email -c$cus_email $email_address");
+				system("cat $temp_dir/asis.$sf |mailx -s\"Subject: $obsid is approved\n\"  -c$cus_email $email_address");
 			}
 			system("rm $temp_dir/asis.$sf");
 		}else{
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes (Approved) log  $obsid.$rev\n\" -r$cus_email  $test_email");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes (Approved) log  $obsid.$rev\n\"  $test_email");
 			}else{
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\" -r$cus_email -c$cus_email $email_address");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  -c$cus_email $email_address");
 			}
 		}
 
-		if($usint_on ne 'test' && $usint_on ne 'test_no'){ system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\" -r$cus_email  $cus_email");
+		if($usint_on ne 'test' && $usint_on ne 'test_no'){ system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  $cus_email");
 		}
 	}else{
 		if($sp_user eq 'no'){
@@ -8688,23 +8688,23 @@ sub oredit_sub{
 			close(USER);
 
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/user.$sf |mailx -s\"Subject:TEST!!  Parameter Changes log  $obsid.$rev\n\"  -r$cus_email $test_email");
+				system("cat $temp_dir/user.$sf |mailx -s\"Subject:TEST!!  Parameter Changes log  $obsid.$rev\n\"  $test_email");
 			}else{
-				system("cat $temp_dir/user.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  -r$cus_email -c$cus_email $email_address");
+				system("cat $temp_dir/user.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"   -c$cus_email $email_address");
 			}
 			system("rm $temp_dir/user.$sf");
 		}else{
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\" -r$cus_email  $test_email");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\"  $test_email");
 			}else{
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\" -r$cus_email -c$cus_email  $email_address");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  -c$cus_email  $email_address");
 			}
 		}
 
 		if($usint_on =~ /test/){
-			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\" -r$cus_email  $test_email");
+			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\"  $test_email");
 		}else{
-			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\" -r$cus_email $cus_email");
+			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  $cus_email");
 		}
 	}
 
