@@ -19,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep 23, 2013
+#		last update: Sep 24, 2013
 #  
 ###############################################################################
 
@@ -3202,12 +3202,20 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '16:22:04.8  -27:43:04.0), or as decimal degrees.  The original OBSCAT decimal ';
 	print ' degree values are provided below the update boxes .';
 
-    $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
+#    $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
+    	$view_http = "$$usint_http/PSPC_page/plot_pspc.cgi?"."$obsid";
 	print 'If you like to see the current viewing orientation, open: ';
 
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='_blank'>RASS</a>, ";
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.pspc.gif' target='_blank'>ROSAT</a>, or  ";
-	print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.dss.gif'  target='_blank'>DSS</a>. ";
+	$test = `ls /data/targets/'."$seq_nbr".'/*.gif`;
+	if($test =~ /soe/){
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.rass.gif' target='_blank'>RASS</a>, ";
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.pspc.gif' target='_blank'>ROSAT</a>, or  ";
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.soe.dss.gif'  target='_blank'>DSS</a>. ";
+	}else{
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.rass.gif' target='_blank'>RASS</a>, ";
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.pspc.gif' target='_blank'>ROSAT</a>, or  ";
+		print "<a href = 'http://cxc.harvard.edu/targets/$seq_nbr/$seq_nbr.$obsid.dss.gif'  target='_blank'>DSS</a>. ";
+	}
 	print "(Note: These figures do not always exist.)</p>";
 
 	print '<table style="border-width:0px">';
@@ -8665,16 +8673,16 @@ sub oredit_sub{
 			close(ASIS);
 
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/asis.$sf |mailx -s\"Subject:TEST!!  $obsid is approved\n\"  $test_email");
+				system("cat $temp_dir/asis.$sf |mailx -s\"Subject:TEST!!  $obsid is approved\n\" $test_email");
 			}else{
-				system("cat $temp_dir/asis.$sf |mailx -s\"Subject: $obsid is approved\n\"  -c$cus_email $email_address");
+				system("cat $temp_dir/asis.$sf |mailx -s\"Subject: $obsid is approved\n\" -c$cus_email $email_address");
 			}
 			system("rm $temp_dir/asis.$sf");
 		}else{
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes (Approved) log  $obsid.$rev\n\"  $test_email");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes (Approved) log  $obsid.$rev\n\" $test_email");
 			}else{
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\"  -c$cus_email $email_address");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes (Approved) log  $obsid.$rev\n\" -c$cus_email $email_address");
 			}
 		}
 
@@ -8690,21 +8698,21 @@ sub oredit_sub{
 			if($usint_on =~ /test/){
 				system("cat $temp_dir/user.$sf |mailx -s\"Subject:TEST!!  Parameter Changes log  $obsid.$rev\n\"  $test_email");
 			}else{
-				system("cat $temp_dir/user.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"   -c$cus_email $email_address");
+				system("cat $temp_dir/user.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  -c$cus_email $email_address");
 			}
 			system("rm $temp_dir/user.$sf");
 		}else{
 			if($usint_on =~ /test/){
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\"  $test_email");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\" $test_email");
 			}else{
-				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  -c$cus_email  $email_address");
+				system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\" -c$cus_email  $email_address");
 			}
 		}
 
 		if($usint_on =~ /test/){
-			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\"  $test_email");
+			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject:TEST!! Parameter Changes log  $obsid.$rev\n\" $test_email");
 		}else{
-			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\"  $cus_email");
+			system("cat $temp_dir/ormail_$obsid.$sf |mailx -s\"Subject: Parameter Changes log  $obsid.$rev\n\" $cus_email");
 		}
 	}
 
