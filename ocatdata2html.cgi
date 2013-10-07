@@ -223,6 +223,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # BEP_PEAK option changed (F, VF, F+B, G ---  default: F)
 # (Sep, 23, 2013)
 #
+# Link to PSPC page removed
+# (Sep 25, 2013)
+# 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -339,9 +342,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-#$usint_on = 'yes';			##### USINT Version
+$usint_on = 'yes';			##### USINT Version
 #$usint_on = 'no';			##### USER Version
-$usint_on = 'test_yes';			##### Test Version USINT
+#$usint_on = 'test_yes';			##### Test Version USINT
 #$usint_on = 'test_no';			##### Test Version USER
 
 #
@@ -1839,11 +1842,12 @@ if($check eq ''){
 			$access_ok = 'yes';
 ###		}else{
         		special_user();			# sub to check whether s/he is a special user
-                	pi_check();			# sub to check whether the pi has an access
+###                	pi_check();			# sub to check whether the pi has an access
 
 			print hidden(-name=>'send_email', -value=>"$send_email");
 		}
 
+$sp_user = 'yes';				#----- this is a temporary measure to let people in Oct 1, 2013
 		if($sp_user eq 'yes'){
                         if($prev_app == 0){
                                 data_input_page();      # sub to display data for edit
@@ -6271,10 +6275,11 @@ if($sp_user eq 'no'){
 	print '16:22:04.8  -27:43:04.0), or as decimal degrees.  The original OBSCAT decimal ';
 	print ' degree values are provided below the update boxes .';
 
-        $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
-	print 'If you want to experiment with viewing orientation, open: ';
+#        $view_http = "$obs_ss_http/PSPC_page/plot_pspc.cgi?"."$obsid";
+        $view_http = "$usint_http/PSPC_page/plot_pspc.cgi?"."$obsid";
+#	print 'If you want to experiment with viewing orientation, open: ';
 
- 	print "<a href = $view_http target='blank'BORDER=0 WIDTH=692 HEIGHT=1000>Viewing Orientation Page</a> (it may take several seconds).";
+# 	print "<a href = $view_http target='blank'BORDER=0 WIDTH=692 HEIGHT=1000>Viewing Orientation Page</a> (it may take several seconds).";
 	
 	if($sp_user eq 'no'){
 		print 'The sum of the differences between new and old RA and/or DEC must be smaller than ';
