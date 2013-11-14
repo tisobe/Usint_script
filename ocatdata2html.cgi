@@ -225,6 +225,12 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 # Link to PSPC page removed
 # (Sep 25, 2013)
+#
+# Highest Energy display added
+#  (Nov 14, 2013)
+#
+# BEP_PACK now has "NULL" option when the instrument is HRC
+#  (Nov 14, 2013)
 # 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -5723,6 +5729,10 @@ sub data_close_page{
 		print "<td align=\"LEFT\">$eventfilter_lower</td>";
 		print '<th><a href="#" onClick="WindowOpen(eventfilter_higher);return false;">Energy Range</a>:</th>';
 		print "<td align=\"LEFT\">$eventfilter_higher</td>";
+        	if($deventfilter =~ /YES/i){
+            		$high_energy = $eventfilter_lower + $eventfilter_higher;
+            		print "<td><b> = Highest Energy:</b> $high_energy</td>";
+        	}
 		print '</tr> ';
 
 #
@@ -7571,8 +7581,13 @@ print "$monitor_elem<br />";
 		}else{
 			print '</td><th><a href="#" onClick="WindowOpen(bep_pack);return false;">Event TM Format</a>:</th><td>';
 		}
-		print popup_menu(-name=>'BEP_PACK', -value=>['F','VF','F+B','G'], 
+        if($instrument =~ /ACIS/i){
+		    print popup_menu(-name=>'BEP_PACK', -value=>['F','VF','F+B','G'], 
 			 	-default=>"$bep_pack", -override=>100000);
+        }else{
+		    print popup_menu(-name=>'BEP_PACK', -value=>['NULL','F','VF','F+B','G'], 
+			 	-default=>"$bep_pack", -override=>100000);
+        }
 		print '</td>';
 	
 	
@@ -7791,6 +7806,11 @@ print "$monitor_elem<br />";
 		print '<td align="LEFT"><input type="text" name="EVENTFILTER_HIGHER" value="';
 		print "$eventfilter_higher";
 		print '" size="12"></td>';
+                if($deventfilter =~ /YES/i){
+                        $high_energy = $eventfilter_lower + $eventfilter_higher;
+                        print "<td><b> = Highest Energy:</b> $high_energy</td>";
+                }
+
 		print '</tr><tr> ';
 
 #

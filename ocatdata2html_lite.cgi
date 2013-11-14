@@ -19,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep 24, 2013
+#		last update: Nov 14, 2013
 #  
 ###############################################################################
 
@@ -3849,8 +3849,13 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	
 	print '</td><th>Event TM Format:</th><td>';
 	
-	print popup_menu(-name=>'BEP_PACK', -value=>['F','VF','F+B','G'], 
-		 	-default=>"$bep_pack", -override=>100000);
+	if($instrument =~ /ACIS/i){
+		print popup_menu(-name=>'BEP_PACK', -value=>['F','VF','F+B','G'], 
+		 		-default=>"$bep_pack", -override=>100000);
+	}else{
+		print popup_menu(-name=>'BEP_PACK', -value=>['NULL','F','VF','F+B','G'], 
+		 		-default=>"$bep_pack", -override=>100000);
+	}
 	print '</td>';
 
 
@@ -4011,6 +4016,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print '<td style="text-align:left"><input type="text" name="EVENTFILTER_HIGHER" value="';
 	print "$eventfilter_higher";
 	print '" size="12"></td>';
+	if($deventfilter =~ /YES/i){
+		$high_energy = $eventfilter_lower + $eventfilter_higher;
+		print "<td><b> = Highest Energy:</b> $high_energy</td>";
+	}
 	print '</tr>';
 
 	print '<tr> ';
