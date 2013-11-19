@@ -31,8 +31,8 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-$usint_on = 'yes';			##### USINT Version
-#$usint_on = 'test_yes';			##### Test Version USINT
+#$usint_on = 'yes';			##### USINT Version
+$usint_on = 'test_yes';			##### Test Version USINT
 
 #
 #---- set a name and email address of a test person
@@ -4913,6 +4913,11 @@ sub chk_entry{
 	@cdo_warning = ();
 	$cdo_w_cnt   = 0;
 
+	@pwarning_name_list = ();
+	@pwarning_orig_val  = ();
+	@pwarning_new_val   = ();
+	$pwarning_cnt       = 0;
+
 #-------------------
 #----- general cases
 #-------------------
@@ -5082,6 +5087,12 @@ sub chk_entry{
 			$lname = lc ($name);
 			$lname2 = lc ($in_name);
 			${$lname} = ${$lname2}[$j];
+
+			$oin_name = 'orig_'."$in_name";
+			$oname = "$oin_name".'.N';
+			$olname = lc ($oname);
+			$olname2 = lc ($oin_name);
+			${$olname} = ${$olname2}[$j];
 		}
 
 		$time_okn = $time_ok[$j];
@@ -5111,6 +5122,17 @@ sub chk_entry{
 			}
 			print '</table>';
 		}
+#
+#--- preference/constraints change check
+#
+		foreach $aname ('WINDOW_FLAG', 'TSTART.N', 'TSTOP.N', 'WINDOW_CONSTRAINT.N'){
+			$vname = lc($aname);
+			$new_val = ${$vname};
+			$orig_name = 'orig_'."$vname";
+			$orig_val = ${$orig_name};
+
+			compare_to_original_val($vname, $new_val, $orig_val);
+		}
 	}
 
 #-------------------------
@@ -5126,6 +5148,12 @@ sub chk_entry{
 			$lname = lc ($name);
 			$lname2 = lc ($in_name);
 			${$lname} = ${$lname2}[$j];
+
+			$oin_name = 'orig_'."$in_name";                                         
+			$oname = "$oin_name".'.N';                                                                      
+			$olname = lc ($oname);
+			$olname2 = lc ($oin_name);
+			${$olname} = ${$olname2}[$j];
 		}
 
 		foreach $name ('ROLL_FLAG','ROLL_CONSTRAINT.N','ROLL_180.N','ROLL.N','ROLL_TOLERANCE.N'){
@@ -5153,6 +5181,17 @@ sub chk_entry{
 				print "<td style='color:green'>$atemp[2]</th></tr>";
 			}
 			print '</table>';
+		}
+#
+#--- preference/constraints change check
+#
+		foreach $aname ('ROLL_FLAG','ROLL_CONSTRAINT.N','ROLL_180.N','ROLL.N','ROLL_TOLERANCE.N'){
+			$vname = lc($aname);
+			$new_val = ${$vname};
+			$orig_name = 'orig_'."$vname";
+			$orig_val = ${$orig_name};
+			
+			compare_to_original_val($vname, $new_val, $orig_val);
 		}
 	}
 
@@ -5214,6 +5253,13 @@ sub chk_entry{
 				$lname2   = lc ($in_name);
 				${$lname} = ${$lname2}[$j];
 
+				$oin_name = 'orig_'."$in_name";                                         
+				$oname = "$oin_name".'.N';                                                                      
+				$olname = lc ($oname);
+				$olname2 = lc ($oin_name); 
+				${$olname} = ${$olname2}[$j];
+
+
                 if($name =~ /PHA_RANGE/i && ${$lname} > 13){
                     $chk_pha_range++;
                 }
@@ -5234,6 +5280,20 @@ sub chk_entry{
 
 					entry_test();			#----- check the condition
 				}
+
+#
+#--- preference/constraints change check
+#
+				foreach $aname ('INSTRUMENT.N','SPWINDOW','ORDR.N', 'CHIP.N','INCDLUDE_FLAG.N','START_ROW.N','START_COLUMN.N',
+					       'HEIGHT.N','WIDTH.N', 'LOWER_THRESHOLD.N','PHA_RANGE.N','SAMPLE.N'){
+					$vname = lc($aname);
+					$new_val = ${$vname};
+					$orig_name = 'orig_'."$vname";
+					$orig_val = ${$orig_name};
+					
+					compare_to_original_val($vname, $new_val, $orig_val);
+				}
+
 			}
 
 #
@@ -5424,13 +5484,105 @@ sub chk_entry{
 		print "<td style='color:green'>pre_min_lead must be smaller than pre_max_lead ($pre_max_lead)</td></tr>";
 		print '</table>';
 	}
+#
+#--- preference/constraints change check
+#
+	foreach $name ('CONSTR_IN_REMARKS', 'PHASE_CONSTRAINT_FLAG', 'PHASE_EPOCH', 'PHASE_PERIOD', 'PHASE_START', 'PHASE_START_MARGIN', 'PHASE_END', 'PHASE_END_MARGIN',
+				'GROUP_ID', 'MONITOR_FLAG', 'PRE_ID', 'PRE_MIN_LEAD', 'PRE_MAX_LEAD', 'MULTITELESCOPE', 'OBSERVATORIES', 'MULTITELESCOPE_INTERVAL'){
+		$lname = lc($name);
+		$new_val = ${$lname};
+		$oin_name = 'orig_'."$lname";
+		$orig_val = ${$oin_name};
+		compare_to_original_val($lname, $new_val, $orig_val);
+	}
+
+#	foreach $name ('DITHER_FLAG', 'Y_AMP', 'Y_FREQ', 'Y_PHASE', 'Z_AMP', 'Z_FREQ', 'Z_PHASE'){
+#		$lname = lc($name);
+#		$new_val = ${$lname};
+#		$oin_name = 'orig_'."$lname";
+#		$orig_val = ${$oin_name};
+#		compare_to_original_val($lname, $new_val, $orig_val);
+#	}
+
+#
+#--- print preference/constraint change warning 
+#	
+	if($pwarning_cnt > 0){
+		print_pwarning();
+	}
+		
 	print '<br /><br />';
+
+	
 
 #---------------------------------------------------------------
 #----- print all paramter entries so that a user verifies input
 #---------------------------------------------------------------
 
 	submit_entry();
+}
+
+###########################################################################################################
+### compare_to_original_val: sending a warning if there is preference/costraint changes                ####
+###########################################################################################################
+
+sub compare_to_original_val{
+
+	my $vname, $new_val, $orig_val;
+	($vname, $new_val, $orig_val) = @_;
+
+	if($vname =~ /\.n/){
+		$vname =~ s/\.n//g;
+	}
+
+	if($new_val ne '' || $orig_val ne ''){
+		if($new_val !~ /$orig_val/i){
+			if( $orig_val eq ''){
+				$orig_val = "' '";
+			}
+			push(@pwarning_name_list, $vname);
+			push(@pwarning_orig_val,  $orig_val);
+			push(@pwarning_new_val,   $new_val);	
+			$pwarning_cnt++;
+		}
+	}
+}
+
+###########################################################################################################
+### print_pwarning: print out preference/constrain change warning                                      ####
+###########################################################################################################
+
+sub print_pwarning{
+	print '<div style="padding-top:30px;padding-bottom:20px">';
+	print '<table border=1 style="width:80%">';
+
+	if($pwarning_cnt > 1){
+		print '<tr><th colspan=3  style="color:red">The following changes impact constraints or preferences.<br /> ';
+		print 'Verify you have indicated CDO approval in the comments.</th></tr>';
+	}else{
+		print '<tr><th colspan=3 style="color:red">The following change impacts a constraint or preference.<br /> ';
+		print 'Verify you have indicated CDO approval in the comments.</td></tr>';
+	}
+	print '<tr><th>Parameter</th><th>Original Value</th><th>New Value</th></tr>';
+	for($i = 0; $i < $pwarning_cnt; $i++){
+		$vname = $pwarning_name_list[$i];
+		$o_val = $pwarning_orig_val[$i];
+		$n_val = $pwarning_new_val[$i];
+
+		$db_name = $vname;
+                find_name();
+		$uvname = uc($vname);
+
+		if($web_name eq ''){
+			print "<tr><td style='text-align:center'><b>$uvname</b></td>";
+		}else{
+			print "<tr><td style='text-align:center'><b>$web_name ($uvname)</b></td>";
+		}
+		print "<td style='text-align:center'>$o_val</td>";
+		print "<td style='text-align:center'>$n_val</td></tr>";
+	}
+	print '</tr></table>';
+	print '</div>';
 }
 
 ###########################################################################################################
