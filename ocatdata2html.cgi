@@ -234,6 +234,11 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 # Preference/Constraint change warning capacity added
 #  (Nov 18, 2013)
+#
+# Definition of "Use Subarray" is modified 
+# ACIS-I :	897	128	769	256	513	original
+# ACIS-I :	897	128	768	256	513	
+#  (Jan 09, 2014)
 # 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -351,9 +356,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-#$usint_on = 'yes';			##### USINT Version
+$usint_on = 'yes';			##### USINT Version
 #$usint_on = 'no';			##### USER Version
-$usint_on = 'test_yes';			##### Test Version USINT
+#$usint_on = 'test_yes';			##### Test Version USINT
 #$usint_on = 'test_no';			##### Test Version USER
 
 #
@@ -1418,7 +1423,7 @@ var subarray = '<font color=blue><b>Use Subarray</b></font><br>'
 		 + '</tr><tr>'
 		 + '<th>aimpoint:</th><td>start</td><td>rows</td><td>start</td><td>rows</td><td>start</td><td>rows</td>'
 		 + '</tr><tr>'
-		 + '<th>ACIS-I  :</th><td>897</td><td>128</td><td>769</td><td>256</td><td>513</td><td>512</td>'
+		 + '<th>ACIS-I  :</th><td>897</td><td>128</td><td>768</td><td>256</td><td>513</td><td>512</td>'
 		 + '</tr><tr>'
 		 + '<th>ACIS-S  :</th><td>449</td><td>128</td><td>385</td><td>256</td><td>257</td><td>512</td>'
 		 + '</tr></table>'
