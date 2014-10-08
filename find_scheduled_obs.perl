@@ -1,4 +1,4 @@
-#!/usr/bin/env /data/fido/censka/bin/perl
+#!/usr/bin/perl
 
 #################################################################################################
 #												#
@@ -6,7 +6,7 @@
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: Mar 26, 2013								#
+#	last update: Jul 29, 2014								#
 #												#
 #################################################################################################
 
@@ -39,10 +39,7 @@ $test_email = 'isobe@head.cfa.harvard.edu';
 #---- set directory paths : updated to read from a file (02/25/2011) --- this is user: mta version
 #
 
-#open(IN, '/data/udoc1/ocat/Info_save/dir_list');
-#open(IN, '/proj/web-cxc-dmz/htdocs/mta/CUS/Usint/ocat/Info_save/dir_list');
 open(IN, '/data/mta4/CUS/www/Usint/ocat/Info_save/dir_list');
-
 while(<IN>){
         chomp $_;
         @atemp    = split(/:/, $_);
@@ -108,7 +105,11 @@ $nlmon = uc($nlmon);
 $temp_list  = "$temp_dir/mpcrit_list";
 $temp_list2 = "$temp_dir/mpcrit_list2";
 
-system("ls -lrtd /data/mpcrit1/mplogs/$uyear/$lmon* /data/mpcrit1/mplogs/$nyear/$nlmon* > $temp_list");
+system("ls -lrtd /data/mpcrit1/mplogs/$uyear/$lmon*  >  $temp_list");
+$test = `ls -lrtd /data/mpcrit1/mplogs/$nyear/*`;
+if($test =~ /$nlmon/){
+    system("ls -lrtd /data/mpcrit1/mplogs/$nyear/$nlmon* >> $temp_list");
+}
 
 @line      = ();
 @in_charge = ();
@@ -180,43 +181,47 @@ while(<FH>){
 #--- checking the next month
 #
 	}elsif($dir =~ /$nlmon/){
-		$file = "$dir".'/input/'."$nlmon*_*.or";
-		system("ls -lrt $file > $temp_list2");
-		open(IN, "$temp_list2");
-		@list = ();
-
-		while(<IN>){
-			chomp $_;
-			@atemp = split(/\s+/,   $_);
-			foreach $test (@atemp){
-				if($test =~ /mplogs/){
-					$in_line = $test;
-					last;
-				}
-			}
-			@etemp = split(/_/, $in_line);
-			@ftemp = split(/\.or/, $etemp[1]);
-			if($ftemp[0] =~ /\d/){
-				@btemp = split(/\//,    $in_line);
-				@ctemp = split(/$lmon/, $btemp[5]);
-				@dtemp = split(//,      $ctemp[1]);
-				$date  = "$dtemp[0]$dtemp[1]";
-				push(@list, $in_line);
-			}
-		}
-		close(IN);
-		system("rm $temp_list2");
-		$last = pop(@list);
-		push(@mp_list, $last);
-
-		if($atemp[2] =~ /\d/){
-			$aline = `ypcat -k passwd |grep $atemp[2]`;
-			@cline = split(/\s+/, $aline);
-			$person = $cline[0];
-		}else{
-			$person = $atemp[2];
-		}
-		push(@in_charge, $person);
+        $test = "$dir".'/input/';
+        $chk  = is_dir_empty($test);
+        if($chk == 1){
+		    $file = "$dir".'/input/'."$nlmon*_*.or";
+		    system("ls -lrt $file > $temp_list2");
+		    open(IN, "$temp_list2");
+		    @list = ();
+    
+		    while(<IN>){
+			    chomp $_;
+			    @atemp = split(/\s+/,   $_);
+			    foreach $test (@atemp){
+				    if($test =~ /mplogs/){
+					    $in_line = $test;
+					    last;
+				    }
+			    }
+			    @etemp = split(/_/, $in_line);
+			    @ftemp = split(/\.or/, $etemp[1]);
+			    if($ftemp[0] =~ /\d/){
+				    @btemp = split(/\//,    $in_line);
+				    @ctemp = split(/$lmon/, $btemp[5]);
+				    @dtemp = split(//,      $ctemp[1]);
+				    $date  = "$dtemp[0]$dtemp[1]";
+				    push(@list, $in_line);
+			    }
+		    }
+		    close(IN);
+		    system("rm $temp_list2");
+		    $last = pop(@list);
+		    push(@mp_list, $last);
+    
+		    if($atemp[2] =~ /\d/){
+			    $aline = `ypcat -k passwd |grep $atemp[2]`;
+			    @cline = split(/\s+/, $aline);
+			    $person = $cline[0];
+		    }else{
+			    $person = $atemp[2];
+		    }
+		    push(@in_charge, $person);
+        }
 	}
 }
 close(FH);
@@ -460,7 +465,7 @@ if($cnt_sign_off > 0){
 		@atemp = split(/\s+/, $ent);
 		$obsid = $atemp[1];
 
-		if($obsid !~ /\d/){
+		if($obsid !~ /\d/){					#---- if obsid is not digit, something wrong. get out
 			next OUTER;
 		}
 		$chk = 0;
@@ -517,9 +522,9 @@ if($cnt_sign_off > 0){
 				
 
 		if($usint_on =~ /test/){
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\" -rcus\@head.cfa.harvard.edu  $test_email");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1] ($usint)\"  $test_email");
 		}else{
-			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\" -rcus\@head.cfa.harvard.edu $usint $test_email cus\@head.cfa.harvard.edu");
+			system("cat $temp_dir/temp_email | mailx -s \"Subject: Warning: Sign Off Needed for Obsid: $btemp[1]\"  $usint $test_email cus\@head.cfa.harvard.edu");
 		}	
 
 		system("rm $temp_dir/temp_email");
@@ -691,3 +696,74 @@ sub split_obsid_list_check{
 
 }
 
+######################################################################################
+### is_dir_empty: check whether the directry is empty                              ###
+######################################################################################
+
+sub is_dir_empty{
+
+    my ($path) = @_;
+    opendir(DIR, $path);
+
+    if(scalar(grep( !/^\.\.?$/, readdir(DIR)) == 0)) {
+        closedir DIR;
+        return 0;                           #---- yes the directory is empty
+    }else{
+        closedir DIR;
+        return 1;                           #---- no the directory is not empty
+    }
+}
+
+######################################################################################
+### is_file_exist: check whether file with a pattern exist                         ###
+######################################################################################
+
+sub is_file_exist{
+
+
+    my ($path, $pattern) = @_;
+
+    $cout = 0;
+    $chk  = is_dir_empty($path);
+    if($chk == 1){
+        system("ls $path/* > ./ztemp");
+        open(FTIN, "./ztemp");
+
+        while(<FTIN>){
+            chomp $_;
+            if($_ =~ /$pattern/){
+                $cout = 1;
+                last;
+            }
+        }
+        close(FTIN);
+        system("rm ./ztemp");
+    }
+    return $cout;
+}
+
+######################################################################################
+### get_file_list: find files with a given pattern in the given directory         ####
+######################################################################################
+
+sub get_file_list{
+
+
+    my ($path, $pattern) = @_;
+
+    @out = ();
+    $chk = is_file_exist($path, $pattern);
+    if($chk == 1){
+        system("ls $path/* > ./ztemp");
+        open(FTIN, "./ztemp");
+        while(<FTIN>){
+            chomp $_;
+            if($_ =~ /$pattern/){
+                push(@out, $_);
+            }
+        }
+        close(FTIN);
+        system("rm ./ztemp");
+    }
+    return @out;
+}

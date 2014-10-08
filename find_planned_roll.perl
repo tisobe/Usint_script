@@ -7,7 +7,7 @@
 #		     planned roll angle.						#
 #											#
 #	Author: T. Isobe (isobe@head.cfa.harvard.edu)					#
-#	Last Update: Mar 27, 2013							#
+#	Last Update: Aug 26, 2014							#
 #											#
 #########################################################################################
 
@@ -89,7 +89,7 @@ sub find_planned_roll{
 					$ent_cnt++;
 				}
 			}
-			$planned_roll_pos = $ent_cnt - 2;
+			$planned_roll_pos = $ent_cnt - 4;   #--- column position change: 08/26/14
 			$pl_roll          = $atemp[$planned_roll_pos];
 
 			print POUT "$obsid:$pl_roll\n";

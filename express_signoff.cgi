@@ -1,4 +1,4 @@
-#!/usr/bin/env  /soft/ascds/DS.release/ots/bin/perl
+#!/soft/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
@@ -18,7 +18,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: May 14, 2013	           				#
+#	last update: Jun 05, 2014	           				#
 #										#
 #################################################################################
 
@@ -505,14 +505,27 @@ if($change =~ /Change/){
 #
 
 	$mp_list      = param('mp_warn_list');
-	@mp_warn_list = split(/:/, $mp_list);
+	@atemp        =  split(/:/, $mp_list);
+	@mp_warn_list = ();
+	$chk          = 0;
 	OUTER:
-	foreach $obsid (@mp_warn_list){
+	foreach $obsid (@atemp){
 		if($obsid =~ /\d/){
-			send_email_to_mp();
+			push(@mp_warn_list, $obsid);
+			$chk++;
 		}
 	}
+	if($chk > 0){
+		send_email_to_mp();
+	}
+#
+#--- check approved obsids is actually in apporved list and send out email to the user
+#
+	check_apporved_list();
 
+#
+#--- notify the user the task is done and display the ending message.
+#
         print "";
         print "<h2 style='padding-bottom:15px'>ALL DONE!!</h2>";
         print "<h3 style='padding-bottom:30px'>You should receive confirmation email shortly.</h3>";
@@ -546,6 +559,7 @@ if($change =~ /Change/){
 print end_form();
 print "</body>";
 print "</html>";
+
 
 #########################################################################
 ### password_check: open a user - a password input page               ###
@@ -3352,14 +3366,20 @@ sub send_email_to_mp{
 	$sot_contact = 'swolk@head.cfa.harvard.edu';
         open(ZOUT, ">$temp_file");
 
-        print ZOUT "\n\nA user: $submitter submitted changes/approval of  ";
-        print ZOUT "OBSID: $obsid which is in the current OR list.\n\n";
+        print ZOUT "\n\nA user: $submitter submitted changes/approval of obsid(s):\n\n";
+	foreach $ent (@mp_warn_list){
+		print ZOUT "$ent\n";
+	}
+
+        print ZOUT "\n which is in the current OR list.\n\n";
 
         print ZOUT "The contact email_address address is: $email_address\n\n";
 
         print ZOUT "Its Ocat Data Page is:\n";
-        print ZOUT "$usint_http/ocatdata2html.cgi?$obsid\n\n\n";
-        print ZOUT "If you have any question about this email, please contact $sot_contact.\n\n\n";
+	foreach $obsid (@mp_warn_list){
+        	print ZOUT "$usint_http/ocatdata2html.cgi?$obsid\n\n";
+	}
+        print ZOUT "\nIf you have any question about this email, please contact $sot_contact.\n\n\n";
 
 #
 #--- today's date
@@ -3401,13 +3421,73 @@ sub send_email_to_mp{
         $mp_email = "$mp_contact".'@head.cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
-#mail#        	system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\"  $test_email");
+        	system("cat $temp_file | mailx -s\"Subject: Change to Obsids Which Is in Active OR List ($mp_email)\n\"  $test_email");
 	}else{
-#mail#		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
+		system("cat $temp_file | mailx -s\"Subject: Change Obsids Which Is in Active OR List\n\"  $mp_email cus\@head.cfa.harvard.edu");
 	}
 
         system("rm $temp_file");
 
+}
+
+
+#########################################################################
+## check_apporved_list: check approved obsids and notify the user     ###
+#########################################################################
+
+sub check_apporved_list{
+
+	open(FIN, "$ocat_dir/approved");
+
+	@approved_list = ();
+	while(<FIN>){
+		chomp $_;
+		push(@approved_list, $_);
+	}
+	close(FIN);
+	@approved_list = reverse(@approved_list);
+
+	@list1 = ();
+	@list2 = ();
+	$cnt   = 0;
+	OUTER:
+	foreach $ent (@obsid_list){
+		$chk = 0;
+		foreach $comp (@approved_list){
+			@btemp = split(/\s+/, $comp);
+			if($ent == $btemp[0]){
+				push(@list1, $comp);
+				$chk = 1;
+				next OUTER;
+			}	
+		}
+		if($chk == 0){
+			push(@list2, $ent);
+			$cnt++;
+		}
+	}
+
+	open(AOUT, ">$temp_dir/alist.tmp");
+	print AOUT "\n\nThe following obsids are added on the approved list.\n\n";
+	foreach $ent (@list1){
+		print AOUT "$ent\n";
+	}
+	print AOUT "\n\n";
+	if($cnt > 0){
+		print AOUT "The following obsid(s) were not added to the approved list.\n";
+		print AOUT "You may want to try them again.\n";
+		foreach $ent (@list2){
+			print AOUT "$ent\n";
+		}
+	}
+
+	if($usint_on =~ /test/i){
+		system("cat $temp_dir/alist.tmp |mailx -s\"Subject: Approved Obsids by $email_address \n\"  $test_email");
+	}else{
+		system("cat $temp_dir/alist.tmp |mailx -s\"Subject: Approved Obsids by $email_address \n\"  $email_address  cus\@head.cfa.harvard.edu");
+	}
+
+	system("rm  $temp_dir/alist.tmp");
 }
 
 

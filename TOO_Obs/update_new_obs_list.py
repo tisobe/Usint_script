@@ -6,7 +6,7 @@
 #                                                                                                               #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                               #
 #                                                                                                               #
-#       last update: Jul 25, 2014                                                                               #
+#       last update: Oct 26, 2012                                                                               #
 #                                                                                                               #
 #################################################################################################################
 
@@ -45,7 +45,6 @@ sys.path.append(mta_dir)
 import convertTimeFormat as tcnv
 import tooddtFunctions   as tdfnc
 import readSQL           as sql
-import mta_common_functions as mcf
 
 #
 #--- check whose account, and set a path to temp location
@@ -82,7 +81,6 @@ def update_new_obs_list():
     [year, mon, day, hours, min, sec, weekday, yday, dst] = tcnv.currentTime('LOCAL')
     tdom = tcnv.findDOM(year, mon, day, 0, 0, 0)
     dom_limit = tdom - 30                      
-    dom_limit = tdom - 100                      
     dom30days = tdom + 30                           #---- use to find observations will happen in 30 days
 #
 #--- read currently assigned ddt/too pocs; save as dict form
@@ -306,26 +304,15 @@ def completeTask(temp_dir, outdir, lname):
 #
 #--- change the old file name to that with "~"
 #
-    test = outdir + lname
-    if mcf.chkFile(test) == 1:
-    	oname = lname + '~'
-    	cmd = 'mv ' + outdir + lname + ' ' + outdir +  oname
-    	os.system(cmd)
+    oname = lname + '~'
+    cmd = 'mv ' + outdir + lname + ' ' + outdir +  oname
+    os.system(cmd)
 
 #
 #--- move the new one to the too_dir
 #
-    test = temp_dir + lname
-    if mcf.chkFile(test) == 1:
-        cmd = 'mv ' + temp_dir + lname + ' ' + outdir + lname
-        os.system(cmd)
-#
-#--- if the file is empty or does not exist, copy back the old one
-#
-    test = outdir + lname
-    if mcf.isFileEmpty(test) == 0:
-       cmd = 'cp ' + outdir +  oname + ' ' + outdir + lname
-       os.system(cmd)
+    cmd = 'mv ' + temp_dir + lname + ' ' + outdir + lname
+    os.system(cmd)
 
 #
 #--- check whether there are any new observations. if so, send out notification email
@@ -394,6 +381,6 @@ if __name__ == "__main__":
 
     update_from_ddttoo_html()
 
-#    cmd = 'chgrp mtagroup ' + too_dir + '* '
-#    os.system(cmd)
+    cmd = 'chgrp mtagroup ' + too_dir + '* '
+    os.system(cmd)
 

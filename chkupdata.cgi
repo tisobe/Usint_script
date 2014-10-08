@@ -1,8 +1,9 @@
-#!/usr/bin/env  /home/ascds/DS.release/ots/bin/perl
+#!/home/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
-    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+#    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+    $ENV{SYBASE} = "/soft/SYBASE15.7";
 }
 
 use DBI;
@@ -18,7 +19,7 @@ use CGI qw/:standard :netscape /;
 #											#
 #	10/31/01:	first version							#
 #	07/22/02:	uninterrupt added						#
-#	last update	May 14, 2013							#
+#	last update	Sep 30, 2014							#
 #											#
 #########################################################################################
 
@@ -138,10 +139,12 @@ while(<PRE>){
 
 		foreach $ent  (@atemp){
 			$cnt++;
-			if($cnt >= 29 && $cnt < 59){
+#			if($cnt >= 29 && $cnt < 59){
+			if($cnt >= 23 && $cnt < 53){
 				$otime = "$otime"."$ent";
 			}
-			if($cnt >= 59){
+#			if($cnt >= 59){
+			if($cnt >= 53){
 				$stime = "$stime"."$ent";
 			}
 		}
@@ -265,6 +268,7 @@ while(<FH>){
 #--- mechanisms break down.
 #
 	chomp $_;
+	$_ =~ s/<Blank>//g;				#---- converting <Blank> to "" (Jun 12, 2014) accomodating ocat data page change
 	$atest = $_;
 	@atemp = split(//,$_);
 	if($_ =~ /Below is a full listing/){
@@ -598,8 +602,10 @@ while(<FH>){
 #
 #---	this part is totally input format dependent. if the input formant change it does not work.
 #---	in fact, this script does not work with earlier input data.
-#---	we assume the name is column 1-28, original data is in columns 29-58, and the new data is in 59 and after.
+#---XXXXX	we assume the name is column 1-28, original data is in columns 29-58, and the new data is in 59 and after.
+#---	we assume the name is column 1-23, original data is in columns 23-53, and the new data is in 53 and after.
 #
+
 		@btemp = split(//,$_);
 		@line = ();
 		$tname = '';
@@ -607,11 +613,13 @@ while(<FH>){
 		$tnew = '';
 		$cnt = 1;
 		foreach $ent (@btemp){
-			if($cnt < 29){
+#			if($cnt < 29){
+			if($cnt < 23){
 				if($ent =~ /\w/){
 					$tname = "$tname"."$ent";
 				}
-			}elsif($cnt >= 29 && $cnt < 59){
+#			}elsif($cnt >= 29 && $cnt < 59){
+			}elsif($cnt >= 23 && $cnt < 53){
 				if($tname eq 'SOE_ST_SCHED_DATE'	# dated entry needs white spaces
 					|| $tname =~ /TSTART/
 					|| $tname =~ /TSTOP/
@@ -621,7 +629,8 @@ while(<FH>){
 					|| $ent eq ':' || $ent eq '+' || $ent eq '/'){
 					$torg = "$torg"."$ent";
 				}
-			}elsif($cnt >=59){
+#			}elsif($cnt >=59){
+			}elsif($cnt >=53){
 				if($tname eq 'SOE_ST_SCHED_DATE'
 					|| $tname =~ /TSTART/
 					|| $tname =~ /TSTOP/
@@ -648,7 +657,8 @@ while(<FH>){
 #
 			$ra_org = '';
 			$ra_new = '';
-			for($i=58;$i<70;$i++){
+#			for($i=58;$i<70;$i++){
+			for($i=52;$i<64;$i++){
 				$ra_new = $ra_new.$btemp[$i];
 			}
 			@ctemp = split(/ /,$ra_new);
@@ -656,7 +666,8 @@ while(<FH>){
 #
 #--- check for 00 00 00 case.
 #
-			if($btemp[60] eq ' ' || $btemp[61] eq ' ' ){	
+#			if($btemp[60] eq ' ' || $btemp[61] eq ' ' ){	
+			if($btemp[54] eq ' ' || $btemp[55] eq ' ' ){	
  
 				$r_ra = 15.0*($ctemp[0] + $ctemp[1]/60.0 + $ctemp[2]/3600.0);
 				$f_chk_r = 1;
@@ -680,12 +691,14 @@ while(<FH>){
 #
 			$dec_org = '';
 			$dec_new = '';
-			for($i=58;$i<70;$i++){
+#			for($i=58;$i<70;$i++){
+			for($i=52;$i<64;$i++){
 				$dec_new = $dec_new.$btemp[$i];
 			}
 			@ctemp = split(/ /,$dec_new);
 			$f_chk_d = 0;
-			if($btemp[60] eq ' ' || $btemp[61] eq ' ' ){
+#			if($btemp[60] eq ' ' || $btemp[61] eq ' ' ){
+			if($btemp[54] eq ' ' || $btemp[55] eq ' ' ){
 				if($ctemp[0] < 0){
 					$r_dec = -1.0*(-1.0*$ctemp[0] + $ctemp[1]/60.0 + $ctemp[2]/3600.0);
 				}else{

@@ -2,7 +2,8 @@
 
 BEGIN
 {
-    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+#    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+    $ENV{SYBASE} = "/soft/SYBASE15.7";
 }
 
 use DBI;
@@ -239,6 +240,20 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # ACIS-I :	897	128	769	256	513	original
 # ACIS-I :	897	128	768	256	513	
 #  (Jan 09, 2014)
+#
+# Added a checking mechanism which notify REMARKS and COMMENTS are delted
+#  (Feb 25, 2014)
+#
+# Input for Roll and Roll_tolerance is now limited to digit
+#  (May 21, 2014)
+#
+# If the original value is <blank>, "Blank" will be desplayed on output
+#  (Jun 12, 2014)
+# Planned Roll has now have a range. 
+#  (Aug 26, 2014)
+#
+# SYBASE link update (/soft/SYBASE15.7)
+#  (Sep 23, 2014)
 # 
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -353,6 +368,12 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 ###############################################################################
 
 #
+#--- set  " " <blank> value 
+#
+$blank  = '&lt;Blank&gt;';
+$blank2 = '<Blank>';
+
+#
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
@@ -437,11 +458,11 @@ close(IN);
 #--- if this is a test case, use the first directory, otherwise use the real one
 #
 
-#if($usint_on =~ /test/i){
-#	$ocat_dir = $test_dir;
-#}else{
+if($usint_on =~ /test/i){
+	$ocat_dir = $test_dir;
+}else{
 	$ocat_dir = $real_dir;
-#}
+}
 
 #
 #--- set html pages
@@ -4968,7 +4989,8 @@ sub read_databases{
 
 	find_planned_roll();
 
-	$scheduled_roll = ${planned_roll.$obsid}{planned_roll}[0];
+	$scheduled_roll  = ${planned_roll.$obsid}{planned_roll}[0];
+	$scheduled_range = ${planned_roll.$obsid}{planned_range}[0];
 
 }
 
@@ -5215,8 +5237,21 @@ sub data_close_page{
 	print '<th><a href="#" onClick="WindowOpen(dec);return false;">Dec (DMS)</a>:</th>';
 	print "<td align=\"LEFT\">$tdec</td>";
 	
+#
+#--- planned roll has a range
+#
         print '<th><a href="#" onClick="WindowOpen(planned_roll);return false;">Planned Roll</a>:';
+
+	if($scheduled_roll eq '' && $scheduled_range eq ""){
+            print '<td>NA</td>';
+        }elsif($scheduled_roll <= $scheduled_range){
+            print '<td>',"$scheduled_roll",' -- ', "$scheduled_range",'</td>';
+        }else{
+            print '<td>',"$scheduled_range",' -- ', "$scheduled_roll",'</td>';
+        }
+
 	print "</th><td>$scheduled_roll";
+
         print '</td></tr>';
 
 	print '<tr><td></td>';
@@ -6323,8 +6358,21 @@ if($sp_user eq 'no'){
 
 	print '<td align="LEFT"><input type="text" name="DEC" value="',"$tdec",'" size="14"></td>';
 #	$target_http = "$mp_http/targets/"."$seq_nbr".'/'."$seq_nbr".'.rollvis.gif';
-	print '<th><a href="#" onClick="WindowOpen(planned_roll);return false;">Planned Roll</a>:</th><td>',"$scheduled_roll";
+#
+#--- planned roll has a range
+#
+	print '<th><a href="#" onClick="WindowOpen(planned_roll);return false;">Planned Roll</a>:</th>';
+
+	if($scheduled_roll eq '' && $scheduled_range eq ""){
+            print '<td>NA</td>';
+        }elsif($scheduled_roll <= $scheduled_range){
+            print '<td>',"$scheduled_roll",' -- ', "$scheduled_range",'</td>';
+        }else{
+            print '<td>',"$scheduled_range",' -- ', "$scheduled_roll",'</td>';
+        }
 	print '</td></tr>';
+
+
 
 	print '<tr><td></td>';
 	print '<th><a href="#" onClick="WindowOpen(dra);return false;">RA</a>:</th><td>',"$dra",'</td>';
@@ -9284,13 +9332,13 @@ sub chk_entry{
 		}
 	
 		print '<table border= "1" cellpadding="4" >';
-		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+		print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
 		foreach $ent (@out_range){
 			@atemp = split(/<->/,$ent);
 			$db_name = $atemp[0];
 			find_name();
 			print "<tr><th>$web_name ($atemp[0])</th>";
-			print "<td><font color=\"red\">$atemp[1]</font></td>";
+			print "<td style='text-align:center'><font color=\"red\">$atemp[1]</font></td>";
 			print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
 		}
 		print "</table>";
@@ -9320,13 +9368,13 @@ sub chk_entry{
 			}
 		
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
 			foreach $ent (@out_range){
 				@atemp = split(/<->/,$ent);
 				$db_name = $atemp[0];
 				find_name();
 				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></td>";
+				print "<td style='text-align:center'><font color=\"red\">$atemp[1]</font></td>";
 				print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
 			}
 	
@@ -9506,9 +9554,9 @@ sub chk_entry{
                 		print '<br />';
 			}
                 	print '<table border= "1" cellpadding="4" >';
-                	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+                	print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
                 	print "<tr><th>CCD Option Selection</th>";
-                	print "<td><font color=\"red\">";
+                	print "<td style='text-align:center'><font color=\"red\">";
 			
 			$chk = $o_cnt + $no_yes;
 			if($chk == 0){
@@ -9569,13 +9617,13 @@ sub chk_entry{
 			print '<br />';
 		
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
 				foreach $ent (@out_range){
 				@atemp = split(/<->/,$ent);
 				$db_name = $atemp[0];
 				find_name();
 				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></th>";
+				print "<td style='text-align:center'><font color=\"red\">$atemp[1]</font></th>";
 				print "<td><font color=\"green\">$atemp[2]</font></th></tr>";
 			}
 			print '</table>';
@@ -9602,24 +9650,49 @@ sub chk_entry{
 		$range_ind = 0;
 		@out_range = ();
 
+		$isdigit = 1;
+		$rline   = '';
 		foreach $in_name ('ROLL_CONSTRAINT','ROLL_180','ROLL','ROLL_TOLERANCE'){
 			$name = "$in_name".'.N';
 			$lname = lc ($name);
 			$lname2 = lc ($in_name);
 			${$lname} = ${$lname2}[$j];
 
-            $oin_name = 'orig_'."$in_name";
-            $oname = "$oin_name".'.N';
-            $olname = lc ($oname);
-            $olname2 = lc ($oin_name);
-            ${$olname} = ${$olname2}[$j];
+            		$oin_name = 'orig_'."$in_name";
+            		$oname = "$oin_name".'.N';
+            		$olname = lc ($oname);
+            		$olname2 = lc ($oin_name);
+            		${$olname} = ${$olname2}[$j];
+	
+			if(($in_name eq 'ROLL') || ($in_name eq 'ROLL_TOLERANCE')){
+				@ctemp = split(//, ${$lname});
+				foreach $etest (@ctemp){
+					if($etest =~ /\d/ || $etest =~ /\./){
+						#--- donothing;
+					}else{
+						$isdigit = 0;
+						break;
+					}
+				}
+				if(${$lname} eq ''){
+					$isdigit = 1;
+				}
+				if($isdigit == 0){
+					$rline = "$rline".'<table border=1>';
+					$rline = "$rline".'<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+					$rline = "$rline"."<tr><th>$in_name</th>";
+					$rline = "$rline"."<th style='color:red;text-align:center'>${$lname}</th>";
+					$rline = "$rline"."<th style='color:green'>number (digit & '.')</th></tr>";
+					$rline = "$rline"."</table><br />";
+				}
+			}
 		}
 
 		foreach $name ('ROLL_FLAG','ROLL_CONSTRAINT.N','ROLL_180.N','ROLL.N','ROLL_TOLERANCE.N'){
 			entry_test();			#----- check the condition
 		}
 
-		if($range_ind > 0){			# write html page about bad news
+		if($range_ind > 0 || $isdigit == 0){			# write html page about bad news
 			$error_ind += $range_ind;
 			print '<br />';
 			print '<b>Roll Order: ',"$j",'</b><br />';
@@ -9628,18 +9701,23 @@ sub chk_entry{
 				print '<br />';
 			}
 			$header_chk++;
-		
-			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-				foreach $ent (@out_range){
-				@atemp = split(/<->/,$ent);
-				$db_name = $atemp[0];
-				find_name();
-				print "<tr><th>$web_name ($atemp[0])</th>";
-				print "<td><font color=\"red\">$atemp[1]</font></th>";
-				print "<td><font color=\"green\">$atemp[2]</font></th></tr>";
+
+			if($isdigit == 0){
+				print $rline;
 			}
-			print '</table>';
+			if($range_ind > 0){	
+				print '<table border= "1" cellpadding="4" >';
+				print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+					foreach $ent (@out_range){
+					@atemp = split(/<->/,$ent);
+					$db_name = $atemp[0];
+					find_name();
+					print "<tr><th>$web_name ($atemp[0])</th>";
+					print "<td style='text-align:center'><font color=\"red\">$atemp[1]</font></th>";
+					print "<td><font color=\"green\">$atemp[2]</font></th></tr>";
+				}
+				print '</table>';
+			}
 		}
 #
 #--- preference/constraints change check
@@ -9694,10 +9772,10 @@ sub chk_entry{
 
 			$header_chk++;
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
 			if($multiple_spectral_lines =~ /n/i){
 				print '<tr><th>Multiple Spectral Lines</th>';
-				print "<td><font color='red'>$multiple_spectral_lines</td>";
+				print "<td style='text-align:center'><font color='red'>$multiple_spectral_lines</td>";
 				print '<td><font color="green">YES</td>';
 				print '</tr>';
 			}
@@ -9721,6 +9799,7 @@ sub chk_entry{
 
 	if($instrument =~ /ACIS/){
 
+		$wcnt = 0;
 		for($j = 0; $j < $aciswin_no; $j++){
 			$jj = $j + 1;
 			$range_ind       = 0;
@@ -9777,9 +9856,12 @@ sub chk_entry{
 #--- added 08/04/11
 #
 			if($chk_pha_range > 0){
-				print "<h3><font color=fuchsia > Warning: PHA_RANGE > 13:</font> <br />";
-				print "In many configurations, an Energy Range above 13 keV will risk telemetry saturation.</h3>";
-				print "<br />";
+				if($wcnt == 0){
+					print "<h3><font color=fuchsia > Warning: PHA_RANGE >= 13:</font> <br />";
+					print "In many configurations, an Energy Range above 13 keV will risk telemetry saturation.</h3>";
+					print "<br />";
+					$wcnt++;
+				}
 			}
 					
 
@@ -9796,13 +9878,13 @@ sub chk_entry{
 				$acis_order_head++;
 			
 				print '<table border= "1" cellpadding="4" >';
-				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+				print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
 				foreach $ent (@out_range){
 					@atemp = split(/<->/,$ent);
 					$db_name = $atemp[0];
 					find_name();
 					print "<tr><th>$web_name ($atemp[0])</th>";
-					print "<td><font color=\"red\">$atemp[1]</font></td>";
+					print "<td style='text-align:center'><font color=\"red\">$atemp[1]</font></td>";
 					print "<td><font color=\"green\">$atemp[2]</font></td></tr>";
 				}
 				print '</table>';
@@ -9836,9 +9918,9 @@ sub chk_entry{
 
 					if($do_not_repeat != 1){
                                         	print '<table border= "1" cellpadding="4" >';
-                                        	print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
+                                        	print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
                                         	print "<tr><th>Energy Filter Lowest Energy</th>";
-                                        	print "<td><font color=\"red\">\>0.5 keV </td>";
+                                        	print "<td style='text-align:center'><font color=\"red\">\>0.5 keV </td>";
                                         	print "<td><font color=\"green\">Spatial Window param  must be filled";
                                         	print "<br />(just click PREVIOUS PAGE)</td>";
                                         	print '</table>';
@@ -9861,8 +9943,8 @@ sub chk_entry{
 				}
 
 				print '<table border= "1" cellpadding="4" >';
-				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-				print "<tr><th>ACIS Lowest Threshold</th><td><font color=\"red\">$lower_threshold[$j]</font></th>";
+				print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+				print "<tr><th>ACIS Lowest Threshold</th><td style='text-align:center'><font color=\"red\">$lower_threshold[$j]</font></th>";
 				print "<td><font color=\"green\">lower_threshold must be larger than or equal to eventfilter_lower ($eventfilter_lower)</tr></tr>";
 				print '</table>';
 			}
@@ -9880,8 +9962,8 @@ sub chk_entry{
 				}
 
 				print '<table border= "1" cellpadding="4" >';
-				print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-				print "<tr><th>ACIS Energy Range</th><td><font color=\"red\">$pha_range[$j]</font></th>";
+				print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+				print "<tr><th>ACIS Energy Range</th><td style='text-align:center'><font color=\"red\">$pha_range[$j]</font></th>";
 				print "<td><font color=\"green\">energy_range must be smaller than or equal to eventfilter_higher ($eventfilter_higher)</tr></tr>";
 				print '</table>';
 			}
@@ -9901,8 +9983,8 @@ sub chk_entry{
 			}
 			$header_chk++;
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Monitor Flag</th><td><font color=\"red\">$monitor_flag</font></th>";
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+			print "<tr><th>Monitor Flag</th><td style='text-align:center'><font color=\"red\">$monitor_flag</font></th>";
 			print "<td><font color=\"green\">A monitor_flag must be NULL or change group_id</th></tr>";
 			print '</table>';
 
@@ -9913,8 +9995,8 @@ sub chk_entry{
 			}
 			$header_chk++;
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Monitor Flag</th><td><font color=\"red\">$monitor_flag</font></th>";
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+			print "<tr><th>Monitor Flag</th><td style='text-align:center'><font color=\"red\">$monitor_flag</font></th>";
 			print "<td><font color=\"green\">A monitor_flag must be NULL or add pre_min_lead and pre_max_lead</th></tr>";
 			print '</table>';
 		}
@@ -9929,8 +10011,8 @@ sub chk_entry{
 			}
 			$header_chk++;
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Group ID</th><td><font color=\"red\">$group_id</font></th>";
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+			print "<tr><th>Group ID</th><td style='text-align:center'><font color=\"red\">$group_id</font></th>";
 			print "<td><font color=\"green\">A group id must be NULL or change monitor_flag</th></tr>";
 			print '</table>';
 
@@ -9941,8 +10023,8 @@ sub chk_entry{
 			}
 			$header_chk++;
 			print '<table border= "1" cellpadding="4" >';
-			print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-			print "<tr><th>Group ID</th><td><font color=\"red\">$group_id</font></th>";
+			print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+			print "<tr><th>Group ID</th><td style='text-align:center'><font color=\"red\">$group_id</font></th>";
 			print "<td><font color=\"green\">A group_id must be NULL or add pre_min_lead and pre_max_lead</th></tr>";
 			print '</table>';
 		}
@@ -9956,8 +10038,8 @@ sub chk_entry{
 		}
 		$header_chk++;
 		print '<table border= "1" cellpadding="4" >';
-		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-		print "<tr><th>Follows ObsID#</th><td><font color=\"red\">$pre_id</font></th>";
+		print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+		print "<tr><th>Follows ObsID#</th><td style='text-align:center'><font color=\"red\">$pre_id</font></th>";
 		print "<td><font color=\"green\">pre_id must be different from the ObsID of this observation ($obsid) </th></tr>";
 		print '</table>';
 	}
@@ -9970,8 +10052,8 @@ sub chk_entry{
 		}
 		$header_chk++;
 		print '<table border= "1" cellpadding="4" >';
-		print '<tr><th>Parameter</th><th>Value</th><th>Possible Values</th></tr>';
-		print "<tr><th>Min Int</th><td><font color=\"red\">$pre_min_lead</font></th>";
+		print '<tr><th>Parameter</th><th>Requested Value</th><th>Possible Values</th></tr>';
+		print "<tr><th>Min Int</th><td style='text-align:center'><font color=\"red\">$pre_min_lead</font></th>";
 		print "<td><font color=\"green\">pre_min_lead must be smaller than pre_max_lead ($pre_max_lead)</th></tr>";
 		print '</table>';
 	}
@@ -10069,7 +10151,11 @@ sub print_pwarning{
         }else{
             print "<tr><td style='text-align:center'><b>$web_name ($uvname)</b></td>";
         }
-        print "<td style='text-align:center'>$o_val</td>";
+	$eo_val = $o_val;
+	if($o_val =~ /\'/){
+		$eo_val = $blank;
+	}
+        print "<td style='text-align:center'>$eo_val</td>";
         print "<td style='text-align:center'>$n_val</td></tr>";
     }
     print '</tr></table>';
@@ -10093,7 +10179,7 @@ sub entry_test{
 	@ctemp = split(//, ${$uname});			
 	OUTER:
 	foreach $comp (@ctemp){
-		if($comp eq '+' || $comp eq '-' || $comp =~/\d/ || $comp =~ /./){
+		if($comp eq '+' || $comp eq '-' || $comp =~/\d/ || $comp =~ /\./){
 			$digit = 1;
 		}else{
 			$digit = 0;
@@ -10105,14 +10191,14 @@ sub entry_test{
 #----- if there any conditions, procceed to check the condtion
 #--------------------------------------------------------------
 
-	unless(${condition.$name}[0]  eq 'OPEN' || ${$uname} eq '' || ${$uname} =~/\s/){
+	unless(${condition.$name}[0]  =~ /OPEN/i){
 		$rchk = 0;				# comparing the data to the value range
 
 #--------------------------------------------
 #----- for the case that the condition is CDO
 #--------------------------------------------
 
-		if(${condition.$name}[0] eq 'CDO'){
+		if(${condition.$name}[0] =~ /CDO/i){
 			$original = "orig_$uname";
 			if(${$original} ne ${$uname}){
 				@{same.$name} = @{condition.$name};
@@ -10122,7 +10208,11 @@ sub entry_test{
 #
 #--- keep CDO warning
 #
-				$wline = "$uname is changed from $original} to  ${$uname}";
+				if($original =~ /\s+/ || $original eq ''){
+					$wline = "$uname is changed from $blank} to  ${$uname}";
+				}else{
+					$wline = "$uname is changed from $original} to  ${$uname}";
+				}
 				push(@cdo_warning, $wline);
 				$cdo_w_cnt++;
 			}
@@ -10130,21 +10220,36 @@ sub entry_test{
 
 		OUTER:
 		foreach $ent (@{condition.$name}){
-
 #---------------------------------------------
 #---- check whether condition is value ranges
 #---------------------------------------------
 
 			@atemp = split(/\(/,$ent);	# the range is numbers
+			if($ent =~ /NULL/i && (${$uname} eq '' || ${$uname}=~ /\s+/)){
+				$rchk = 0;
+				last OUTER;
+			}			
 
-			if($ent eq 'NULL' || $ent eq 'CDO' || $ent eq 'DEFAULT'){
-				if(${$uname} eq $ent){
+			if($ent =~ /NULL/i || $ent =~ /CDO/i || $ent =~ /DEFAULT/i){
+				if(${$uname} =~ /$ent/){
 					$rchk = 0;
 					last OUTER;
 				}
+			}elsif($ent =~  /MUST/i){
+				if(${$uname} eq '' || ${$uname} =~ /NULL/i || ${$uname} =~ /\s+/){
+					$rchk++;
+				}else{
+					$rchk =0;
+				}
+				last OUTER;
 			}elsif($atemp[1] eq '+' || $atemp[1] eq '-' || $atemp[1] =~ /\d/){
 				@btemp = split(/\)/, $atemp[1]);
 				@data  = split(/<>/, $btemp[0]);
+				if($digit == 0){
+					$digit = 1;
+					$rchk++;
+					last OUTER;
+				}
 				if($digit == 1 && (${$uname} <  $data[0] || ${$uname} > $data[1])){
 					$rchk++;
 					last OUTER;
@@ -10154,15 +10259,16 @@ sub entry_test{
 #---- check whether there is a special restriction
 #--------------------------------------------------
 
-			}elsif($ent eq 'REST'){		# it has a special restriction
+			}elsif(($ent =~ /REST/i) && ( ${$uname} ne '' || ${$uname} !~/\s/)){		# it has a special restriction
 					$rchk = 0;
+					last OUTER;
 			}else{
 
 #----------------------------------------------
 #---- check the case that the condition is word
 #----------------------------------------------
 
-				if($digit == 0){	# the condition is in words
+				if($digit == 0 && ${$uname} ne '' && ${$uname} !~/\s+/){	# the condition is in words
 					$rchk++;
 					if(${$uname} eq $ent){
 						$rchk = 0;
@@ -10194,6 +10300,9 @@ sub entry_test{
 			if($digit == 0){
 				$line = "$name<->${$uname}<->@{condition.$name}";
 				$sind = 0;
+				if(${condition.$name}[0] =~ /MUST/){
+					$line = "$name<->${$uname}<-> 'Must Have a Value'";
+				}
 				@{same.$name}      = @{condition.$name};
 
 #-----------------------------------------------------------------
@@ -10209,7 +10318,7 @@ sub entry_test{
 				@{condition.$name}= @{same.$name};
 			}else{
 				@{same.$name}      = @{condition.$name};
-				if(${condition.$name}[0] eq 'NULL'){
+				if(${condition.$name}[0] =~ /NULL/i){
 					$add = 'NULL '."$data[0]<-->$data[1]";
 				}else{
 					$add = "$data[0]<---->$data[1]";
@@ -10229,13 +10338,15 @@ sub entry_test{
 #---- the value is in the range, but still want to check restrictions
 #--------------------------------------------------------------------
 
-			$sind = 0;			
-			restriction_check();		#----- sub to check an extra restriction
-			if($sind >  0){
-				$range_ind++;
-				$line = "$name<->${$uname}<->$add";
-				push(@out_range,$line);
-				@{condition.$name}= @{same.$name};
+			if( ${$uname} ne '' && ${$uname} !~/\s+/){
+				$sind = 0;			
+				restriction_check();		#----- sub to check an extra restriction
+				if($sind >  0){
+					$range_ind++;
+					$line = "$name<->${$uname}<->$add";
+					push(@out_range,$line);
+					@{condition.$name}= @{same.$name};
+				}
 			}
 		}
 
@@ -10505,7 +10616,7 @@ sub entry_test{
 				@{condition.$name} = @{same.$name};
 				$rchk++;
 #
-#---CDO warning
+#---CDO warnine
 #
 				$wline = "$name<->${$uname}";
 				push(@cdo_warning, $wline);
@@ -10739,12 +10850,11 @@ sub read_range{
 		@line = ();
 		shift(@atemp);
 
+
 		foreach $ent (@atemp){		  		# pick up only real entries
 				
-			unless($ent =~ /\s/ || $ent eq ''){
-				$ent = uc ($ent);
-				push(@line,$ent);
-			}
+			$ent = uc ($ent);
+			push(@line,$ent);
 		}
 
 		push(@name_array, $line[1]);	    		# name of the value
@@ -10757,6 +10867,10 @@ sub read_range{
 
 		}elsif($line[2] eq 'REST'){	     		# the case which restriction attached
 			@{condition.$line[1]} = ('REST');
+			${cndno.$line[1]}++;
+
+		}elsif($line[2] eq 'MUST'){	     		# the case which restriction attached
+			@{condition.$line[1]} = ('MUST');
 			${cndno.$line[1]}++;
 
 		}else{				  		# check the range of the value
@@ -10998,16 +11112,19 @@ sub submit_entry{
 					$nameagain     = 'WINDOW_CONSTRAINT'."$j";
 					$current_entry = $window_constraint[$j];
 					$old_value     = $orig_window_constraint[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTART'."$j";
 					$current_entry = $tstart[$j];
 					$old_value     = $orig_tstart[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTOP'."$j";
 					$current_entry = $tstop[$j];
 					$old_value     = $orig_tstop[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -11023,21 +11140,25 @@ sub submit_entry{
 					$nameagain     = 'ROLL_CONSTRAINT'."$j";
 					$current_entry = $roll_constraint[$j];
 					$old_value     = $orig_roll_constraint[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'ROLL_180'."$j";
 					$current_entry = $roll_180[$j];
 					$old_value     = $orig_roll_180[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL'."$j";
 					$current_entry = $roll[$j];
 					$old_value     = $orig_roll[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL_TOLERANCE'."$j";
 					$current_entry = $roll_tolerance[$j];
 					$old_value     = $orig_roll_tolerance[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -11209,16 +11330,19 @@ sub submit_entry{
 					$nameagain     = 'WINDOW_CONSTRAINT'."$j";
 					$current_entry = $window_constraint[$j];
 					$old_value     = $orig_window_constraint[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTART'."$j";
 					$current_entry = $tstart[$j];
 					$old_value     = $orig_tstart[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTOP'."$j";
 					$current_entry = $tstop[$j];
 					$old_value     = $orig_tstop[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -11233,21 +11357,25 @@ sub submit_entry{
 					$nameagain     = 'ROLL_CONSTRAINT'."$j";
 					$current_entry = $roll_constraint[$j];
 					$old_value     = $orig_roll_constraint[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'ROLL_180'."$j";
 					$current_entry = $roll_180[$j];
 					$old_value     = $orig_roll_180[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL'."$j";
 					$current_entry = $roll[$j];
 					$old_value     = $orig_roll[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL_TOLERANCE'."$j";
 					$current_entry = $roll_tolerance[$j];
 					$old_value     = $orig_roll_tolerance[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -11398,10 +11526,20 @@ sub submit_entry{
 	print "<p>";
 	print "Username = $submitter<p>";
 
+#        print "<b>Note:</b><br />";
+        print "<b style='color:red'>New! (Jun 2014):</b><br />";
+        print "<p style='padding-bottom:20px'>";
+        print "If you see a <span style='color:red'>&lt;Blank&gt;</span> in the \"Original Value\" Column below, ";
+        print "it is because you requested to add a value on a \"Blank\" space. ";
+        print "The \"Blank\" space in <em>Ocat Data Page</em> could mean \"empty string\", \"NULL\", or even \"0\" value in the database. ";
+        print "If you requested to change any non-\"Blank\" value to a \"Blank\" space, <em>arcops</em> will pass it as a \"NULL\" value.";
+        print "</p>";
 #
 #---- counter of number of changed paramters
 #
 
+	print "<table border=1 cellspacing=3>";
+	print "<th>Parameter</th><th>Original Value</th><th>Requested</th></tr>";
 	$cnt_modified = 0;
 	
 	foreach $name (@paramarray){
@@ -11461,7 +11599,7 @@ sub submit_entry{
 						$jj = $j + 1;
 						print '<spacer type=horizontal size=5>';
 #						print "ORDER $j:<br />";
-						print "ENTRY $jj:<br />";
+						$ehead = "ENTRY $jj: ";
 
 						foreach $tent ('ORDR','CHIP',
 #								'INCLUDE_FLAG',
@@ -11493,11 +11631,15 @@ sub submit_entry{
 							}
 
 							if($match_ok == 1){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								$tname = "$ehead $tent";
+								print_table_row($tname, 'same', $new_value);
 							}else{
-								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								$tname = "$ehead $tent";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tname, $blank, $new_value);
+								}else{
+									print_table_row($tname, $old_value, $new_value);
+								}
 								$k++; 		#telling asicwin has modified param!
 							}
 						}
@@ -11508,11 +11650,11 @@ sub submit_entry{
 #-------------------------------
 
 				}elsif($name =~ /TIME_ORDR/){
-					print "$name unchanged, set to $new_value<br />";
+					print_table_row($name, 'same', $new_value);
 
 					for($j = 1; $j <= $time_ordr; $j++){
-						print '<spacer type=horizontal size=5>';
-						print "ORDER $j:<br />";
+						#print '<spacer type=horizontal size=5>';
+						$ehead =  "ORDER $j: ";
 
 						foreach $tent ('WINDOW_CONSTRAINT', 'TSTART', 'TSTOP'){
 							$new_entry = lc ($tent);
@@ -11540,11 +11682,15 @@ sub submit_entry{
 							}
 
 							if($match_ok == 1){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								$tname = "$ehaad $tent";
+								print_table_row($tname, 'same', $new_value);
 							}else{
-								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								$tname = "$ehaad $tent";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tname, $blank, $new_value);
+								}else{
+									print_table_row($tname, $old_value, $new_value);
+								}
 								$m++;		#telling general change is ON
 							}
 						}
@@ -11555,11 +11701,10 @@ sub submit_entry{
 #------------------------------
 
 				}elsif($name =~ /ROLL_ORDR/){
-					print "$name unchanged, set to $new_value<br />";
-
+					print_table_row($name, 'same', $new_value);
 					for($j = 1; $j <= $roll_ordr; $j++){
-						print '<spacer type=horizontal size=5>';
-						print "ORDER $j:<br />";
+						#print '<spacer type=horizontal size=5>';
+						$ehead = "ORDER $j: ";
 
 						foreach $tent ('ROLL_CONSTRAINT', 'ROLL_180','ROLL', 'ROLL_TOLERANCE'){
 							$new_entry = lc ($tent);
@@ -11587,11 +11732,15 @@ sub submit_entry{
 							}
 
 							if($match_ok == 1){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								$tname = "$ehead $tent";
+								print_table_row($tname, 'same', $new_value);
 							}else{
-								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								$tname = "$ehead $tent";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tname, $blank, $new_value);
+								}else{
+									print_table_row($tname, $old_value, $new_value);
+								}
 								$m++;		# telling general change is ON
 							}
 						}
@@ -11602,7 +11751,7 @@ sub submit_entry{
 #----------------------
 
 				}else{
-					print "$name unchanged, set to $new_value<br />";
+					print_table_row($name, 'same', $new_value);
 				}
 
 #------------------------------------------------
@@ -11615,7 +11764,13 @@ sub submit_entry{
 #----- window order case
 #-----------------------
 				if($name eq 'ORDR'){
-					print "<FONT color=\"\#FF0000\">rank\/ORDR  changed from $old_value to $new_value</FONT><br />";
+					if($old_value =~ /\s+/ || $old_value eq ''){
+						$rent = 'rank ORDR';
+						print_table_row($rent, $blank, $new_value);
+					}else{
+						$rent = 'rank ORDR';
+						print_table_row($rent, $old_value, $new_value);
+					}
 
 					for($j = 0; $j < $aciswin_no; $j++){
 						$jj = $j + 1;
@@ -11651,11 +11806,14 @@ sub submit_entry{
 							}
 
 							if($match_ok == 1){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								print_table_row($tent, 'same', $new_value);
 							}else{
 								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tent, $old_value, $new_value);
+								}else{
+									print_table_row($tent, $old_value, $new_value);
+								}
 								$k++;		#telling aciswin param changes
 							}
 						}
@@ -11666,11 +11824,15 @@ sub submit_entry{
 #---------------------
 
 				}elsif($name =~ /TIME_ORDR/){
-					print "<FONT color=\"\#FF0000\">$name changed from $old_value to $new_value</FONT><br />";
+					if($old_value =~ /\s+/ || $old_value eq ''){
+						print_table_row($name, $blank, $new_value);
+					}else{
+						print_table_row($name, $old_value, $new_value);
+					}
 
 					for($j = 1; $j <= $time_ordr; $j++){
-					print '<spacer type=horizontal size=5>';
-					print "ORDER $j:<br />";
+					#print '<spacer type=horizontal size=5>';
+					$ehead =  "ORDER $j: ";
 
 						foreach $tent ('WINDOW_CONSTRAINT', 'TSTART', 'TSTOP'){
 							$new_entry = lc ($tent);
@@ -11698,11 +11860,15 @@ sub submit_entry{
 							}
 
 							if($match_ok == 1){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								$tname = "$ehead $tent";
+								print_table_row($tname, 'same', $new_value);
 							}else{
-								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								$tname = "$ehead $tent";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tname, $blank, $new_value);
+								}else{
+									print_table_row($tname, $old_value, $new_value);
+								}
 								$m++; 			# telling general change is ON
 							}
 						}
@@ -11711,11 +11877,15 @@ sub submit_entry{
 #----- roll order case
 #---------------------
 				}elsif($name =~ /ROLL_ORDR/){
-					print "<FONT color=\"\#FF0000\">$name changed from $old_value to $new_value</FONT><br />";
+					if($old_value =~ /\s+/ || $old_value eq ''){
+						print_table_row($name, $blank, $new_value);
+					}else{
+						print_table_row($name, $old_value, $new_value);
+					}
 
 					for($j = 1; $j <= $roll_ordr; $j++){
-					print '<spacer type=horizontal size=5>';
-					print "ORDER $j:<br />";
+					#print '<spacer type=horizontal size=5>';
+					$ehead = "ORDER $j: ";
 
 						foreach $tent ('ROLL_CONSTRAINT', 'ROLL_180', 'ROLL','ROLL_TOLERANCE'){
 							$new_entry = lc ($tent);
@@ -11724,11 +11894,15 @@ sub submit_entry{
 							$old_value = ${$old_entry}[$j];
 
 							if($new_value eq $old_value){
-								print '<spacer type=horizontal size=15>';
-								print "$tent unchanged, set to $new_value<br />";
+								$tname = "$ehead $tent";
+								print_table_row($tname, 'same', $new_value);
 							}else{
-								print '<spacer type=horizontal size=15>';
-								print "<FONT color=\"\#FF0000\">$tent changed from $old_value to $new_value</FONT><br />";
+								$tname = "$ehead $tent";
+								if($old_value =~ /\s+/ || $old_value eq ''){
+									print_table_row($tname, $blank, $new_value);
+								}else{
+									print_table_row($tname, $old_value, $new_value);
+								}
 								$m++;			# telling general change is ON
 							}
 						}
@@ -11739,10 +11913,17 @@ sub submit_entry{
 				}else{
 					if((($old_value =~ /OPT/) && ($new_value =~ /Y/))
 						|| (($old_value =~ /Y/) && ($new_value =~ /OPT/))){
-						
-						print "<FONT color=\"lime\">$name changed from $old_value to $new_value</FONT><br />";
+						if($old_value =~ /\s+/ || $old_value eq ''){
+							print_table_row($name, $blank, $new_value, 'lime');
+						}else{
+							print_table_row($name, $old_value, $new_value, 'lime');
+						}
 					}else{
-						print "<FONT color=\"\#FF0000\">$name changed from $old_value to $new_value</FONT><br />";
+						if($old_value =~ /\s+/ || $old_value eq ''){
+							print_table_row($name, $blank, $new_value);
+						}else{
+							print_table_row($name, $old_value, $new_value);
+						}
 					}
 				}
 
@@ -11765,21 +11946,48 @@ sub submit_entry{
 		}
 	}
 
+	print "</table><br />";
+
 #--------------------------------
 #----- check remarks and comment
 #--------------------------------
 
 	$tremarks      = $remarks;
+	$tremarks      =~ s/\n+//g;
+	$tremarks      =~ s/\t+//g;
 	$tremarks      =~ s/\s+//g;
 	$torig_remarks = $orig_remarks;
+	$torig_remarks =~ s/\n+//g;
+	$torig_remarks =~ s/\t+//g;
 	$torig_remarks =~ s/\s+//g;
 	
+	print "<h3>REAMARKS and COMMENTS Changes</h3>";
+
 	if($tremarks ne $torig_remarks){
-		print "<FONT color=\"\#FF0000\">REMARKS changed from<br /> $orig_remarks<br /> to<br /> $remarks</FONT><br /><br />";
+
+		if($torig_remarks ne '' && $tremarks eq ''){
+			$remarks = "ALL TEXT FROM THE REMRKS HAS BEEN DELETED";
+
+                        print "<span style='color:#FF0000'>REMARKSM</span> changed from<br /><br />";
+                        print "<span style='color:#FF0000'> $orig_remarks</span><br /> to<br />";
+                        print "<span style='color:#FF0000'> <b>$remarks</b></span><br /><br />";
+		}elsif($torig_remarks eq ''){
+                        print "<span style='color:#FF0000'>REMARKS</span> changed from<br /><br />";
+                        print "<span style='color:#FF0000'> $blank</span><br /> to<br />";
+                        print "<span style='color:#FF0000'> $remarks</span><br /><br />";
+		}else{
+                        print "<span style='color:#FF0000'>REMARKSM</span> changed from<br /><br />";
+                        print "<span style='color:#FF0000'> $orig_remarks</span><br /> to<br />";
+                        print "<span style='color:#FF0000'> $remarks</span><br /><br />";
+		}
 		$m++;			# remark is a part of general change
 		$cnt_modified++;
 	} else {
-		print "REMARKS unchanged, set to $remarks<br />";
+                if($tremarks eq ''){
+                        print "REMARKS unchanged and there is no remark.<br /><br />";
+                }else{
+                        print "REMARKS unchanged, set to <br /><br />$remarks<br /><br />";
+                }
 	}
 
 #	$tmp_remarks       = $mp_remarks;
@@ -11794,24 +12002,49 @@ sub submit_entry{
 #	}
 
 	$tcomments      = $comments;
+	$tcomments      =~ s/\n+//g;
+	$tcomments      =~ s/\t+//g;
 	$tcomments      =~ s/\s+//g;
 	$torig_comments = $orig_comments;
+	$torig_comments =~ s/\n+//g;
+	$torig_comments =~ s/\t+//g;
 	$torig_comments =~ s/\s+//g;
 
 	if ($tcomments ne $torig_comments){
 		$cnt_modified++;
+		if($torig_comments ne '' && $tcomments eq ''){
+			$comments = "ALL TEXT FROM THE COMMENTS HAS BEEN DELETED";
 
-		print "<FONT color=\"\#FF0000\">COMMENTS changed from<br /> $orig_comments";
-		print"<br />to<br />";
-		print "$comments<br /></FONT>";
+                        print "<span style='color:#FF0000'>COMMENTS</span> changed from<br /><br /> ";
+                        print "<span style='color:#FF0000'>$orig_comments</span>";
+			print"<br />to<br />";
+			print "<span style='color:#FF0000'><b>$comments</b><br /></span>";
+		}elsif($torig_comments eq ''){
+                        print "<span style='color:#FF0000'>COMMENTS</span> changed from<br /><br />";
+                        print "<span style='color:#FF0000'> $blank</span>";
+			print"<br />to<br />";
+			print "<span style='color:#FF0000'>$comments<br /></span>";
+		}else{
+                        print "<span style='color:#FF0000'>COMMENTS</span> changed from<br /><br /> ";
+                        print "<span style='color:#FF0000'>$orig_comments</span>";
+			print"<br />to<br />";
+			print "<span style='color:#FF0000'>$comments<br /></span>";
+		}
 	} else {
-		print "COMMENTS unchanged, set to $comments<br />";
+                if($tcomments eq ''){
+                        print "COMMENTS unchanged and there is no comment.<br />";
+                }else{
+                        print "COMMENTS unchanged, set to<br /><br /> $comments<br />";
+                }
 	}
 
 	print "<br />";
 	if($wrong_si == 0){
-		print "<b>If these values are correct, click the FINALIZE button.<br />";
-		print "Otherwise, use the previous page button to edit.</b><br />";
+		print "<br /><hr />";
+		print "<p style='padding-top:15px;padding-bottom:5px'>";
+		print "<strong>If these values are correct, click the FINALIZE button.<br />";
+		print "Otherwise, use the previous page button to edit.</strong><br />";
+		print "</p>";
 	}
 	$j = 0;
 
@@ -11876,6 +12109,7 @@ sub submit_entry{
 		}
 	}
 	print "<input type=\"SUBMIT\" name =\"Check\"  value=\"PREVIOUS PAGE\">";
+	print "<div style='padding-bottom:30px'></div>";
 	print "</form></body></html>";
 
 #---------------------------------
@@ -11931,7 +12165,7 @@ sub submit_entry{
 
 		unless (($name =~/ORIG/) || ($name =~/OBSID/) || ($name =~/USER/) || ($name =~/COMMENTS/) || ($name =~/ACISTAG/) 
 			|| ($name =~/GENERALTAG/) || ($name =~/SITAG/) || ($name eq "RA") || ($name eq "DEC")
-			|| ($name eq 'ASIS')){
+			|| ($name eq 'ASIS') || ($name eq 'REMARKS')){
 
 			$a         = 0;
 			$aw        = 0;
@@ -11942,7 +12176,11 @@ sub submit_entry{
 			$old_value = ${$old_entry};
 			$test1     = $new_value;
 			$test2     = $old_value;
+			$test1     =~ s/\n+//g;
+			$test1     =~ s/\t+//g;
 			$test1     =~ s/\s+//g;
+			$test2     =~ s/\n+//g;
+			$test2     =~ s/\t+//g;
 			$test2     =~ s/\s+//g;
 
 #-------------------------------------
@@ -11952,13 +12190,21 @@ sub submit_entry{
 			unless ($test1 eq $test2){
 				foreach $param3 (@acisarray){
 					if ($name eq $param3){
-						$aline = "$name changed from $old_value to $new_value\n";
+						if($test2 eq ''){
+							$aline = "$name changed from $blank2 to $new_value\n";
+						}else{
+							$aline = "$name changed from $old_value to $new_value\n";
+						}
 						push(@alines,$aline);
 						$a++;
 					}
 				}
 				if ($a == 0){
-					print FILE "$name changed from $old_value to $new_value\n";
+					if($test2 eq ''){
+						print FILE "$name changed from $blank2 to $new_value\n";
+					}else{
+						print FILE "$name changed from $old_value to $new_value\n";
+					}
 					$j++;
 				}
 			}
@@ -11978,7 +12224,11 @@ sub submit_entry{
 
 					if($new_value ne $old_value){
 						print FILE  "time_ordr= $j: ";
-						print FILE  "$tent changed from $old_value to $new_value\n";
+						if($old_value =~ /\s+/ || $old_value eq ''){
+							print FILE  "$tent changed from $blank2 to $new_value\n";
+						}else{
+							print FILE  "$tent changed from $old_value to $new_value\n";
+						}
 					}
 				}
 			}
@@ -11998,7 +12248,11 @@ sub submit_entry{
 
 					if($new_value ne $old_value){
 						print FILE "roll_ordr= $j: ";
-						print FILE "$tent changed from $old_value to $new_value\n";
+						if($old_value =~ /\s+/ || $old_value eq ''){
+							print FILE "$tent changed from $blank2 to $new_value\n";
+						}else{
+							print FILE "$tent changed from $old_value to $new_value\n";
+						}
 					}
 				}
 			}
@@ -12013,7 +12267,11 @@ sub submit_entry{
 			unless ($ra == $orig_ra){
 				$ra      = $dra;
 				$orig_ra = "$orig_dra";
-				print FILE "$name changed from $orig_ra to $ra\n";
+				if($orig_ra =~ /\s+/ || $orig_ra eq ''){
+					print FILE "$name changed from $blank2 to $ra\n";
+				}else{
+					print FILE "$name changed from $orig_ra to $ra\n";
+				}
 			}   
 		}
 		if ($name eq "DEC"){
@@ -12021,7 +12279,11 @@ sub submit_entry{
 			unless ($dec == $orig_dec){
 				$dec = "$dec";
 				$orig_dec = "$orig_ddec";
-				print FILE "$name changed from $orig_dec to $dec\n";
+				if($orig_dec =~ /\s+/ || $orig_dec eq ''){
+					print FILE "$name changed from $blank2 to $dec\n";
+				}else{
+					print FILE "$name changed from $orig_dec to $dec\n";
+				}
 			}   
 		}
 	}
@@ -12053,7 +12315,11 @@ sub submit_entry{
 			$old_value = ${$old_entry}[$j];
 			if($new_value ne $old_value){
 				print FILE "acis window entry $jj: ";
-				print FILE "$tent changed from $old_value to $new_value\n";
+				if($old_value =~ /\s+/ || $old_value eq ''){
+					print FILE "$tent changed from $blank2 to $new_value\n";
+				}else{
+					print FILE "$tent changed from $old_value to $new_value\n";
+				}
 			}
 		}
 	}
@@ -12103,16 +12369,19 @@ sub submit_entry{
 					$nameagain     = 'WINDOW_CONSTRAINT'."$j";
 					$current_entry = $window_constraint[$j];
 					$old_value     = $orig_window_constraint[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTART'."$j";
 					$current_entry = $tstart[$j];
 					$old_value     = $orig_tstart[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'TSTOP'."$j";
 					$current_entry = $tstop[$j];
 					$old_value     = $orig_tstop[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -12127,21 +12396,25 @@ sub submit_entry{
 					$nameagain     = 'ROLL_CONSTRAINT'."$j";
 					$current_entry = $roll_constraint[$j];
 					$old_value     = $orig_roll_constraint[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'ROLL_180'."$j";
 					$current_entry = $roll_180[$j];
 					$old_value     = $orig_roll_180[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL'."$j";
 					$current_entry = $roll[$j];
 					$old_value     = $orig_roll[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 
 					$nameagain     = 'ROLL_TOLERANCE'."$j";
 					$current_entry = $roll_tolerance[$j];
 					$old_value     = $orig_roll_tolerance[$j];
+					check_blank_entry();
 					write (PARAMLINE);
 				}
 
@@ -12155,11 +12428,13 @@ sub submit_entry{
 					$nameagain     = 'ORDR'."$jj";
 					$current_entry = $ordr[$j];
 					$old_value     = $orig_ordr[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'CHIP'."$jj";
 					$current_entry = $chip[$j];
 					$old_value     = $orig_chip[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 #					$nameagain     = 'INCLUDE_FLAG'."$jj";
@@ -12170,43 +12445,52 @@ sub submit_entry{
 					$nameagain     = 'START_ROW'."$jj";
 					$current_entry = $start_row[$j];
 					$old_value     = $orig_start_row[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'START_COLUMN'."$jj";
 					$current_entry = $start_column[$j];
 					$old_value     = $orig_start_column[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'HEIGHT'."$jj";
 					$current_entry = $height[$j];
 					$old_value     = $orig_height[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'WIDTH'."$jj";
 					$current_entry = $width[$j];
 					$old_value     = $orig_width[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'LOWER_THRESHOLD'."$jj";
 					$current_entry = $lower_threshold[$j];
 					$old_value     = $orig_lower_threshold[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'PHA_RANGE'."$jj";
 					$current_entry = $pha_range[$j];
 					$old_value     = $orig_pha_range[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 
 					$nameagain     = 'SAMPLE'."$jj";
 					$current_entry = $sample[$j];
 					$old_value     = $orig_sample[$j];
+					check_blank_entry();
 					write(PARAMLINE);
 				}
         		}elsif($lc_name =~ /\w/){
                 		$current_entry = ${$lc_name};
+				check_blank_entry();
         			write (PARAMLINE);
         		}else{
                 		$current_entry = ${$old_name};
+				check_blank_entry();
         			write (PARAMLINE);
         		}
 
@@ -12275,6 +12559,48 @@ sub submit_entry{
 	close (ARNOLDFILE);
 	
 ####	exit(0);
+}
+
+
+#########################################################################
+##########################################################################
+##########################################################################
+
+sub print_table_row{
+	($t_name, $o_value, $n_value, $color) = @_;
+
+	if ($color eq ''){
+		$color= '#FF0000'
+	}
+	if($o_value eq 'same'){
+			print "<tr><th>$t_name</th><td style='text-align:center'>$n_value</td><td style='text-align:center;font-size:70%'>No Change</td></tr>";
+	}elsif($o_value eq $blank){
+#		print "<tr style='color:$color'><th>$t_name</th><td>&#160;</td><td style='text-align:center'>$n_value</td></tr>";
+		print "<tr style='color:$color'><th>$t_name</th><td style='text-align:center'>$blank</td><td style='text-align:center'>$n_value</td></tr>";
+	}else{
+		print "<tr style='color:$color'><th>$t_name</th><td style='text-align:center'>$o_value</td><td style='color:#FF0000;text-align:center'>$n_value</td></tr>";
+	}
+}
+
+#########################################################################
+##########################################################################
+##########################################################################
+
+sub check_blank_entry{
+        $ctest1 = $current_entry;
+        $ctest1 =~ s/\n+//g;
+        $ctest1 =~ s/\t+//g;
+        $ctest1 =~ s/\s+//g;
+        $ctest2 = $old_entry;
+        $ctest2 =~ s/\n+//g;
+        $ctest2 =~ s/\t+//g;
+        $ctest2 =~ s/\s+//g;
+
+        if($ctest1 ne ''){
+                if($ctest2 eq ''){
+                        $old_value = $blank2;
+                }
+        }
 }
 
 #########################################################################
@@ -12363,10 +12689,15 @@ sub oredit{
 				$old_value = ${$old_entry};
 				$test1 = $new_value;
 				$test2 = $old_value;
+				$test1 =~ s/\n+//g;
+				$test1 =~ s/\t+//g;
 				$test1 =~ s/\s+//g;
+				$test2 =~ s/\n+//g;
+				$test2 =~ s/\t+//g;
 				$test2 =~ s/\s+//g;
 
 				if($test1 ne $test2){
+					change_old_value_to_blank();
 					print FILE "$ent $old_value\:\:$new_value\n";
 				}
 			}
@@ -12384,6 +12715,7 @@ sub oredit{
 						$old_value = ${$old_entry}[$j];
 
 						if($new_value ne $old_value){
+							change_old_value_to_blank();
 							print FILE "\tTIME_ORDR: $J   $tent $old_value\:\:$new_value\n";
 						}
 					}
@@ -12403,6 +12735,7 @@ sub oredit{
 						$old_value = ${$old_entry}[$j];
 
 						if($new_value ne $old_value){
+							change_old_value_to_blank();
 							print FILE "\tROLL_ORDER: $j   $tent $old_value\:\:$new_value\n";
 						}
 					}
@@ -12427,6 +12760,7 @@ sub oredit{
 						$old_value = ${$old_entry}[$j];
 
 						if($new_value ne $old_value){
+							change_old_value_to_blank();
 							print FILE "\tEntry $jj   $tent $old_value\:\:$new_value\n";
 						}
 					}
@@ -12486,6 +12820,22 @@ sub oredit{
 
 	print "</body>";
 	print "</html>";
+}
+
+#####################################################################################
+######################################################################################
+######################################################################################
+
+sub change_old_value_to_blank{
+
+        $stest = $old_value;
+        $stest =~ s/\n+//g;
+        $stest =~ s/\t+//g;
+        $stest =~ s/\s+//g;
+
+        if($stest eq ''){
+                $old_value = $blank2;
+        }
 }
 
 #####################################################################################
@@ -12862,7 +13212,7 @@ sub find_planned_roll{
         while(<PFH>){
 		chomp $_;
 		@ptemp = split(/:/, $_);
-        	%{planned_roll.$ptemp[0]} = (planned_roll =>["$ptemp[1]"]);
+                %{planned_roll.$ptemp[0]} = (planned_roll =>["$ptemp[1]"], planned_range =>["$ptemp[2]"]);
 
         }
         close(PFH);

@@ -1,4 +1,4 @@
-#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
+#!/soft/ascds/DS.release/ots/bin/perl
 
 BEGIN
 {
@@ -14,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # rm_submission.cgi: remove an accidental submission from database			#
 #											#
 # 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
-#		Last Update: May  14, 2013 						#
+#		Last Update: Sept 05, 2013 						#
 # This script removes an obsid from database.    	                            	#
 #											#
 #########################################################################################
@@ -390,7 +390,7 @@ sub remve_submission{
 		}
 
     		($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) 
-					= stat "/data/udoc1/ocat/updates/$obsrev";
+					= stat "/data/mta4/CUS/www/Usint/ocat/updates/$obsrev";
 #    		($na0,$na1,$na2,$na3,$na4,$na5,$na6,$na7,$na8,$mtime,$na10,$na11,$na12) 
 #			= stat "/proj/ascwww/AXAF/extra/science/cgi-gen/mta/Obscat/ocat/updates/$obsrev";
 
@@ -564,6 +564,9 @@ sub update_info {
 #--------------------------------------------------------------------------------------------------
 
 	                        flock($update, LOCK_EX) or die "died while trying to lock the file<br />\n";
+
+				seek($update, 0, 0);
+				truncate($update, 0);
 
 	    			foreach $outline (@newoutput){
 
