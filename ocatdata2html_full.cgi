@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 
 BEGIN
 {
@@ -254,7 +254,21 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 # SYBASE link update (/soft/SYBASE15.7)
 #  (Sep 23, 2014)
+#
+# Note to window constraint (exclusion) added.
+#  (Oct 30, 2014)
 # 
+# Exposure Time is now not editable
+# (Dec 21, 2014)
+#
+# CDO warning on change of Y/Z det offset added (>10arcmin)
+# (Feb 13, 2015)
+#
+# Reordering the ranks of aciswin in increasing order
+# (Jul 17, 2015)
+#
+#  /soft/ascds/DS.release/ots/bin/perl ---> /usr/bin/perl  (accessible from cxc)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -3971,6 +3985,72 @@ sub read_databases{
 
 		$sqlh1->finish;
 
+#
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
+#
+        if($aciswin_no > 0){
+            @rlist = ();
+            for($i = 0; $i <= $aciswin_no; $i++){
+                push(@rlist, $ordr[$i]);
+            }
+            @sorted = sort{$a<=>$b} @rlist;
+            @tlist = ();
+            foreach $ent (@sorted){
+                for($i = 0; $i <= $aciswin_no; $i++){
+                    if($ent == $ordr[$i]){
+                        push(@tlist, $i);
+                    }
+                }
+            }
+        
+            @temp0 = ();
+            @temp1 = ();
+            @temp2 = ();
+            @temp3 = ();
+            @temp4 = ();
+            @temp5 = ();
+            @temp6 = ();
+            @temp7 = ();
+            @temp8 = ();
+            @temp9 = ();
+            @temp10= ();
+        
+            for($i = 0; $i <= $aciswin_no; $i++){
+                $pos = $tlist[$i];
+                if($pos == 0){
+                    last;
+                }
+                $pos--;
+        
+                push(@temp0 , $ordr[$pos]);
+                push(@temp1 , $start_row[$pos]);
+                push(@temp2 , $start_column[$pos]);
+                push(@temp3 , $width[$pos]);
+                push(@temp4 , $height[$pos]);
+                push(@temp5 , $lower_threshold[$pos]);
+                push(@temp6 , $pha_range[$pos]);
+                push(@temp7 , $sample[$pos]);
+                push(@temp8 , $chip[$pos]);
+                push(@temp9 , $include_flag[$pos]);
+                push(@temp10, $aciswin_id[$pos]);
+            }
+            @ordr            = @temp0;
+            @start_row       = @temp1;
+            @start_column    = @temp2;
+            @width           = @temp3;
+            @height          = @temp4;
+            @lower_threshold = @temp5;
+            @pha_range       = @temp6;
+            @sample          = @temp7;
+            @chip            = @temp8;
+            @include_flag    = @temp9;
+            @aciswin_id      = @temp10;
+        
+        }
+
+#------------------ Jul 14, 2015 update ends -------------------------
+
+
 
 #		OUTER:
 #		for($aciswin_no = 1; $aciswin_no < 30; $aciswin_no++){
@@ -6243,15 +6323,15 @@ if($sp_user eq 'no'){
 	print '<th><a href="#" onClick="WindowOpen(coi_contact);return false;">Observer</a>:';
 	print "</th><td> $Observer</td></tr>";
 
-	if($sp_user eq 'no'){
+#	if($sp_user eq 'no'){
 		print '<th><a href="#" onClick="WindowOpen(approved_exposure_time);return false;">Exposure Time</a>:</th>';
 		print "<td>$approved_exposure_time ks</td>";
 		print "<input type=\"hidden\" name=\"APPROVED_EXPOSURE_TIME\" value=\"$approved_exposure_time\">";
-	}else{
-		print '<th><a href="#" onClick="WindowOpen(approved_exposure_time);return false;">Exposure Time</a>:</th>';
-		print '<td align="LEFT"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
-		print "$approved_exposure_time".'" size="8"> ks</td>';
-	}
+#	}else{
+#		print '<th><a href="#" onClick="WindowOpen(approved_exposure_time);return false;">Exposure Time</a>:</th>';
+#		print '<td align="LEFT"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
+#		print "$approved_exposure_time".'" size="8"> ks</td>';
+#	}
 
 	print '<th><a href="#" onClick="WindowOpen(rem_exp_time);return false;">Remaining Exposure Time</a>:</th>';
 	print "<td>$rem_exp_time ks</td>";
@@ -8145,7 +8225,19 @@ print "$monitor_elem<br />";
                 	print 'Window Filter above is set to "YES".<br />';
                 	print 'Otherwise, all changes are automatically nullified ';
                 	print 'when you submit the changes.';
-                	print '<br /><br />';
+                        print "<p style='padding-right:300px;padding-bottom:10px'>";
+                        print '<b>NOTE</b>: All windows are now <b>"Exclusion"</b> windows. What were formerly inclusion';
+			print 'windows are just exclusion windows with a sample value of 1.';
+                        print "<br /><br />";
+			print 'For each pixel, the software looks at the specified windows in order';
+			print '(starting with 0). When it finds a window which has the pixel within';
+			print 'its range, it uses the specification in that window, ignoring later';
+			print 'windows in the list.';
+                        print "<br /><br />";
+			print 'So you want an exclusion window for the 128 x 128 rectangle, with a';
+			print 'sample value of 1, followed by an exclusion window for 1024 x 1024,';
+			print 'with a sample value of 0.';
+                	print '</p>';
 	
                 	if($eventfilter_lower > 0.5 || $awc_l_th == 1){
                         	print 'If you change one or more CCD from YES to NO or the other way around in ACIS Parameters section, ';
@@ -9236,6 +9328,70 @@ sub prep_submit{
 		elsif($include_flag[$j] eq 'EXCLUDE'){$include_flag[$j] = 'E'}
 	}
 		
+#
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
+#
+        if($aciswin_no > 0){
+            @rlist = ();
+            for($i = 0; $i <= $aciswin_no; $i++){
+                push(@rlist, $ordr[$i]);
+            }
+            @sorted = sort{$a<=>$b} @rlist;
+            @tlist = ();
+            foreach $ent (@sorted){
+                if($ent == 0){
+                    next;
+                }
+                for($i = 0; $i <= $aciswin_no; $i++){
+                    if($ent == $ordr[$i]){
+                        push(@tlist, $i);
+                    }
+                }
+            }
+        
+            @temp0 = ();
+            @temp1 = ();
+            @temp2 = ();
+            @temp3 = ();
+            @temp4 = ();
+            @temp5 = ();
+            @temp6 = ();
+            @temp7 = ();
+            @temp8 = ();
+            @temp9 = ();
+            @temp10= ();
+        
+            for($i = 0; $i <= $aciswin_no; $i++){
+                $pos = $tlist[$i];
+                push(@temp0 , $ordr[$pos]);
+                push(@temp1 , $start_row[$pos]);
+                push(@temp2 , $start_column[$pos]);
+                push(@temp3 , $width[$pos]);
+                push(@temp4 , $height[$pos]);
+                push(@temp5 , $lower_threshold[$pos]);
+                push(@temp6 , $pha_range[$pos]);
+                push(@temp7 , $sample[$pos]);
+                push(@temp8 , $chip[$pos]);
+                push(@temp9 , $include_flag[$pos]);
+                push(@temp10, $aciswin_id[$pos]);
+            }
+            @ordr            = @temp0;
+            @start_row       = @temp1;
+            @start_column    = @temp2;
+            @width           = @temp3;
+            @height          = @temp4;
+            @lower_threshold = @temp5;
+            @pha_range       = @temp6;
+            @sample          = @temp7;
+            @chip            = @temp8;
+            @include_flag    = @temp9;
+            @aciswin_id      = @temp10;
+        
+        }
+
+#------------------ Jul 14, 2015 update ends -------------------------
+
+
 #----------------------------------------------------------------
 #----------- these have different values shown in Ocat Data Page
 #----------- find database values for them
@@ -10602,6 +10758,43 @@ sub entry_test{
 			}
 		}
 
+#---------------------------------------------------------------------
+#-- y/z det offset: change must be less than equal to 10 arc min  ----
+#---------------------------------------------------------------------
+
+        if($uname =~/y_det_offset/i){
+            $ydiff = $orig_y_det_offset - $y_det_offset;
+            $zdiff = $orig_z_det_offset - $z_det_offset;
+
+            $diff = sqrt($ydiff * $ydiff + $zdiff * $zdiff);
+
+
+            if($diff >= 10){
+                @{same.$name} = @{condition.$name};
+                $wline = '1) No changes can be requested until the out of range is corrected. ';
+                $wline = "$wline".'please use the back button to correct out of range requests.<br />';
+
+                $wline = "$wline".'2) If you desire CDO approval please use the Helpdesk (link) and select ';
+                $wline = "$wline".'obscat changes.';
+
+                @{condition.$name} = ("<span style='olor:red'>$wline<\/span>");
+
+                $line = "y/z_offset<->Y/Z Offset > 10 arcmin<->@{condition.$name}";
+                push(@out_range,$line);
+                @{condition.$name}= @{same.$name};
+                $rchk++;
+#
+#---CDO warning
+#
+                $wline = "y/z_offset<->Y/Z Offset >= 10 arcmin";
+                push(@cdo_warning, $wline);
+                $cdo_w_cnt++;
+            }
+            if($rchk > 0){
+                $range_ind++;
+            }
+        }
+
 #-------------------------
 #----- multitelescope case
 #-------------------------
@@ -11527,7 +11720,6 @@ sub submit_entry{
 	print "Username = $submitter<p>";
 
 #        print "<b>Note:</b><br />";
-        print "<b style='color:red'>New! (Jun 2014):</b><br />";
         print "<p style='padding-bottom:20px'>";
         print "If you see a <span style='color:red'>&lt;Blank&gt;</span> in the \"Original Value\" Column below, ";
         print "it is because you requested to add a value on a \"Blank\" space. ";

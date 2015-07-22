@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Sep 23, 2014
+#		last update: Jan 12, 2015
 #  
 ###############################################################################
 
@@ -3136,8 +3136,11 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print "</th><td> $Observer</td></tr>";
 
 	print '<tr><th>Exposure Time:</TH>';
-	print '<td style="text-align:left"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
-	print "$approved_exposure_time".'" size="8"> ks</td>';
+#	print '<td style="text-align:left"><input type="text" name="APPROVED_EXPOSURE_TIME" value="';
+#	print "$approved_exposure_time".'" size="8"> ks</td>';
+    print "<input type='hidden' name='APPROVED_EXPOSURE_TIME' value='$approved_exposure_time'>";
+    print '<td style="text-align:left">';
+    print "$approved_exposure_time".' ks</td>';
 
 	print '<th>Remaining Exposure Time:</TH>';
 	print "<td>$rem_exp_time ks</td>";
@@ -4172,6 +4175,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 			print 'Window Filter above is set to "YES".<br />';
 		print 'Otherwise, all changes are automatically nullified ';
 		print 'when you submit the changes.';
+		print "<br /><br />";
+                print 'Note: By default: the sample rate is 0 and the window specified is an <b>EXCLUSION</b> area. To set as INCLUSION, set the sample rate to 1 in the desired window and then  an exclusion window for 1024 x 1024, with a sample value of 0.';
+                print '<br /><br />';
+
 		print '</p>';
 	
 		if($eventfilter_lower > 0.5 || $awc_l_th == 1){
