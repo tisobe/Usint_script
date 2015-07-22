@@ -1,0 +1,8 @@
+source /home/mta/.ascrc 
+rm -rf param
+mkdir param
+source /home/mta/bin/reset_param
+setenv PFILES "${PDIRS}" 
+set path = (/home/ascds/DS.release/bin/  $path)
+
+/proj/DS.ots/perl-5.10.0.SunOS5.8/bin/perl /proj/web-icxc/cgi-bin/obs_ss/make_data_list.perl

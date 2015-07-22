@@ -1,0 +1,8 @@
+source /home/mta/.ascrc 
+rm -rf param
+mkdir param
+source /home/mta/bin/reset_param
+setenv PFILES "${PDIRS}" 
+set path = (/home/ascds/DS.release/bin/  $path)
+
+perl /proj/web-icxc/cgi-bin/obs_ss/sendout_obs_info.perl
