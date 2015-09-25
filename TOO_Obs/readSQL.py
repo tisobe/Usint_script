@@ -6,7 +6,7 @@
 #                                                                                                                           #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                                           #
 #                                                                                                                           #
-#       last update: Mar 26, 2013                                                                                           #
+#       last update: Jul 10, 2015                                                                                           #
 #                                                                                                                           #
 #############################################################################################################################
 
@@ -95,7 +95,7 @@ def get_target_info(obsid, monitor, group):
 
     database = 'axafocat'
 
-    cmd = 'select group_id,pre_id,pre_min_lead,pre_max_lead,grating,type,instrument,obs_ao_str,status,seq_nbr,ocat_propid,soe_st_sched_date,lts_lt_plan,targname from target where obsid=' + str(obsid)
+    cmd = 'select group_id,pre_id,pre_min_lead,pre_max_lead,grating,type,instrument,obs_ao_str,status,seq_nbr,ocat_propid,soe_st_sched_date,lts_lt_plan,targname,object from target where obsid=' + str(obsid)
 
     targetdata   = readSQL(cmd, database)
 
@@ -113,6 +113,7 @@ def get_target_info(obsid, monitor, group):
     soe_st_sched_date = targetdata['soe_st_sched_date']
     lts_lt_plan       = targetdata['lts_lt_plan']
     targname          = targetdata['targname']
+    object            = targetdata['object']
 
     monitor_flag = 'N'
     if pre_id:
@@ -160,7 +161,7 @@ def get_target_info(obsid, monitor, group):
     out = readSQL(cmd, database)
     obs_ao_str = out['ao_str']
 
-    return (group_id, pre_id, pre_min_lead, pre_max_lead, grating, type, instrument, obs_ao_str, status, seq_nbr, ocat_propid, soe_st_sched_date, lts_lt_plan,targname)
+    return (group_id, pre_id, pre_min_lead, pre_max_lead, grating, type, instrument, obs_ao_str, status, seq_nbr, ocat_propid, soe_st_sched_date, lts_lt_plan,targname, object)
 
 
 #----------------------------------------------------------------------------------------------------------------

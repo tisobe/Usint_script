@@ -2,11 +2,11 @@
 
 #################################################################################################################
 #                                                                                                               #
-#   update_new_obs_list.py: read sot list and udate new_obs_ist, too_list, ddt_list, and obs_in_30days          #
+#   update_new_obs_list.py: read sot list and udate new_obs_ist and obs_in_30days                               #
 #                                                                                                               #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                               #
 #                                                                                                               #
-#       last update: Oct 26, 2012                                                                               #
+#       last update: Jul 13, 2015                                                                               #
 #                                                                                                               #
 #################################################################################################################
 
@@ -34,22 +34,19 @@ for ent in data:
     var  = atemp[1].strip()
     line = atemp[0].strip()
     exec "%s = %s" %(var, line)
-
 #
 #--- append path to a private folder
 #
-
 sys.path.append(bin_dir)
 sys.path.append(mta_dir)
 
 import convertTimeFormat as tcnv
 import tooddtFunctions   as tdfnc
 import readSQL           as sql
-
+import mta_common_functions as mcf
 #
 #--- check whose account, and set a path to temp location
 #
-
 user = getpass.getuser()
 user = user.strip()
 
@@ -62,7 +59,6 @@ elif user == 'html':
 else:
     temp_dir = './'
 
-
 #------------------------------------------------------------------------------------------------------
 #--- update_new_obs_list: update, new_obs_list                                                      ---
 #------------------------------------------------------------------------------------------------------
@@ -74,20 +70,14 @@ def update_new_obs_list():
     no input but data are taken from sot_ocat.out.
 
     """
-
 #
 #--- set limit to the last 30  days
 #
     [year, mon, day, hours, min, sec, weekday, yday, dst] = tcnv.currentTime('LOCAL')
     tdom = tcnv.findDOM(year, mon, day, 0, 0, 0)
     dom_limit = tdom - 30                      
+    dom_limit = tdom - 100                      
     dom30days = tdom + 30                           #---- use to find observations will happen in 30 days
-#
-#--- read currently assigned ddt/too pocs; save as dict form
-#
-
-    obsid_poc_dict = tdfnc.find_current_poc()
-
 #
 #--- read special obsid --- poc list
 #
@@ -95,13 +85,13 @@ def update_new_obs_list():
     f    = open(line, 'r')
     data = [line.strip() for line in f.readlines()]
     f.close()
+
     sp_obsid = []
     sp_user  = []
     for ent in data:
         atemp = re.split('\s+', ent)
         sp_obsid.append(atemp[0])
         sp_user.append(atemp[1])
-
 #
 #--- read database
 #
@@ -111,31 +101,43 @@ def update_new_obs_list():
     f.close()
 
     out_list = []
-
+#
+#--- read too_list and ddt_list
+#
+    line = too_dir + 'too_list'
+    fo   = open(line, 'r')
+    too  = [line.strip() for line in fo.readlines()]
+    fo.close()
+    too_dict = {}
+    for ent in too:
+        atemp = re.split('\s+', ent)
+        too_dict[atemp[2]] = ent
+    
+    line = too_dir + 'ddt_list'
+    fo   = open(line, 'r')
+    ddt  = [line.strip() for line in fo.readlines()]
+    fo.close()
+    ddt_dict = {}
+    for ent in ddt:
+        atemp = re.split('\s+', ent)
+        ddt_dict[atemp[2]] = ent
 #
 #--- open temporary writing files
 #
-    line = temp_dir + 'new_obs_list'
-    out1 = open(line, 'w')
-    line = temp_dir + 'too_list'
-    out2 = open(line, 'w')
-    line = temp_dir + 'ddt_list'
-    out3 = open(line, 'w')
-    line = temp_dir + 'obs_in_30days'
-    out4 = open(line, 'w')
-#
-#--- these two are used to update monitor list
-#
-    new_ddt_too_list   = []
-    new_ddt_too_person = []
-
+    newf = temp_dir + 'new_obs_list'
+    out1 = open(newf, 'w')
+    obsf = temp_dir + 'obs_in_30days'
+    out2 = open(obsf, 'w')
 #
 #--- start itelations
 #
     for ent in data:
-        atemp   = re.split('\^', ent)
-        status  = atemp[16].strip().lower()
-        date    = atemp[13].strip()
+        atemp  = re.split('\^', ent)
+        try:
+            status = atemp[16].strip().lower()
+            date   = atemp[13].strip()
+        except:
+            continue
 #
 #--- limit data re-checking to the last 30 days
 #
@@ -151,23 +153,22 @@ def update_new_obs_list():
         ochk = 0
         if str(date).lower() == 'null' or str(date).lower() == 'none':
             ochk = 1
-        else:
 
+        else:
             if dom > dom_limit:
                 ochk = 1
 
-        if ochk ==1  and (status == 'scheduled' or status == 'unobserved' or status == 'observed'):
+        if ochk == 1  and (status == 'scheduled' or status == 'unobserved' or status == 'observed'):
             chk   = 0
             obsid = atemp[1].strip()
 #
 #--- check this obsid is listed on a special_obsid_poc_list
 #
             sp_poc = 'na'
-	    for sval in range(0, len(sp_obsid)):
-		if obsid == sp_obsid[sval]:
-		    sp_poc = sp_user[sval]
-		    break
-
+            for sval in range(0, len(sp_obsid)):
+                if obsid == sp_obsid[sval]:
+                    sp_poc = sp_user[sval]
+                    break
 #
 #--- extract basic information
 #
@@ -175,8 +176,8 @@ def update_new_obs_list():
             groupid = []
             try:
                 (group_id, pre_id, pre_min_lead, pre_max_lead, grating, type, instrument, obs_ao_str, status, \
-                seq_nbr, ocat_propid, soe_st_sched_date, lts_lt_plan,targname) = sql.get_target_info(int(obsid), monitor,groupid)
-
+                seq_nbr, ocat_propid, soe_st_sched_date, lts_lt_plan,targname, object) = sql.get_target_info(int(obsid), monitor,groupid)
+    
                 if soe_st_sched_date is not None:
                     date = soe_st_sched_date
                     chk = 1
@@ -204,7 +205,6 @@ def update_new_obs_list():
                     oday  = int(temp[1])
                     oyear = int(temp[2])
                     dom   = tcnv.findDOM(oyear, omon, oday, 0, 0, 0)
-
 #
 #--- if it is ddt or  too, add to the list anyway
 #
@@ -216,63 +216,70 @@ def update_new_obs_list():
 #--- the observation is cleared all criteria;  prepare to print them out to files
 #
                 if chk == 1:
-    
                     pchk = 1
-		    if sp_poc != 'na':
+                else:
+                    pchk = 0
+                    continue
+    
+                if sp_poc != 'na':
 #
 #-- for the case the obsid is given a specific poc
 #
-			person = sp_poc
+                    person = sp_poc
 
-                    elif type.lower() == 'ddt' or type.lower() == 'too':
+                elif type.lower() == 'ddt' or type.lower() == 'too':
 #
 #-- too/ddt case: assign poc
 #
-                        if date == 'NA':
+                    if date == 'NA':
+                        person = 'TBD'
+                    else:
+                        try:
+                            [person, chk]  = tdfnc.find_too_ddt_poc(obsid)
+                        except:
                             person = 'TBD'
-                        else:
-                            try:
-                                person = obsid_poc_dict[int(obsid)]
-                            except:
-                                person = 'TBD'
 #
 #--- observed obsid but no poc name -- record mistake; so drop
 #
-                            if person  == 'TBD':
-                                if status == 'observed':
-                                    pchk = 0
-                                else:
-                                    person = tdfnc.find_person_in_charge(targname, grating)
-                                    new_ddt_too_list.append(int(obsid))
-                                    new_ddt_too_person.append(person)
-                    else:
+                        if person  == 'TBD':
+                            if status == 'observed':
+                                pchk = 0
+                else:
 #
 #--- none too/ddt observations
 #
-                        person = tdfnc.match_usint_person(type,grating,int(seq_nbr),instrument, targname)
-    
+                    person = tdfnc.match_usint_person(type,grating,int(seq_nbr),instrument, targname)
 #
 #--- print out to files
 #
-                    if pchk == 1:
-                        line  = type.lower() + '\t' + str(seq_nbr) + '\t' + obsid + '\t' + status  + '\t' + person + '\t' + str(obs_ao_str) + '\t' + str(date) + '\n'
-                        if person != 'TBD' and type.lower() == 'too':
-                            out2.write(line)
-                        elif person != 'TBD' and type.lower() == 'ddt':
-                            out3.write(line)
+                if pchk == 1:
+                    line  = type.lower() + '\t' + str(seq_nbr) + '\t' + obsid + '\t' + status  + '\t'   \
+                            + person + '\t' + str(obs_ao_str) + '\t' + str(date) + '\n'
+#
+#--- if it is ddt or too observation, replace the line in ddt_list or too_list
+#
+                    if type.lower() == 'ddt':
+                        try:
+                            line = ddt_dict[obsid]
+                            line = line + '\n'
+                        except:
+                            pass
 
-                        out1.write(line)
+                    if type.lower() == 'too':
+                        try:
+                            line = too_dict[obsid]
+                            line = line + '\n'
+                        except:
+                            pass
 
-                        if status != 'observed' and dom < dom30days:
-                            out4.write(line)
+                    out1.write(line)
+    
+                    if status != 'observed' and dom < dom30days:
+                        out2.write(line)
 
     out1.close()
     out2.close()
-    out3.close()
-    out4.close()
 
-    completeTask(temp_dir, too_dir, 'too_list')
-    completeTask(temp_dir, too_dir, 'ddt_list')
     completeTask(temp_dir, too_dir, 'new_obs_list')
     completeTask(temp_dir, too_dir, 'obs_in_30days')
 
@@ -304,15 +311,26 @@ def completeTask(temp_dir, outdir, lname):
 #
 #--- change the old file name to that with "~"
 #
-    oname = lname + '~'
-    cmd = 'mv ' + outdir + lname + ' ' + outdir +  oname
-    os.system(cmd)
+    test = outdir + lname
+    if mcf.chkFile(test) == 1:
+        oname = lname + '~'
+        cmd = 'mv ' + outdir + lname + ' ' + outdir +  oname
+        os.system(cmd)
 
 #
 #--- move the new one to the too_dir
 #
-    cmd = 'mv ' + temp_dir + lname + ' ' + outdir + lname
-    os.system(cmd)
+    test = temp_dir + lname
+    if mcf.chkFile(test) == 1:
+        cmd = 'mv ' + temp_dir + lname + ' ' + outdir + lname
+        os.system(cmd)
+#
+#--- if the file is empty or does not exist, copy back the old one
+#
+    test = outdir + lname
+    if mcf.isFileEmpty(test) == 0:
+       cmd = 'cp ' + outdir +  oname + ' ' + outdir + lname
+       os.system(cmd)
 
 #
 #--- check whether there are any new observations. if so, send out notification email
@@ -320,10 +338,18 @@ def completeTask(temp_dir, outdir, lname):
     lname2  = outdir + lname
     oname2  = outdir + oname
     new_ent = tdfnc.comp_two_record_lists(lname2, oname2)
+#
+#--- only "unobserved" is truely new
+#
+    cleaned_list = []
+    for ent in new_ent:
+        atemp = re.split('\s+', ent)
+        if atemp[3] == 'unobserved':
+            cleaned_list.append(ent)
 
-    if len(new_ent) > 0 and lname != 'obs_in_30days':
+    if len(cleaned_list) > 0 and lname != 'obs_in_30days':
         atemp = re.split('_list', lname)
-        tdfnc.send_email(atemp[0], new_ent)
+        tdfnc.send_email(atemp[0], cleaned_list)
 
 
 #------------------------------------------------------------------------------------------------------
@@ -379,8 +405,8 @@ if __name__ == "__main__":
 
     update_new_obs_list()
 
-    update_from_ddttoo_html()
+#    update_from_ddttoo_html()
 
-    cmd = 'chgrp mtagroup ' + too_dir + '* '
-    os.system(cmd)
+#    cmd = 'chgrp mtagroup ' + too_dir + '* '
+#    os.system(cmd)
 

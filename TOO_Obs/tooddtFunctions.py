@@ -6,7 +6,7 @@
 #                                                                                                                   #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                                   #
 #                                                                                                                   #
-#       last update: Mar 27, 2013                                                                                   #
+#       last update: Jul 10, 2015                                                                                   #
 #                                                                                                                   #
 #####################################################################################################################
 
@@ -42,8 +42,9 @@ for ent in data:
 sys.path.append(bin_dir)
 sys.path.append(mta_dir)
 
-import convertTimeFormat as tcnv
-import readSQL           as tdsql
+import mta_common_functions as mcf
+import convertTimeFormat    as tcnv
+import readSQL              as tdsql
 
 #
 #--- check whose account, and set a path to temp location
@@ -91,7 +92,7 @@ def removeDuplicate(seq, sorted='NA'):
 #--- find_person_in_charge: find who is POC today                                          ---
 #---------------------------------------------------------------------------------------------
 
-def find_person_in_charge(target, grating):
+def find_person_in_charge(target, grating, object):
 
     """
     find who is POC today. input: target and grating to handle special case
@@ -138,7 +139,8 @@ def find_person_in_charge(target, grating):
 #
     if target.lower() == 'crab':
         person_in_charge = 'ppp'
-    elif target.lower() == 'jupiter' or target.lower() == 'saturn':
+    #elif target.lower() in ['mercury', 'venus','earth','mars','jupiter','saturn', 'uranus', 'neptune', 'ploto']:
+    elif object.llwer() != 'none':
         person_in_charge = 'sjw'
     elif grating.lower() == 'letg' or grating.lower() == 'hetg':
         person_in_charge = grating.lower()
@@ -146,71 +148,62 @@ def find_person_in_charge(target, grating):
     return person_in_charge
 
 #------------------------------------------------------------------------------------------------------
-#--- find_current_poc: find who are currently assigned poc for approved too/ddt observations         --
+#--- find_current_poc: find who are currently assigned poc for observations                          --
 #------------------------------------------------------------------------------------------------------
 
-def find_current_poc():
+def find_current_poc(obsid):
 
     """
-    find who are currently assigned poc for approved too/ddt observations
-    output: dict form of obsid, poc pair
+    find who are currently assigned poc for approved observations
+    input:  obsid       --- obsid
+    output: poc         --- poc
 
     """
 
     obsid_poc_dict = {}
-
 #
 #--- new_obs_list
 #
-    line = too_dir + 'new_obs_list'
-    f    = open(line, 'r')
+    file = too_dir + 'new_obs_list'
+    obsid_poc_dict  = updata_poc_dict(obsid_poc_dict, file)
+#
+#--- ddt_list
+#
+    file = too_dir + 'ddt_list'
+    obsid_poc_dict  = updata_poc_dict(obsid_poc_dict, file)
+#
+#--- too_list
+#
+    file = too_dir + 'too_list'
+    obsid_poc_dict  = updata_poc_dict(obsid_poc_dict, file)
+
+    try:
+        poc = obsid_poc_dict[obsid]
+    except:
+        poc = 'TBD'
+
+    return poc 
+
+#---------------------------------------------------------------------------------------------
+#-- updata_poc_dict: update obsid_poc_dict from a given file                                --
+#---------------------------------------------------------------------------------------------
+
+def updata_poc_dict(obsid_poc_dict, file):
+    """
+    update obsid_poc_dict from a given file
+    input:  obsid_poc_dict  --- the original dictionary
+            file            --- the file to be read
+    outpu:  obsid_poc_dict  --- the updated dictionary
+    """
+    f    = open(file, 'r')
     data = [line.strip() for line in f.readlines()]
     f.close()
 
     for ent in data:
         atemp = re.split('\s+|\t+', ent)
-        if atemp[0].lower() == 'ddt' or atemp[0].lower() == 'too':
-            obsid_poc_dict[int(atemp[2])] = atemp[4]
-
-#
-#--- monitor_too_ddt
-#
-    monitor_dict = read_monitor_too_ddt()
-
-    for key in monitor_dict:
-        obsid_poc_dict[key] = monitor_dict[key]
-
-#
-#--- ddt_list
-#
-    try:
-        line = too_dir + 'ddt_list'
-        f    = open(line, 'r')
-        data = [line.strip() for line in f.readlines()]
-        f.close()
-    
-        for ent in data:
-            atemp = re.split('\s+|\t+', ent)
-            obsid_poc_dict[int(atemp[2])] = atemp[4]
-    except:
-        pass
-#
-#--- too_list
-#
-    try:
-        line = too_dir + 'too_list'
-        f    = open(line, 'r')
-        data = [line.strip() for line in f.readlines()]
-        f.close()
-
-        for ent in data:
-            atemp = re.split('\s+|\t+', ent)
-            obsid_poc_dict[int(atemp[2])] = atemp[4]
-    except:
-        pass
+        obsid_poc_dict[int(atemp[2])] = atemp[4]
 
     return obsid_poc_dict
-
 
 #---------------------------------------------------------------------------------------------
 #--  match_usint_person: find usint person who is in charge for the observation            ---
@@ -234,9 +227,9 @@ def match_usint_person(type, grating, seq, instrument, target):
     elif seq >= 100000 and seq < 300000:
         poc = 'sjw'
     elif seq >= 300000 and seq <390000:
-	poc = 'sjw'
+	    poc = 'sjw'
     elif seq >= 400000 and seq <490000:
-	poc = 'sjw'
+	    poc = 'sjw'
 #    elif seq >= 300000 and seq < 500000:
 #        poc = 'nraw'
     elif seq >= 500000 and seq < 600000:
@@ -704,7 +697,6 @@ def update_monitor_list(new_ddt_too_list, new_ddt_too_person, tempdir='NA'):
 #--- read the current monitor_too_ddt list
 #
     line = too_dir + 'monitor_too_ddt'
-    line = '/data/udoc1/ocat/Info_save/too_contact_info/monitor_too_ddt_test'
     f    = open(line, 'r')
     data = [line.strip() for line in f.readlines()]
     f.close()
@@ -822,7 +814,7 @@ def update_monitor_list(new_ddt_too_list, new_ddt_too_person, tempdir='NA'):
 
             f.close()
 
-            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry" isobe@head.cfa.harvard.edu'
+            cmd = 'cat ' + tempfile + ' | mailx -s"Subject: New Monitor Entry" tisobe@cfa.harvard.edu'
             os.system(cmd)
 
 
@@ -837,7 +829,6 @@ def update_list(list_name, newList):
     input: list_name (e.g., too_list, ddt_list), newList: a list of new obsids
 
     """
-
 #
 #--- save the old file
 #
@@ -865,7 +856,7 @@ def update_list(list_name, newList):
 #
         try:
             (group_id, pre_id, pre_min_lead, pre_max_lead, grating, type, instrument, obs_ao_str, status, seq_nbr, \
-             ocat_propid, soe_st_sched_date, lts_lt_plan,targname) = tdsql.get_target_info(obsid, monitor, group)
+             ocat_propid, soe_st_sched_date, lts_lt_plan,targname, object) = tdsql.get_target_info(obsid, monitor, group)
             chk = 1
         except:
             chk = 0
@@ -875,15 +866,19 @@ def update_list(list_name, newList):
 #
         if chk > 0:
 #
-#--- check whether obsid is already in monitor_list, and have assigned poc
+#--- if it is too or ddt, it gives poc, otherwise 'TBD'
+#
+            if list_name == 'too_list' or list_name == 'ddt_list':
+                [poc, cnew] = find_too_ddt_poc(obsid)
+                update_propno_poc_list(ocat_propid, poc)
+            else:
+#
+#--- if this is not ddt or too, check whether obsid is already in new_obs_list, and have assigned poc
 #--- if not, find who is the charge for the observation
 #
-            obsid_poc_dict = find_current_poc()
-            try:
-                poc = obsid_poc_dict[obsid]
-            except:
-                poc = find_person_in_charge(targname, grating)
-
+                poc = find_current_poc(obsid)
+                if poc == 'TBD':
+                    poc = find_person_in_charge(targname, grating, object)
 #
 #--- set observation date; probably soe_st_sched_date, but if not lts_lt_plan 
 #
@@ -895,24 +890,75 @@ def update_list(list_name, newList):
 #
 #--- append the new observation to the list
 #
-            line = type.lower() + '\t' + str(seq_nbr) + '\t' + str(obsid) + '\t' + status + '\t' + poc + '\t' + str(date) + '\n'
+            line = type.lower() + '\t' + str(seq_nbr) + '\t' + str(obsid) + '\t' + status + '\t' + poc + '\t' + str(obs_ao_str) +  '\t' + str(date) + '\n'
             f.write(line)
             emailList.append(line)
             new_obsid_list.append(obsid)
             new_person_list.append(poc)
 
     f.close()
-
-#
-#--- check monitor_list and update if necessary
-#
-    update_monitor_list(new_obsid_list, new_person_list)
-
 #
 #--- notify the update by email
 #
     atemp = re.split('_', list_name)
     send_email(atemp[0], emailList, temp_dir)
+
+#---------------------------------------------------------------------------------------------
+#-- update_propno_poc_list: update propno_poc_list                                         ---
+#---------------------------------------------------------------------------------------------
+
+def update_propno_poc_list(prop_no, poc):
+    """
+    update propno_poc_list
+    input:  prop_no     ---- proposal number
+            poc         ---- poc
+    output: updated propno_poc_list
+    """
+#
+#--- check whether prop_no is numeric. if not don't do anything
+#
+    try:
+        val = float(prop_no)
+    except:
+        return prop_no
+#
+#--- read the current propno_poc_list and convert it to a dic form
+#
+    file = too_dir + 'propno_poc_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+
+    prop_no_list = []
+    prop_dict    = {}
+    for ent in data:
+        atemp = re.split('<>', ent)
+        prop_no_list.append(atemp[0])
+        prop_dict[atemp[0]] = atemp[1]
+
+    try:
+#
+#--- check whether poc is already assigned to the proposal number
+#--- if not, assign the new one
+#
+        if prop_dict[prop_no] == 'TBD':
+            prop_dict[prop_no] = poc
+    except:
+#
+#--- if this is totally new proposal number, add to the list
+#
+        prop_no_list.append(prop_no)
+        prop_dict[prop_no]  = poc
+#
+#--- print out the update
+#
+    fo   = open(file, 'w')
+    
+    for pnum in prop_no_list:
+        line = str(pnum) + '<>' + prop_dict[pnum] + '\n'
+        fo.write(line)
+
+    fo.close()
 
 #---------------------------------------------------------------------------------------------
 #-- read_current_obsid: create obsid list from given table                                 ---
@@ -958,7 +1004,10 @@ def comp_two_record_lists(list1, list2):
     obsidList1 = []
     for ent in data1:
         atemp = re.split('\s+|\t+', ent)
-        obsidList1.append(atemp[2])
+	try:
+       	    obsidList1.append(atemp[2])
+	except:
+            pass
 
     f     = open(list2, 'r')
     data2 = [line.strip() for line in f.readlines()]
@@ -966,7 +1015,10 @@ def comp_two_record_lists(list1, list2):
     obsidList2 = []
     for ent in data2:
         atemp = re.split('\s+|\t+', ent)
-        obsidList2.append(atemp[2])
+	try:
+            obsidList2.append(atemp[2])
+        except:
+            pass
 
     newobsids  = list(set(obsidList1).difference(set(obsidList2)))
 
@@ -992,17 +1044,163 @@ def pick_lines(list, tags):
             if str(atemp[2]) == str(comp):
                 newentry.append(ent)
 
-
     return newentry
 
 
+#
+#---- added Dec 11, 2014 ----
+#
+
+
+#---------------------------------------------------------------------------------------------
+#-- find_too_ddt_poc: find a poc for a give obsid specifically for too or ddt              ---
+#---------------------------------------------------------------------------------------------
+
+def find_too_ddt_poc(obsid):
+    """
+    find a poc for a give obsid specifically for too or ddt
+    input:  obsid       --- obsid
+    output: [poc,chk]   --- poc and status. 0 if poc is already assigned, 1 if it is new
+    """
+#
+#--- convert obsid to string as the dictionay take only a string
+#
+    obsid = str(obsid)
+    file = too_dir + 'new_obs_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+#
+#--- create obsid - poc dictionary from the existing data
+#
+    poc_dict = {}
+    for ent in data:
+        atemp = re.split('\s+', ent)
+        if atemp[0] == 'too' or atemp[0] == 'ddt':
+            poc_dict[atemp[2]] = atemp[4]
+
+    try:
+#
+#--- for the case obsid is already in the existing list
+#
+        poc = poc_dict[obsid]
+        if poc == 'TBD':
+            poc = find_too_ddt_poc_sub(obsid)
+            return [poc, 1]
+        else:
+            return [poc, 0]
+    except:
+#
+#--- for the case obsid is not in the existing list
+#
+            poc = find_too_ddt_poc_sub(obsid)
+            return [poc, 1]
+
+#---------------------------------------------------------------------------------------------
+#-- find_too_ddt_poc_sub: find poc from obsid by reading tables.                            --
+#---------------------------------------------------------------------------------------------
+
+def find_too_ddt_poc_sub(obsid):
+    """
+    find poc from obsid by reading tables. 
+    input:  obsid   --- obsid
+    output: poc     --- poc
+
+    """
+    try:
+#
+#--- get the basic information about the observations and update the current data
+#
+        monitor = []
+        groupid = []
+        sqlinfo = tdsql.get_target_info(obsid, monitor, groupid)
+        grating = sqlinfo[4]
+        prop_no = sqlinfo[10]
+        target  = sqlinfo[13]
+        object  = sqlinfo[14]
+
+        poc = find_poc_from_propno_poc_list(grating, prop_no, target, object)
+    except:
+#
+#--- if the database is not set up for the obsid, try to another method
+#
+        poc = check_tooddt_prop_obsid_list(obsid)
+
+    return poc
+
+#---------------------------------------------------------------------------------------------
+#-- find_poc_from_propno_poc_list: find a poc from a proposal number using propno_poc_list  --
+#---------------------------------------------------------------------------------------------
+
+def find_poc_from_propno_poc_list(grating, prop_no, target, object):
+    """
+    find a poc from a proposal number using propno_poc_list
+    input:  grating     --- grating
+            prop_no     --- proposal number
+            target      --- target name
+    output: poc         --- poc
+    """
+    file = too_dir + 'propno_poc_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+
+    poc = 'TBD'
+    for ent in data:
+        atemp = re.split('<>', ent)
+        if prop_no == atemp[0]:
+            poc = atemp[1]
+            break
+#
+#--- if poc is not listed in the table, assign today's poc
+#
+    if poc == 'TBD':
+        poc = find_person_in_charge(target, grating, object)
+
+    return poc
+
+#---------------------------------------------------------------------------------------------
+#-- check_tooddt_prop_obsid_list: check intooddt_prop_obsid_list and poc                   ---
+#---------------------------------------------------------------------------------------------
+
+def check_tooddt_prop_obsid_list(obsid):
+    """
+    check whether obsid is listed intooddt_prop_obsid_list and find poc from there
+    input:  obsid   --- obsid
+    output: poc     --- poc
+    """
+
+    file = too_dir + 'tooddt_prop_obsid_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+#
+#--- find proposal # corresponding to obsid
+#
+    prop_no = 'na'
+    for ent in data:
+        mc = re.search(obsid, ent)
+        if mc is not None:
+            atemp = re.split('<>', ent)
+            prop_no = atemp[0]
+            break;
+    if prop_no == 'na':
+        poc = 'TBD'
+    else:
+#
+#--- if it finds a correspointing proposal #, try to find poc from it
+#
+        poc = find_poc_from_propno_poc_list(prop_no)
+
+    return poc
+    
 
 #-------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
 
-#    obsid_poc_dict = find_current_poc()
+#    obsid_poc_dict = find_current_poc(obsid)
 #
 #    for key in obsid_poc_dict:
 #        print str(key) + ' : '  + obsid_poc_dict[key]
@@ -1011,4 +1209,6 @@ if __name__ == "__main__":
     obs_list =[14141]
     person_list=['das']
     update_monitor_list(obs_list, person_list)
+    update_propno_poc_list('15400475', 'jeanconn')
     """
+
