@@ -1,8 +1,9 @@
-#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /usr/bin/perl 
 
 BEGIN
 {
-    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+#    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+    $ENV{SYBASE} = "/soft/SYBASE15.7";
 }
 
 use DBI;
@@ -16,7 +17,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Aug  21, 2013							#
+#		last update: Apr 24, 2015							#
 #												#
 #################################################################################################
 

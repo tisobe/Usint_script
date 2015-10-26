@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Jul 17, 2015
+#		last update: Oct 26, 2015
 #  
 ###############################################################################
 
@@ -3347,6 +3347,14 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print "$z_det_offset";
 	print '" size="12"> arcmin</td>';
 	print '</tr><tr>';
+
+    ($achipx, $achipy) = find_aiming_point($instrument, $y_det_offset, $z_det_offset);
+    print "<tr><th>Aim Point: Chip X:</th>";
+    print "<td>$achipx</td>";
+    print "<td>&#160;</td>";
+    print "<th>Chip Y:</th>";
+    print "<td>$achipy</td></tr>";
+
 	print '<th>Z-Sim:</th>';
 	print '<td style="text-align:left"><input type="text" name="TRANS_OFFSET" value="';
 	print "$trans_offset";
@@ -9484,4 +9492,43 @@ sub adjust_o_values{
     }
 }
 
+##################################################################################
+### find_aiming_point: find aiming point in pixel with offset adjustment       ###
+##################################################################################
+
+sub find_aiming_point{
+
+    ($instrument, $y_offset, $z_offset) = @_;
+
+    if ($instrument =~/ACIS-I/i){
+        $chipx  = 930.2;
+        $chipy  = 1009.6;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/ACIS-S/i){
+        $chipx  = 200.7;
+        $chipy  = 476.9;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/HRC-I/i){
+        $chipx  = 7591.0;
+        $chipy  = 7936.1;
+        $factor = 7.5901;
+
+    }elsif ($instrument =~/HRC-S/i){
+        $chipx  = 2041.0;
+        $chipy  = 9062.7;
+        $factor = 7.5901;
+    }
+#
+#--- convert offset from arcmin to acrsec then to pixels
+#
+    $chipx -= $factor * $y_offset * 60.0;
+    $chipy += $factor * $z_offset * 60.0;
+
+    $chipx  = sprintf("%.1f", $chipx);
+    $chipy  = sprintf("%.1f", $chipy);
+
+    return ($chipx, $chipy);
+}
 

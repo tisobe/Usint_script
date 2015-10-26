@@ -1,9 +1,9 @@
-#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 # R. Kilgard, Jan 30/31 2000
 # This script generates a dynamic webpage for keeping track of updates to
 # target parameters.  
 #
-# last udpated Mar. 27, 2013 (t. isobe: tisobe@cfa.harvard.edu)
+# last udpated Apr. 24, 2015 (t. isobe: tisobe@cfa.harvard.edu)
 #
 #
 
@@ -68,7 +68,7 @@ foreach $line (@revisions){
     $ftime ="$month/$day/$year";
     unless ($dutysci_status =~/NA/){
 	print "<tr>";
-#	print "<td><a href=\"http://cxc.cfa.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+#	print "<td><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocat/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 	print "<td><a href=\"https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi\?$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 	print "<td>$general_status</td><td>$acis_status</td><td>$si_mode_status</td><td><span style='color:#005C00'>$dutysci_status</span></td></tr>";
 

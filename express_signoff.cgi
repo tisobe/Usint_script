@@ -1,8 +1,9 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 
 BEGIN
 {
-    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+#    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+    $ENV{SYBASE} = "/soft/SYBASE15.7";
 } 
 
 use DBI;
@@ -18,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: Jun 05, 2014	           				#
+#	last update: Apr 24, 2015	           				#
 #										#
 #################################################################################
 

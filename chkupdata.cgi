@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 
 BEGIN
 {
@@ -19,7 +19,7 @@ use CGI qw/:standard :netscape /;
 #											#
 #	10/31/01:	first version							#
 #	07/22/02:	uninterrupt added						#
-#	last update	Sep 30, 2014							#
+#	last update	Jul 23, 2015							#
 #											#
 #########################################################################################
 
@@ -1311,6 +1311,12 @@ sub match_param{
 		}
 	}
 #
+#--- correcting order ranking. ordr may not go 1, 2, 3 .... it may go 2, 1, 3... (Jul 14, 2015)
+#
+    if($entry =~ /ordr/i){
+        $pordr = $new[$i]
+    }
+#
 #--- these two parameters are added Mar 2011, and older data don't have them; need to have a special treatment
 #
 	if($entry =~ /MULTIPLE_SPECTRAL_LINES/i || $entry =~ /SPECTRA_MAX_COUNT/i){
@@ -1365,7 +1371,12 @@ sub match_param{
 #
 			if($awin_chk > 0){
 				$ltent = lc($tent);
-				$ddat  = ${$ltent}[$it-1];
+#----- Jul 23 2015 change. this may be modified farther
+                if( $it == $ordr[$it-1]){
+				    $ddat  = ${$ltent}[$it-1];
+                }else{
+                    $ddat  = ${$ltent}[$ordr[$it]];
+                }
 				$ddat  =~ s/\s+//g;
 			}
 
@@ -1419,7 +1430,9 @@ sub match_param{
 				$comb = "$comb"."$ent";
 			}
 
-			$name[$i] = "acis window chip ordr  $end: $comb";
+			#$name[$i] = "acis window chip ordr  $end: $comb";
+			$name[$i] = "acis window chip ordr  $pordr: $comb";
+			#$name[$i] = "acis window chip set  $pordr: $comb";
 		}
 				
 		if($lname eq 'ra' || $lname eq 'dec'){

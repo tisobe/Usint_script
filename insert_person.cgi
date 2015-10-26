@@ -1,5 +1,4 @@
-#!/usr/bin/env /home/ascds/DS.release/ots/bin/perl
-
+#!/usr/bin/perl
 use DBI;
 use CGI qw/:standard :netscape /;
 
@@ -9,7 +8,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: May 14, 2013   	 						#
+#		last update: Apr 24, 2015   	 						#
 #												#
 #################################################################################################
 

@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 
 BEGIN
 {
@@ -14,7 +14,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # rm_submission.cgi: remove an accidental submission from database			#
 #											#
 # 		Author: t. isobe (tisobe@cfa.harvard.edu)				#
-#		Last Update: Sept 05, 2013 						#
+#		Last Update: Apr  24, 2015 						#
 # This script removes an obsid from database.    	                            	#
 #											#
 #########################################################################################

@@ -269,6 +269,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #  /soft/ascds/DS.release/ots/bin/perl ---> /usr/bin/perl  (accessible from cxc)
 #
+# Aimpoint Chipx and Chipy values added
+# (Oct 26, 2015)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -5350,6 +5353,14 @@ sub data_close_page{
 	print '<th><a href="#" onClick="WindowOpen(z_det_offset);return false;">Z</a>:</th>';
 	print "<td align=\"LEFT\">$z_det_offset arcmin</td>";
 	print '</tr><tr>';
+
+    ($achipx, $achipy) = find_aiming_point($instrument, $y_det_offset, $z_det_offset);
+    print "<tr><th>Aim Point: Chip X:</th>";
+    print "<td>$achipx</td>";
+    print "<td>&#160;</td>";
+    print "<th>Chip Y:</th>";
+    print "<td>$achipy</td></tr>";
+
 	print '<th><a href="#" onClick="WindowOpen(trans_offset);return false;">Z-Sim</a>:</th>';
 	print "<td align=\"LEFT\">$trans_offset mm<td>";
 	print '<th><a href="#" onClick="WindowOpen(focus_offset);return false;">Sim-Focus</a>:</th>';
@@ -6496,6 +6507,14 @@ if($sp_user eq 'no'){
 	print "$z_det_offset";
 	print '" size="12"> arcmin</td>';
 	print '</tr><tr>';
+
+    ($achipx, $achipy) = find_aiming_point($instrument, $y_det_offset, $z_det_offset);
+    print "<tr><th>Aim Point: Chip X:</th>";
+    print "<td>$achipx</td>";
+    print "<td>&#160;</td>";
+    print "<th>Chip Y:</th>";
+    print "<td>$achipy</td></tr>";
+
 	print '<th><a href="#" onClick="WindowOpen(trans_offset);return false;">Z-Sim</a>:</th>';
 	print '<td align="LEFT"><input type="text" name="TRANS_OFFSET" value="';
 	print "$trans_offset";
@@ -14138,5 +14157,46 @@ sub adjust_o_values{
 			${$d_name} = '';
 		}
 	}
+}
+
+
+##################################################################################
+### find_aiming_point: find aiming point in pixel with offset adjustment       ###
+##################################################################################
+
+sub find_aiming_point{
+
+    ($instrument, $y_offset, $z_offset) = @_;
+
+    if ($instrument =~/ACIS-I/i){
+        $chipx  = 930.2;
+        $chipy  = 1009.6;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/ACIS-S/i){
+        $chipx  = 200.7;
+        $chipy  = 476.9;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/HRC-I/i){
+        $chipx  = 7591.0;
+        $chipy  = 7936.1;
+        $factor = 7.5901;
+
+    }elsif ($instrument =~/HRC-S/i){
+        $chipx  = 2041.0;
+        $chipy  = 9062.7;
+        $factor = 7.5901;
+    }
+#
+#--- convert offset from arcmin to acrsec then to pixels
+#
+    $chipx -= $factor * $y_offset * 60.0;
+    $chipy += $factor * $z_offset * 60.0;
+
+    $chipx  = sprintf("%.1f", $chipx);
+    $chipy  = sprintf("%.1f", $chipy);
+
+    return ($chipx, $chipy);
 }
 

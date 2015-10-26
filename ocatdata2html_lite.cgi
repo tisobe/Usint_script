@@ -1,4 +1,4 @@
-#!/soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 
 BEGIN
 {
@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Jan 12, 2015
+#		last update: Oct 26, 2015
 #  
 ###############################################################################
 
@@ -2061,6 +2061,70 @@ sub read_databases{
 			$j++;
 		}
 		$aciswin_no = $j;
+#
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
+#
+        if($aciswin_no > 0){
+            @rlist = ();
+            for($i = 0; $i <= $aciswin_no; $i++){
+                push(@rlist, $ordr[$i]);
+            }
+            @sorted = sort{$a<=>$b} @rlist;
+            @tlist = ();
+            foreach $ent (@sorted){
+                for($i = 0; $i <= $aciswin_no; $i++){
+                    if($ent == $ordr[$i]){
+                        push(@tlist, $i);
+                    }
+                }
+            }
+        
+            @temp0 = ();
+            @temp1 = ();
+            @temp2 = ();
+            @temp3 = ();
+            @temp4 = ();
+            @temp5 = ();
+            @temp6 = ();
+            @temp7 = ();
+            @temp8 = ();
+            @temp9 = ();
+            @temp10= ();
+        
+            for($i = 0; $i <= $aciswin_no; $i++){
+                $pos = $tlist[$i];
+                if($pos == 0){
+                    last;
+                }
+                $pos--;
+        
+                push(@temp0 , $ordr[$pos]);
+                push(@temp1 , $start_row[$pos]);
+                push(@temp2 , $start_column[$pos]);
+                push(@temp3 , $width[$pos]);
+                push(@temp4 , $height[$pos]);
+                push(@temp5 , $lower_threshold[$pos]);
+                push(@temp6 , $pha_range[$pos]);
+                push(@temp7 , $sample[$pos]);
+                push(@temp8 , $chip[$pos]);
+                push(@temp9 , $include_flag[$pos]);
+                push(@temp10, $aciswin_id[$pos]);
+            }
+            @ordr            = @temp0;
+            @start_row       = @temp1;
+            @start_column    = @temp2;
+            @width           = @temp3;
+            @height          = @temp4;
+            @lower_threshold = @temp5;
+            @pha_range       = @temp6;
+            @sample          = @temp7;
+            @chip            = @temp8;
+            @include_flag    = @temp9;
+            @aciswin_id      = @temp10;
+        
+        }
+
+#------------------ Jul 14, 2015 update ends -------------------------
 
 		$sqlh1->finish;
 
@@ -3283,6 +3347,14 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	print "$z_det_offset";
 	print '" size="12"> arcmin</td>';
 	print '</tr><tr>';
+
+    ($achipx, $achipy) = find_aiming_point($instrument, $y_det_offset, $z_det_offset);
+    print "<tr><th>Aim Point: Chip X:</th>";
+    print "<td>$achipx</td>";
+    print "<td>&#160;</td>";
+    print "<th>Chip Y:</th>";
+    print "<td>$achipy</td></tr>";
+
 	print '<th>Z-Sim:</th>';
 	print '<td style="text-align:left"><input type="text" name="TRANS_OFFSET" value="';
 	print "$trans_offset";
@@ -4877,7 +4949,70 @@ sub prep_submit{
 		if($include_flag[$j] eq 'INCLUDE'){$include_flag[$j] = 'I'}
 		elsif($include_flag[$j] eq 'EXCLUDE'){$include_flag[$j] = 'E'}
 	}
-		
+
+#
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
+#
+        if($aciswin_no > 0){
+            @rlist = ();
+            for($i = 0; $i <= $aciswin_no; $i++){
+                push(@rlist, $ordr[$i]);
+            }
+            @sorted = sort{$a<=>$b} @rlist;
+            @tlist = ();
+            foreach $ent (@sorted){
+                if ($ent == 0){
+                    next;
+                }
+                for($i = 0; $i <= $aciswin_no; $i++){
+                    if($ent == $ordr[$i]){
+                        push(@tlist, $i);
+                    }
+                }
+            }
+        
+            @temp0 = ();
+            @temp1 = ();
+            @temp2 = ();
+            @temp3 = ();
+            @temp4 = ();
+            @temp5 = ();
+            @temp6 = ();
+            @temp7 = ();
+            @temp8 = ();
+            @temp9 = ();
+            @temp10= ();
+        
+            for($i = 0; $i <= $aciswin_no; $i++){
+                $pos = $tlist[$i];
+                push(@temp0 , $ordr[$pos]);
+                push(@temp1 , $start_row[$pos]);
+                push(@temp2 , $start_column[$pos]);
+                push(@temp3 , $width[$pos]);
+                push(@temp4 , $height[$pos]);
+                push(@temp5 , $lower_threshold[$pos]);
+                push(@temp6 , $pha_range[$pos]);
+                push(@temp7 , $sample[$pos]);
+                push(@temp8 , $chip[$pos]);
+                push(@temp9 , $include_flag[$pos]);
+                push(@temp10, $aciswin_id[$pos]);
+            }
+            @ordr            = @temp0;
+            @start_row       = @temp1;
+            @start_column    = @temp2;
+            @width           = @temp3;
+            @height          = @temp4;
+            @lower_threshold = @temp5;
+            @pha_range       = @temp6;
+            @sample          = @temp7;
+            @chip            = @temp8;
+            @include_flag    = @temp9;
+            @aciswin_id      = @temp10;
+        
+        }
+#------------------ Jul 14, 2015 update ends -------------------------
+
+
 #----------------------------------------------------------------
 #----------- these have different values shown in Ocat Data Page
 #----------- find database values for them
@@ -6087,6 +6222,44 @@ sub entry_test{
 			}
 		}
 
+#---------------------------------------------------------------------
+#-- y/z det offset: change must be less than equal to 10 arc min  ----
+#---------------------------------------------------------------------
+
+        if($uname =~/y_det_offset/i){
+            $ydiff = $orig_y_det_offset - $y_det_offset;
+            $zdiff = $orig_z_det_offset - $z_det_offset;
+        
+            $diff = sqrt($ydiff * $ydiff + $zdiff * $zdiff);
+        
+        
+            if($diff >= 10){
+                @{same.$name} = @{condition.$name};
+                $wline = '1) No changes can be requested until the out of range is corrected. ';
+                $wline = "$wline".'please use the back button to correct out of range requests.<br />';
+        
+                $wline = "$wline".'2) If you desire CDO approval please use the Helpdesk (link) and select ';
+                $wline = "$wline".'obscat changes.';
+        
+                @{condition.$name} = ("<span style='olor:red'>$wline<\/span>");
+        
+        
+                $line = "y/z_offset<->Y/Z Offset > 10 arcmin<->@{condition.$name}";
+                push(@out_range,$line);
+                @{condition.$name}= @{same.$name};
+                $rchk++;
+#
+#---CDO warning
+#
+                $wline = "y/z_offset<->Y/Z Offset >= 10 arcmin";
+                push(@cdo_warning, $wline);
+                $cdo_w_cnt++;
+            }
+            if($rchk > 0){
+                $range_ind++;
+            }
+        }
+
 #-------------------------
 #----- multitelescope case
 #-------------------------
@@ -6976,7 +7149,6 @@ sub submit_entry{
 	print "Username = $submitter</p>";
 
 #	print "<b>Note:</b><br />";
-	print "<b style='color:red'>New! (Jun 2014):</b><br />";
 	print "<p style='padding-bottom:20px'>";
 	print "If you see a <span style='color:red'>&lt;Blank&gt;</span>  in the \"Original Value\" Column below, ";
 	print "it is because you requested to add a value on a \"Blank\" space. ";
@@ -9320,4 +9492,43 @@ sub adjust_o_values{
     }
 }
 
+##################################################################################
+### find_aiming_point: find aiming point in pixel with offset adjustment       ###
+##################################################################################
+
+sub find_aiming_point{
+
+    ($instrument, $y_offset, $z_offset) = @_;
+
+    if ($instrument =~/ACIS-I/i){
+        $chipx  = 930.2;
+        $chipy  = 1009.6;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/ACIS-S/i){
+        $chipx  = 200.7;
+        $chipy  = 476.9;
+        $factor = 2.0333;
+
+    }elsif ($instrument =~/HRC-I/i){
+        $chipx  = 7591.0;
+        $chipy  = 7936.1;
+        $factor = 7.5901;
+
+    }elsif ($instrument =~/HRC-S/i){
+        $chipx  = 2041.0;
+        $chipy  = 9062.7;
+        $factor = 7.5901;
+    }
+#
+#--- convert offset from arcmin to acrsec then to pixels
+#
+    $chipx -= $factor * $y_offset * 60.0;
+    $chipy += $factor * $z_offset * 60.0;
+
+    $chipx  = sprintf("%.1f", $chipx);
+    $chipy  = sprintf("%.1f", $chipy);
+
+    return ($chipx, $chipy);
+}
 

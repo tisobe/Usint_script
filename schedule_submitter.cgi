@@ -1,4 +1,4 @@
-#!/home/ascds/DS.release/ots/bin/perl
+#!/usr/bin/perl
 use CGI qw/:standard :netscape /;
 
 #################################################################################################################
@@ -7,7 +7,7 @@ use CGI qw/:standard :netscape /;
 #														#
 #		author: t. isobe (tisobe@cfa.harvard.edu)							#
 #														#
-#		last update: Mar 27, 2013									#
+#		last update: Apr 24, 2015									#
 #														#
 #################################################################################################################
 
@@ -558,31 +558,31 @@ while(<FH>){
 
 	print  '<td>';
 	print  "<select name='$nfield'>","\n";
-	if($atemp[3] == 2009){
-		print  '<option selected> 2009</option>',"\n";
-	}else{
-		print  '<option> 2009</option>',"\n";
-	}
-	if($atemp[3] == 2010){
-		print  '<option selected> 2010</option>',"\n";
-	}else{
-		print  '<option> 2010</option>',"\n";
-	}
-	if($atemp[3] == 2011){
-		print  '<option selected> 2011</option>',"\n";
-	}else{
-		print  '<option> 2011</option>',"\n";
-	}
-	if($atemp[3] == 2012){
-		print  '<option selected> 2012</option>',"\n";
-	}else{
-		print  '<option> 2012</option>',"\n";
-	}
-	if($atemp[3] == 2013){
-		print  '<option selected> 2013</option>',"\n";
-	}else{
-		print  '<option> 2013</option>',"\n";
-	}
+#	if($atemp[3] == 2009){
+#		print  '<option selected> 2009</option>',"\n";
+#	}else{
+#		print  '<option> 2009</option>',"\n";
+#	}
+#	if($atemp[3] == 2010){
+#		print  '<option selected> 2010</option>',"\n";
+#	}else{
+#		print  '<option> 2010</option>',"\n";
+#	}
+#	if($atemp[3] == 2011){
+#		print  '<option selected> 2011</option>',"\n";
+#	}else{
+#		print  '<option> 2011</option>',"\n";
+#	}
+#	if($atemp[3] == 2012){
+#		print  '<option selected> 2012</option>',"\n";
+#	}else{
+#		print  '<option> 2012</option>',"\n";
+#	}
+#	if($atemp[3] == 2013){
+#		print  '<option selected> 2013</option>',"\n";
+#	}else{
+#		print  '<option> 2013</option>',"\n";
+#	}
 	if($atemp[3] == 2014){
 		print  '<option selected> 2014</option>',"\n";
 	}else{
@@ -597,6 +597,26 @@ while(<FH>){
 		print  '<option selected> 2016</option>',"\n";
 	}else{
 		print  '<option> 2016</option>',"\n";
+	}
+	if($atemp[3] == 2017){
+		print  '<option selected> 2017</option>',"\n";
+	}else{
+		print  '<option> 2017</option>',"\n";
+	}
+	if($atemp[3] == 2018){
+		print  '<option selected> 2018</option>',"\n";
+	}else{
+		print  '<option> 2018</option>',"\n";
+	}
+	if($atemp[3] == 2019){
+		print  '<option selected> 2019</option>',"\n";
+	}else{
+		print  '<option> 2019</option>',"\n";
+	}
+	if($atemp[3] == 2020){
+		print  '<option selected> 2020</option>',"\n";
+	}else{
+		print  '<option> 2020</option>',"\n";
 	}
 	print  '</select>';
 	print  '</td>';
@@ -687,31 +707,31 @@ while(<FH>){
 
 	print  '<td>',"\n";
 	print  "<select name='$nfield'>","\n";
-	if($atemp[6] == 2009){
-		print  '<option selected> 2009</option>',"\n";
-	}else{
-		print  '<option> 2009</option>',"\n";
-	}
-	if($atemp[6] == 2010){
-		print  '<option selected> 2010</option>',"\n";
-	}else{
-		print  '<option> 2010</option>',"\n";
-	}
-	if($atemp[6] == 2011){
-		print  '<option selected> 2011</option>',"\n";
-	}else{
-		print  '<option> 2011</option>',"\n";
-	}
-	if($atemp[6] == 2012){
-		print  '<option selected> 2012</option>',"\n";
-	}else{
-		print  '<option> 2012</option>',"\n";
-	}
-	if($atemp[6] == 2013){
-		print  '<option selected> 2013</option>',"\n";
-	}else{
-		print  '<option> 2013</option>',"\n";
-	}
+#	if($atemp[6] == 2009){
+#		print  '<option selected> 2009</option>',"\n";
+#	}else{
+#		print  '<option> 2009</option>',"\n";
+#	}
+#	if($atemp[6] == 2010){
+#		print  '<option selected> 2010</option>',"\n";
+#	}else{
+#		print  '<option> 2010</option>',"\n";
+#	}
+#	if($atemp[6] == 2011){
+#		print  '<option selected> 2011</option>',"\n";
+#	}else{
+#		print  '<option> 2011</option>',"\n";
+#	}
+#	if($atemp[6] == 2012){
+#		print  '<option selected> 2012</option>',"\n";
+#	}else{
+#		print  '<option> 2012</option>',"\n";
+#	}
+#	if($atemp[6] == 2013){
+#		print  '<option selected> 2013</option>',"\n";
+#	}else{
+#		print  '<option> 2013</option>',"\n";
+#	}
 	if($atemp[6] == 2014){
 		print  '<option selected> 2014</option>',"\n";
 	}else{
@@ -726,6 +746,26 @@ while(<FH>){
 		print  '<option selected> 2016</option>',"\n";
 	}else{
 		print  '<option> 2016</option>',"\n";
+	}
+	if($atemp[6] == 2017){
+		print  '<option selected> 2017</option>',"\n";
+	}else{
+		print  '<option> 2017</option>',"\n";
+	}
+	if($atemp[6] == 2018){
+		print  '<option selected> 2018</option>',"\n";
+	}else{
+		print  '<option> 2018</option>',"\n";
+	}
+	if($atemp[6] == 2019){
+		print  '<option selected> 2019</option>',"\n";
+	}else{
+		print  '<option> 2019</option>',"\n";
+	}
+	if($atemp[6] == 2020){
+		print  '<option selected> 2020</option>',"\n";
+	}else{
+		print  '<option> 2020</option>',"\n";
 	}
 	print  '</select>',"\n";
 	print  '</td>',"\n";
@@ -902,31 +942,31 @@ for($ic = 0; $ic < $unsigned_cnt; $ic++){
 
 	print  '<td>';
 	print  "<select name='$nfield'>","\n";
-	if($syear == 2009){
-		print  '<option selected> 2009</option>',"\n";
-	}else{
-		print  '<option> 2009</option>',"\n";
-	}
-	if($syear == 2010){
-		print  '<option selected> 2010</option>',"\n";
-	}else{
-		print  '<option> 2010</option>',"\n";
-	}
-	if($syear == 2011){
-		print  '<option selected> 2011</option>',"\n";
-	}else{
-		print  '<option> 2011</option>',"\n";
-	}
-	if($syear == 2012){
-		print  '<option selected> 2012</option>',"\n";
-	}else{
-		print  '<option> 2012</option>',"\n";
-	}
-	if($syear == 2013){
-		print  '<option selected> 2013</option>',"\n";
-	}else{
-		print  '<option> 2013</option>',"\n";
-	}
+#	if($syear == 2009){
+#		print  '<option selected> 2009</option>',"\n";
+#	}else{
+#		print  '<option> 2009</option>',"\n";
+#	}
+#	if($syear == 2010){
+#		print  '<option selected> 2010</option>',"\n";
+#	}else{
+#		print  '<option> 2010</option>',"\n";
+#	}
+#	if($syear == 2011){
+#		print  '<option selected> 2011</option>',"\n";
+#	}else{
+#		print  '<option> 2011</option>',"\n";
+#	}
+#	if($syear == 2012){
+#		print  '<option selected> 2012</option>',"\n";
+#	}else{
+#		print  '<option> 2012</option>',"\n";
+#	}
+#	if($syear == 2013){
+#		print  '<option selected> 2013</option>',"\n";
+#	}else{
+#		print  '<option> 2013</option>',"\n";
+#	}
 	if($syear == 2014){
 		print  '<option selected> 2014</option>',"\n";
 	}else{
@@ -941,6 +981,26 @@ for($ic = 0; $ic < $unsigned_cnt; $ic++){
 		print  '<option selected> 2016</option>',"\n";
 	}else{
 		print  '<option> 2016</option>',"\n";
+	}
+	if($syear == 2017){
+		print  '<option selected> 2017</option>',"\n";
+	}else{
+		print  '<option> 2017</option>',"\n";
+	}
+	if($syear == 2018){
+		print  '<option selected> 2018</option>',"\n";
+	}else{
+		print  '<option> 2018</option>',"\n";
+	}
+	if($syear == 2019){
+		print  '<option selected> 2019</option>',"\n";
+	}else{
+		print  '<option> 2019</option>',"\n";
+	}
+	if($syear == 2020){
+		print  '<option selected> 2020</option>',"\n";
+	}else{
+		print  '<option> 2020</option>',"\n";
 	}
 	print  '</select>';
 	print  '</td>';
@@ -1031,31 +1091,31 @@ for($ic = 0; $ic < $unsigned_cnt; $ic++){
 
 	print  '<td>',"\n";
 	print  "<select name='$nfield'>","\n";
-	if($eyear == 2009){
-		print  '<option selected> 2009</option>',"\n";
-	}else{
-		print  '<option> 2009</option>',"\n";
-	}
-	if($eyear == 2010){
-		print  '<option selected> 2010</option>',"\n";
-	}else{
-		print  '<option> 2010</option>',"\n";
-	}
-	if($eyear == 2011){
-		print  '<option selected> 2011</option>',"\n";
-	}else{
-		print  '<option> 2011</option>',"\n";
-	}
-	if($eyear == 2012){
-		print  '<option selected> 2012</option>',"\n";
-	}else{
-		print  '<option> 2012</option>',"\n";
-	}
-	if($eyear == 2013){
-		print  '<option selected> 2013</option>',"\n";
-	}else{
-		print  '<option> 2013</option>',"\n";
-	}
+#	if($eyear == 2009){
+#		print  '<option selected> 2009</option>',"\n";
+#	}else{
+#		print  '<option> 2009</option>',"\n";
+#	}
+#	if($eyear == 2010){
+#		print  '<option selected> 2010</option>',"\n";
+#	}else{
+#		print  '<option> 2010</option>',"\n";
+#	}
+#	if($eyear == 2011){
+#		print  '<option selected> 2011</option>',"\n";
+#	}else{
+#		print  '<option> 2011</option>',"\n";
+#	}
+#	if($eyear == 2012){
+#		print  '<option selected> 2012</option>',"\n";
+#	}else{
+#		print  '<option> 2012</option>',"\n";
+#	}
+#	if($eyear == 2013){
+#		print  '<option selected> 2013</option>',"\n";
+#	}else{
+#		print  '<option> 2013</option>',"\n";
+#	}
 	if($eyear == 2014){
 		print  '<option selected> 2014</option>',"\n";
 	}else{
@@ -1070,6 +1130,26 @@ for($ic = 0; $ic < $unsigned_cnt; $ic++){
 		print  '<option selected> 2016</option>',"\n";
 	}else{
 		print  '<option> 2016</option>',"\n";
+	}
+	if($eyear == 2017){
+		print  '<option selected> 2017</option>',"\n";
+	}else{
+		print  '<option> 2017</option>',"\n";
+	}
+	if($eyear == 2018){
+		print  '<option selected> 2018</option>',"\n";
+	}else{
+		print  '<option> 2018</option>',"\n";
+	}
+	if($eyear == 2019){
+		print  '<option selected> 2019</option>',"\n";
+	}else{
+		print  '<option> 2019</option>',"\n";
+	}
+	if($eyear == 2020){
+		print  '<option selected> 2020</option>',"\n";
+	}else{
+		print  '<option> 2020</option>',"\n";
 	}
 	print  '</select>',"\n";
 	print  '</td>',"\n";
@@ -1234,31 +1314,31 @@ for($j = 0; $j < $upper; $j++){
 
         print  '<td>',"\n";
         print  "<select name='$nfield'>","\n";
-        if($syear == 2009){
-                print  '<option selected> 2009</option>',"\n";
-        }else{
-                print  '<option> 2009</option>',"\n";
-        }
-        if($syear == 2010){
-                print  '<option selected> 2010</option>',"\n";
-        }else{
-                print  '<option> 2010</option>',"\n";
-        }
-        if($syear == 2011){
-                print  '<option selected> 2011</option>',"\n";
-        }else{
-                print  '<option> 2011</option>',"\n";
-        }
-        if($syear == 2012){
-                print  '<option selected> 2012</option>',"\n";
-        }else{
-                print  '<option> 2012</option>',"\n";
-        }
-        if($syear == 2013){
-                print  '<option selected> 2013</option>',"\n";
-        }else{
-                print  '<option> 2013</option>',"\n";
-        }
+#        if($syear == 2009){
+#                print  '<option selected> 2009</option>',"\n";
+#        }else{
+#                print  '<option> 2009</option>',"\n";
+#        }
+#        if($syear == 2010){
+#                print  '<option selected> 2010</option>',"\n";
+#        }else{
+#                print  '<option> 2010</option>',"\n";
+#        }
+#        if($syear == 2011){
+#                print  '<option selected> 2011</option>',"\n";
+#        }else{
+#                print  '<option> 2011</option>',"\n";
+#        }
+#        if($syear == 2012){
+#                print  '<option selected> 2012</option>',"\n";
+#        }else{
+#                print  '<option> 2012</option>',"\n";
+#        }
+#        if($syear == 2013){
+#                print  '<option selected> 2013</option>',"\n";
+#        }else{
+#                print  '<option> 2013</option>',"\n";
+#        }
         if($syear == 2014){
                 print  '<option selected> 2014</option>',"\n";
         }else{
@@ -1273,6 +1353,26 @@ for($j = 0; $j < $upper; $j++){
                 print  '<option selected> 2016</option>',"\n";
         }else{
                 print  '<option> 2016</option>',"\n";
+        }
+        if($syear == 2017){
+                print  '<option selected> 2017</option>',"\n";
+        }else{
+                print  '<option> 2017</option>',"\n";
+        }
+        if($syear == 2018){
+                print  '<option selected> 2018</option>',"\n";
+        }else{
+                print  '<option> 2018</option>',"\n";
+        }
+        if($syear == 2019){
+                print  '<option selected> 2019</option>',"\n";
+        }else{
+                print  '<option> 2019</option>',"\n";
+        }
+        if($syear == 2020){
+                print  '<option selected> 2020</option>',"\n";
+        }else{
+                print  '<option> 2020</option>',"\n";
         }
         print  '</select>',"\n";
         print  '</td>';
@@ -1363,31 +1463,31 @@ for($j = 0; $j < $upper; $j++){
 
         print  '<td>',"\n";
         print  "<select name='$nfield'>","\n";
-        if($eyear == 2009){
-                print  '<option selected> 2009</option>',"\n";
-        }else{
-                print  '<option> 2009</option>',"\n";
-        }
-        if($eyear == 2010){
-                print  '<option selected> 2010</option>',"\n";
-        }else{
-                print  '<option> 2010</option>',"\n";
-        }
-        if($eyear == 2011){
-                print  '<option selected> 2011</option>',"\n";
-        }else{
-                print  '<option> 2011</option>',"\n";
-        }
-        if($eyear == 2012){
-                print  '<option selected> 2012</option>',"\n";
-        }else{
-                print  '<option> 2012</option>',"\n";
-        }
-        if($eyear == 2013){
-                print  '<option selected> 2013</option>',"\n";
-        }else{
-                print  '<option> 2013</option>',"\n";
-        }
+#        if($eyear == 2009){
+#                print  '<option selected> 2009</option>',"\n";
+#        }else{
+#                print  '<option> 2009</option>',"\n";
+#        }
+#        if($eyear == 2010){
+#                print  '<option selected> 2010</option>',"\n";
+#        }else{
+#                print  '<option> 2010</option>',"\n";
+#        }
+#        if($eyear == 2011){
+#                print  '<option selected> 2011</option>',"\n";
+#        }else{
+#                print  '<option> 2011</option>',"\n";
+#        }
+#        if($eyear == 2012){
+#                print  '<option selected> 2012</option>',"\n";
+#        }else{
+#                print  '<option> 2012</option>',"\n";
+#        }
+#        if($eyear == 2013){
+#                print  '<option selected> 2013</option>',"\n";
+#        }else{
+#                print  '<option> 2013</option>',"\n";
+#        }
         if($eyear == 2014){
                 print  '<option selected> 2014</option>',"\n";
         }else{
@@ -1402,6 +1502,26 @@ for($j = 0; $j < $upper; $j++){
                 print  '<option selected> 2016</option>',"\n";
         }else{
                 print  '<option> 2016</option>',"\n";
+        }
+        if($eyear == 2017){
+                print  '<option selected> 2017</option>',"\n";
+        }else{
+                print  '<option> 2017</option>',"\n";
+        }
+        if($eyear == 2018){
+                print  '<option selected> 2018</option>',"\n";
+        }else{
+                print  '<option> 2018</option>',"\n";
+        }
+        if($eyear == 2019){
+                print  '<option selected> 2019</option>',"\n";
+        }else{
+                print  '<option> 2019</option>',"\n";
+        }
+        if($eyear == 2020){
+                print  '<option selected> 2020</option>',"\n";
+        }else{
+                print  '<option> 2020</option>',"\n";
         }
         print  '</select>',"\n";
         print  '</td>',"\n";

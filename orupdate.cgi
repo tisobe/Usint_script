@@ -1,8 +1,9 @@
-#!/usr/bin/env /soft/ascds/DS.release/ots/bin/perl
+#!/usr/bin/env /usr/bin/perl
 
 BEGIN
 {
-    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+#    $ENV{SYBASE} = "/soft/SYBASE_OCS15.5";
+    $ENV{SYBASE} = "/soft/SYBASE15.7";
 }
 
 use DBI;
@@ -93,6 +94,12 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 # T. Isobe Oct  7, 2013									#
 #    end_body cgi system function commented out						#
+#											#
+# T. Isobe Sep 23, 2014									#
+#    sybase update (/soft/SYBASE15.7)							#
+#
+# T. Isobe Apr 24, 2015
+# /soft/ascds/DS.release/ots/bin/perl ---> /usr/bin/perl (make accessible from cxc)
 #											#
 #########################################################################################
 
