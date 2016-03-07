@@ -6,7 +6,7 @@
 #                                                                                                               #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                               #
 #                                                                                                               #
-#       last update: Mar 02, 2016                                                                               #
+#       last update: Mar 07, 2016                                                                               #
 #                                                                                                               #
 #################################################################################################################
 
@@ -75,20 +75,6 @@ def update_ddt_too():
     [year, mon, day, hours, min, sec, weekday, yday, dst] = tcnv.currentTime('LOCAL')
     tdom = tcnv.findDOM(year, mon, day, 0, 0, 0)
     dom_limit = tdom - 60                      
-#
-#--- read special obsid --- poc list
-#
-    line = too_dir + 'special_obsid_poc_list'
-    f    = open(line, 'r')
-    data = [line.strip() for line in f.readlines()]
-    f.close()
-
-    sp_obsid = []
-    sp_user  = []
-    for ent in data:
-        atemp = re.split('\s+', ent)
-        sp_obsid.append(atemp[0])
-        sp_user.append(atemp[1])
 
 #
 #--- read too_list and ddt_list and make obsid <---> poc dictionary
@@ -126,7 +112,23 @@ def update_ddt_too():
              poc_dict[obsid] = atemp[4] 
 
         ctoo.append(obsid)
-    
+#
+#--- poc list from the prop numbers<---> poc relation
+#
+    [obsid_list, poc_list] = make_obsid_poc_list()
+    for k in range(0, len(obsid_list)):
+        poc_dict[obsid_list[k]] = poc_list[k]
+#
+#--- read special obsid --- poc list
+#
+    line = too_dir + 'special_obsid_poc_list'
+    f    = open(line, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+
+    for ent in data:
+        atemp = re.split('\s+', ent)
+        poc_dict[atemp[0]] = atemp[1]
 #
 #--- read database
 #
@@ -193,27 +195,13 @@ def update_ddt_too():
             except:
                 person = 'TBD'
 #
-#--- check this obsid is listed on a special_obsid_poc_list
-#
-            if person == 'TBD':
-                sp_poc = 'na'
-                for sval in range(0, len(sp_obsid)):
-                    if obsid == sp_obsid[sval]:
-                        sp_poc = sp_user[sval]
-                        break
-#
-#-- for the case the obsid is given a specific poc
-#
-                if sp_poc != 'na':
-                    person = sp_poc
-#
 #--- it is new; so assigned today's poc
 #
-                else:
-                    try:
-                        [person, chk]  = tdfnc.find_too_ddt_poc(obsid)
-                    except:
-                        pass
+            if person == 'TBD':
+                try:
+                    person = find_person_in_charge()
+                except:
+                    pass
 
             line = str(type) + '\t'
             line = line + str(seq_no) + '\t'
@@ -279,8 +267,101 @@ def update_ddt_too():
         cmd = 'rm ' + out
         os.system(cmd)
 
-            
                 
+#------------------------------------------------------------------------------------------------------
+#-- make_obsid_poc_list: find poc for obsid based on proposal number                               ----
+#------------------------------------------------------------------------------------------------------
+
+def make_obsid_poc_list():
+    """
+    find poc for obsid based on proposal number
+    input:  none, but read from propno_poc_list and tooddt_prop_obsid_list
+    ouptut: obsid_list  --- a list of obsids
+            poc_list    --- a list of poc corresponding to bosid
+    """
+
+    file = too_dir + 'propno_poc_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+
+    prop_list = {}
+    for ent in data:
+        atemp = re.split('<>', ent)
+        prop_list[atemp[0]] = atemp[1]
+
+    file = too_dir + 'tooddt_prop_obsid_list'
+    f    = open(file, 'r')
+    data = [line.strip() for line in f.readlines()]
+
+    obsid_list = []
+    poc_list   = []
+    for ent in data:
+        atemp = re.split('<>', ent)
+        prop  = atemp[0]
+        try:
+            poc = prop_list[prop]
+        except:
+            continue
+
+        btemp = re.split(':', atemp[1])
+        for num in btemp:
+            obsid_list.append(num)
+            poc_list.append(poc)
+
+
+    return [ obsid_list, poc_list]
+
+
+#------------------------------------------------------------------------------------------------------
+#-- find_person_in_charge: find who is POC today                                                -------
+#------------------------------------------------------------------------------------------------------
+
+def find_person_in_charge():
+
+    """
+    find who is POC today. 
+    input:  none but read from this_week_person_in_charge
+    output: person_in_charge  --- poc for today
+
+    """
+
+    line = too_dir + 'this_week_person_in_charge'
+    f    = open(line, 'r')
+    data = [line.strip() for line in f.readlines()]
+    f.close()
+
+    for ent in data:
+
+        m = re.search('\#', ent)
+
+        if m is None:
+            atemp    = re.split('\,', ent)
+            poc_mail = atemp[4]
+            line = too_dir + 'personal_list'
+            f     = open(line, 'r')
+            plist = [line.strip() for line in f.readlines()]
+            f.close()
+
+            person_in_charge = 'TBD'
+
+            for person in plist:
+                n = re.search(poc_mail, person)
+                if n is not None:
+                    btemp = re.split('\<\>', person)
+                    ctemp = re.split('\@',   btemp[4])
+                    person_in_charge = ctemp[0]
+
+                    if person_in_charge == 'pzhao':
+                        person_in_charge = 'ping'
+                    elif person_in_charge == 'swolk':
+                        person_in_charge = 'sjw'
+                    elif person_in_charge == 'nadams':
+                        person_in_charge = 'nraw'
+                    elif person_in_charge == 'jdrake':
+                        person_in_charge = 'jd'
+
+    return person_in_charge
+
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
