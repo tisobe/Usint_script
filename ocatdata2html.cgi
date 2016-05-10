@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Oct 26, 2015
+#		last update: May 10, 2016
 #  
 ###############################################################################
 
@@ -3836,7 +3836,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	if($group_id){
 		print "<br />Observations in the Group: @group<br />";
 	}elsif($monitor_flag =~ /Y/i){
-		print "<br /> Observations in the Monitoring: @monitor_series_list<br />";
+		print "<br /> Remaining Observations in the Monitoring: @monitor_series_list<br />";
 	}else{
 		print "<br />";
 	}

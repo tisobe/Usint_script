@@ -272,6 +272,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # Aimpoint Chipx and Chipy values added
 # (Oct 26, 2015)
 #
+# Observations in the Monitoring --> Remaining Observations in the Monitoring
+# (May 10, 2016)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -5681,7 +5684,7 @@ sub data_close_page{
         if($group_id){
                 print "<br />Observations in the Group: @group<br />";
         }elsif($monitor_flag =~ /Y/i){
-                print "<br />Observations in the Monitoring: @monitor_series_list<br />";
+                print "<br />Remaining Observations in the Monitoring: @monitor_series_list<br />";
         }else{
                 print "<br />";
         }
@@ -7201,7 +7204,7 @@ print "$monitor_elem<br />";
 		if($group_id){
 			print "<br />Observations in the Group: @group<br />";
 		}elsif($monitor_flag =~ /Y/i){
-			print "<br />Observations in the Monitoring: @monitor_series_list<br />";
+			print "<br />Remaining Observations in the Monitoring: @monitor_series_list<br />";
 		}else{
 			print "<br />";
 		}
@@ -7385,7 +7388,7 @@ print "$monitor_elem<br />";
 		if($group_id){
 			print "<br />Observations in the Group: @group<br />";
 		}elsif($monitor_flag =~ /Y/i){
-			print "<br /> Observations in the Monitoring: @monitor_series_list<br />";
+			print "<br /> Remaining Observations in the Monitoring: @monitor_series_list<br />";
 		}else{
 			print "<br />";
 		}
