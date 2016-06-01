@@ -275,6 +275,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # Observations in the Monitoring --> Remaining Observations in the Monitoring
 # (May 10, 2016)
 #
+# Warning email to MP about the late submission (less than 10days to lts date)
+# (May 26, 2016)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -2137,7 +2140,15 @@ if($access_ok eq 'yes'){
 #
 		if($mp_check > 0 && $cnt_modified > 0){
 			send_email_to_mp();		# sending warning email to MP
-		}
+#
+#--- if this is a late submission (less than 10 days to lts date), warn MP
+#
+		}else{
+            $mchk = check_lts_date_coming();
+            if($mchk > 0){
+                send_lt_warning_email();
+            }
+        }
 
 #
 #---once USINT  can be submited OPT# selection for CCDs, comment out the next sub
@@ -6179,6 +6190,19 @@ if($mp_check > 0){
 	print "This observation is currently under review in an active OR list. ";
 	print "You must get a permission from MP to modify entries.";
 	print "</font></b><br /></h2>";
+}else{
+    $lchk = check_lts_date_coming();
+    if($lchk == 1){
+        print "<h2><strong style='color:red'>";
+
+        if($lts_diff < 2){
+            $ldays = 'day';
+        }else{
+            $ldays = 'days';
+        }
+        print "$lts_diff $ldays  left to LTS date. You must get a permission from MP to modify entries.";
+        print "</strong></h2>";
+    }
 }
 
 if($status !~ /scheduled/i && $status !~ /unobserved/i){
@@ -14203,3 +14227,199 @@ sub find_aiming_point{
     return ($chipx, $chipy);
 }
 
+
+##################################################################################
+## send_lt_warning_email: send out a warning email to mp abou a late submission ##
+##################################################################################
+
+sub send_lt_warning_email{
+
+	$temp_file = "$temp_dir/mp_lts";
+	open(ZOUT, ">$temp_file");
+	
+	print ZOUT "\n\nA user: $submitter submitted changes of  ";
+	print ZOUT "OBSID: $obsid which is scheduled in 10 days.\n\n";
+	
+	print ZOUT "The contact email_address address is: $email_address\n\n";
+	
+	print ZOUT "Its Ocat Data Page is:\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
+
+	print ZOUT "If you like to see what were changed:\n";
+
+	$file_name = "$obsid".'.'."$rev";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
+
+	print ZOUT "If you have any question about this email, please contact ";
+	print ZOUT "swolk\@head.cfa.harvard.edu.","\n\n\n";
+    
+    close(ZOUT);
+	
+
+#
+#--- find out who is the mp contact person for this obsid
+#
+    $mp_contact = '';
+	open(IN, "$obs_ss/scheduled_obs_list");
+	OUTER:
+	while(<IN>){
+		chomp $_;
+		@mtemp = split(/\s+/, $_);
+        $msave = $mtemp[1];
+		if($obsid == $mtemp[0]){
+			$mp_contact = $mtemp[1];
+			last OUTER;
+		}
+	}
+	close(IN);
+#
+#--- if no mp is assigned for this obsid, use the last person listed on the list
+#
+    if($mp_contact eq ''){
+        $mp_contact = $msave;
+    }
+
+	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+
+	if($usint_on =~ /test/){
+		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is Scheduled in $lts_diff days ($mp_email)\n\" $test_email");
+	}else{
+		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is Scheduled in $lts_diff days\n\"  $mp_email cus\@head.cfa.harvard.edu");
+	}
+
+	system("rm $temp_file");
+
+}
+
+##################################################################################
+## check_lts_date_coming: check whether lts date is coming less than 10 days    ##
+##################################################################################
+
+sub check_lts_date_coming{
+#
+#--- today's date
+#
+	($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
+	$uyear = 1900 + $year;
+#
+#--- convert today's date in fractional year
+#
+    $val = is_liea_year($uyear);
+    if($val == 1){
+        $base = 366;
+    }else{
+        $base = 365;
+    }
+
+    $tyear = $uyear + $yday / $base;
+#
+#--- convert the lts date into fractional year
+#
+    $lts = lts_date_to_fyear($lts_lt_plan);
+#
+#--- warning date: how many more day left to lts date
+#
+    $diff     = $lts - $tyear;
+    $lts_diff = int($diff * $base);
+#
+#--- setting the warning start date to the Monday before the real lts date
+#
+    if($wday == 0){
+        $sday = 6;
+    }else{
+        $sday = $wday -1;
+    }
+    $sday /= $base; 
+    
+    $diff -= $sday;
+#
+#-- 10 day interval in fractional year
+#
+    $interval = 10.0 / $base;
+
+    if($diff < $interval){
+        return 1;
+    }else{
+        return 0;
+    }
+
+}    
+
+##################################################################################
+## lts_date_to_fyear: converting lts date format to fractional year format     ###
+##################################################################################
+
+sub lts_date_to_fyear{
+
+    ($lts_date) = @_;
+
+    if($lts_date eq ''){
+        return "";
+    }
+
+    @atemp = split(/\s+/, $lts_date);
+    $mon   = $atemp[0];
+    $day   = $atemp[1];
+    $year  = $atemp[2];
+#
+#--- month is in the letter from; convert it into digit
+#
+    $i = 1;
+    foreach $cmon ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'){
+        if($mon eq $cmon){
+            $mon = $i;
+            last;
+        }else{
+            $i++;
+        }
+    }
+#
+#--- check whether the year is a leap year
+#
+    $val = is_liea_year($year);
+
+    if($val == 1){
+        @m_list =(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335);
+        $base = 366;
+    }else{
+        @m_list =(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334);
+        $base = 365;
+    }
+
+    $add = $m_list[$mon-1];
+
+    $fyear = $year + ($add + $day) / $base;
+
+    return $fyear;
+
+}
+
+##################################################################################
+## is_liea_year: check a given year is a leap year                             ###
+##################################################################################
+
+sub is_liea_year{
+
+    ($lyear) = @_;
+
+    $chk  = $lyear % 4;
+    $chk2 = $lyear % 100;
+    $chk3 = $lyear % 400;
+
+    $val = 0;
+    if($chk == 0){
+        $val = 1;
+        if($chk2 == 0){
+            $val = 0;
+        }
+    }
+    if($chk3 == 0){
+        $val = 1;
+    }
+    
+    return $val;
+}
+    
+    
+        
+        
