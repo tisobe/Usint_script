@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: May 26, 2016
+#		last update: Jun 07, 2016
 #  
 ###############################################################################
 
@@ -9622,6 +9622,10 @@ sub send_lt_warning_email{
 ##################################################################################
 
 sub check_lts_date_coming{
+
+    if($lts_lt_plan eq ''){
+        return 0;
+    }
 #
 #--- today's date
 #
