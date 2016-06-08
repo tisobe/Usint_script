@@ -6,7 +6,7 @@
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: Jul 29, 2014								#
+#	last update: Jun 08, 2016								#
 #												#
 #################################################################################################
 
@@ -133,50 +133,93 @@ while(<FH>){
 #--- check this month's data
 #
 	if($dir =~ /$lmon/){
-		$file = "$dir".'/input/'."$lmon*_*.or";
-		system("ls -lrt $file > $temp_list2");
+        $test = "$dir".'/input/';
+        $input = "$dir".'/input/';
+        $chk  = is_dir_empty($test);
+        if($chk == 1){
+            $test = `ls $dir/input/*`;
+            @tlist = split(/\n+/, $test);
+            $chk2 = 0;
+            foreach $ent (@tlist){
+                @atemp = split(/\input\//, $ent);
+                if($atemp[1] =~ /$lmon/){
+                    $chk2 =1;
+                    break;
+                }
+            }
+            if($chk2 > 0){
+                #$file = "$dir".'/input/'."$lmon*_*.or";            #--- -05/26/16
 
-		open(IN, "$temp_list2");
-		@list = ();
+                $tchk = is_file_exist($dir, 'pre_scheduled');
+                if($tchk == 1){
+                    $nchk = is_dir_empty("$dir/pre_scheduled");
+                }
+                if($nchk ==1){
+                    $file = "$dir".'/input/* '."$dir".'/pre_scheduled/* '."$dir".'/scheduled/*';
+                }else{
+                    $file = "$dir".'/input/* '."$dir".'/scheduled/*';
+                }
 
-		while(<IN>){
-			chomp $_;
-			@atemp = split(/\s+/,   $_);
-			foreach $test (@atemp){
-				if($test =~ /mplogs/){
-					$in_line = $test;
-					last;
-				}
-			}
-			@btemp = split(/\//,    $in_line);
-			@ctemp = split(/$lmon/, $btemp[5]);
-			@dtemp = split(//,      $ctemp[1]);
-			$date  = "$dtemp[0]$dtemp[1]";
+	            system("ls -lrt $file > $temp_list2");
 
-			if($date > $mday){
-				@ctemp = split(/_/, $in_line);
-				@dtemp = split(/\.or/, $ctemp[1]);
-				if($dtemp[0] =~ /\d/){
-					push(@list, $in_line);
-				}
-			}
-		}
-		close(IN);
-		system("rm $temp_list2");
+		        open(IN, "$temp_list2");
+		        @list = ();
+     
+                $llmon = lc($lmon);
+		        while(<IN>){
+			        chomp $_;
+			        @atemp = split(/\s+/,   $_);
+                    $chk = 0;
+			        foreach $test (@atemp){
+				        if(($test =~ /mplogs/) && ($test =~ /\.or/)){
+					        $in_line = $test;
+                            $chk = 1;
+					        last;
+				        }
+			        }
+
+                    if($chk == 0){
+                        next;
+                    }
+
+			        @btemp = split(/\//,    $in_line);
+
+                    if($btemp[5] =~ /$lmon/){
+			            @ctemp = split(/$lmon/, $btemp[5]);
+                    }elsif($btemp[5] =~ /$llmon/){
+			            @ctemp = split(/$llmon/, $btemp[5]);
+                    }else{
+                        next;
+                    }
+			        @dtemp = split(//,      $ctemp[1]);
+			        $date  = "$dtemp[0]$dtemp[1]";
+     
+			        if($date > $mday){
+				        @ctemp = split(/_/, $in_line);
+				        @dtemp = split(/\.or/, $ctemp[1]);
+				        if(($dtemp[0] =~ /\d/) || ($dtemp[0] =~ /[A-G]/)){      #---- 05/26/16
+					        push(@list, $in_line);
+				        }
+			        }
+		        }
+		        close(IN);
+		        system("rm $temp_list2");
 #
 #--- use only the last version of the same data file
 #
-		$last = pop(@list);
-		push(@mp_list, $last);
-
-		if($atemp[2] =~ /\d/){
-			$aline = `ypcat -k passwd |grep $atemp[2]`;	# changing ID # to actual user name
-			@cline = split(/\s+/, $aline);
-			$person = $cline[0];
-		}else{
-			$person = $atemp[2];
-		}
-		push(@in_charge, $person);
+		        $last = pop(@list);
+		        push(@mp_list, $last);
+     
+		        if($atemp[2] =~ /\d/){
+			        $aline = `ypcat -k passwd |grep $atemp[2]`;	# changing ID # to actual user name
+			        @cline = split(/\s+/, $aline);
+			        $person = $cline[0];
+		        }else{
+			        $person = $atemp[2];
+		        }
+		        push(@in_charge, $person);
+            }
+        }
 #
 #--- checking the next month
 #
@@ -184,43 +227,81 @@ while(<FH>){
         $test = "$dir".'/input/';
         $chk  = is_dir_empty($test);
         if($chk == 1){
-		    $file = "$dir".'/input/'."$nlmon*_*.or";
-		    system("ls -lrt $file > $temp_list2");
-		    open(IN, "$temp_list2");
-		    @list = ();
-    
-		    while(<IN>){
-			    chomp $_;
-			    @atemp = split(/\s+/,   $_);
-			    foreach $test (@atemp){
-				    if($test =~ /mplogs/){
-					    $in_line = $test;
-					    last;
-				    }
-			    }
-			    @etemp = split(/_/, $in_line);
-			    @ftemp = split(/\.or/, $etemp[1]);
-			    if($ftemp[0] =~ /\d/){
-				    @btemp = split(/\//,    $in_line);
-				    @ctemp = split(/$lmon/, $btemp[5]);
-				    @dtemp = split(//,      $ctemp[1]);
-				    $date  = "$dtemp[0]$dtemp[1]";
-				    push(@list, $in_line);
-			    }
-		    }
-		    close(IN);
-		    system("rm $temp_list2");
-		    $last = pop(@list);
-		    push(@mp_list, $last);
-    
-		    if($atemp[2] =~ /\d/){
-			    $aline = `ypcat -k passwd |grep $atemp[2]`;
-			    @cline = split(/\s+/, $aline);
-			    $person = $cline[0];
-		    }else{
-			    $person = $atemp[2];
-		    }
-		    push(@in_charge, $person);
+            $test = `ls $dir/input/*`;
+            @tlist = split(/\n+/, $test);
+            $chk2 = 0;
+            foreach $ent (@tlist){
+                @atemp = split(/\input\//, $ent);
+                if($atemp[1] =~ /$nlmon/){
+                    $chk2 =1;
+                    break;
+                }
+            }
+            if($chk2 > 0){
+		        #$file = "$dir".'/input/'."$nlmon*_*.or";
+                $tchk = is_file_exist($dir, 'pre_scheduled');
+                if($tchk == 1){
+                    $nchk = is_dir_empty("$dir/pre_scheduled");
+                }
+                if($nchk ==1){
+                    $file = "$dir".'/input/* '."$dir".'/pre_scheduled/* '."$dir".'/scheduled/*';
+                }else{
+                    $file = "$dir".'/input/* '."$dir".'/scheduled/*';
+                }
+
+		        system("ls -lrt $file > $temp_list2");
+		        open(IN, "$temp_list2");
+		        @list = ();
+     
+                $lnlmon = lc($nlmon);
+		        while(<IN>){
+			        chomp $_;
+			        @atemp = split(/\s+/,   $_);
+                    $chk = 0;
+			        foreach $test (@atemp){
+				        if(($test =~ /mplogs/) && ($test =~ /\.or/)){
+					        $in_line = $test;
+                            $chk = 1;
+					        last;
+				        }
+			        }
+                    if($chk == 0){
+                        $next;
+                    }
+
+			        @etemp = split(/_/, $in_line);
+			        @ftemp = split(/\.or/, $etemp[1]);
+			        if($ftemp[0] =~ /\d/){
+				        @btemp = split(/\//,    $in_line);
+
+                        if($btemp[5] =~ /$nlmon/){
+				            @ctemp = split(/$nlmon/, $btemp[5]);
+                        }elsif($btemp[5] =~ /$lnlmon/){
+				            @ctemp = split(/$lnlmon/, $btemp[5]);
+                        }else{
+                            next;
+                        }
+
+				        @dtemp = split(//,      $ctemp[1]);
+				        $date  = "$dtemp[0]$dtemp[1]";
+				        push(@list, $in_line);
+			        }
+		        }
+		        close(IN);
+		        system("rm $temp_list2");
+
+		        $last = pop(@list);
+		        push(@mp_list, $last);
+     
+		        if($atemp[2] =~ /\d/){
+			        $aline = `ypcat -k passwd |grep $atemp[2]`;
+			        @cline = split(/\s+/, $aline);
+			        $person = $cline[0];
+		        }else{
+			        $person = $atemp[2];
+		        }
+		        push(@in_charge, $person);
+            }
         }
 	}
 }
@@ -441,7 +522,7 @@ OUTER:
 #--- read split obsid list which we do not need to sign-off
 #
 
-split_obsid_list_check();
+#split_obsid_list_check();   #---- MAIL DIRECTOY IS NOT UPDATED ANY MORE (MAY 2015)
 
 
 #
