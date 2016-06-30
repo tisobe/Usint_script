@@ -278,6 +278,12 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # Warning email to MP about the late submission (less than 10days to lts date)
 # (May 26, 2016)
 #
+# Bug due to null lts_lt_plan date fixed
+# (June 07, 2016)
+#
+# Warning email to MP now also sent to USINT user
+# (Jun 30, 2016)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -2147,6 +2153,7 @@ if($access_ok eq 'yes'){
             $mchk = check_lts_date_coming();
             if($mchk > 0){
                 send_lt_warning_email();
+                send_lt_warning_email2();
             }
         }
 
@@ -14292,10 +14299,78 @@ sub send_lt_warning_email{
 }
 
 ##################################################################################
+## send_lt_warning_email2: send out a warning email to USINT  a late submission ##
+##################################################################################
+
+sub send_lt_warning_email2{
+
+#
+#--- find out who is the mp contact person for this obsid
+#
+    $mp_contact = '';
+	open(IN, "$obs_ss/scheduled_obs_list");
+	OUTER:
+	while(<IN>){
+		chomp $_;
+		@mtemp = split(/\s+/, $_);
+        $msave = $mtemp[1];
+		if($obsid == $mtemp[0]){
+			$mp_contact = $mtemp[1];
+			last OUTER;
+		}
+	}
+	close(IN);
+#
+#--- if no mp is assigned for this obsid, use the last person listed on the list
+#
+    if($mp_contact eq ''){
+        $mp_contact = $msave;
+    }
+
+	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+
+
+	$temp_file = "$temp_dir/mp_lts";
+	open(ZOUT, ">$temp_file");
+	
+	print ZOUT "\n\nA You submitted changes of  ";
+	print ZOUT "OBSID: $obsid which is scheduled in 10 days.\n\n";
+	
+	print ZOUT "The email_address of MP of this observation: $mp_email\n\n";
+	
+	print ZOUT "Its Ocat Data Page is:\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
+
+	print ZOUT "If you like to see what were changed:\n";
+
+	$file_name = "$obsid".'.'."$rev";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
+
+	print ZOUT "If you have any question about this email, please contact ";
+	print ZOUT "swolk\@head.cfa.harvard.edu.","\n\n\n";
+    
+    close(ZOUT);
+	
+
+	if($usint_on =~ /test/){
+		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is Scheduled in $lts_diff days ($email_address)\n\" $test_email");
+	}else{
+		system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is Scheduled in $lts_diff days\n\"  $email_address cus\@head.cfa.harvard.edu");
+	}
+
+	system("rm $temp_file");
+
+}
+
+##################################################################################
 ## check_lts_date_coming: check whether lts date is coming less than 10 days    ##
 ##################################################################################
 
 sub check_lts_date_coming{
+
+    if($lts_lt_plan eq ''){
+        return 0;
+    }
 #
 #--- today's date
 #
