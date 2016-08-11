@@ -284,6 +284,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # Warning email to MP now also sent to USINT user
 # (Jun 30, 2016)
 #
+# the bug introduced by Jul 17, 2015 update (not showing the first row) fixed 
+# (Aug 10, 2016)
+#
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
 # ----------
@@ -2898,7 +2901,7 @@ sub pass_param {
 #
 #---- if window filter is set to Null or No, set everything to a Null setting
 #
-		$aicswin_id[0]      = '';
+		$aciswin_id[0]      = '';
 		$ordr[0]            = '';
                 $chip[0]            = 'NULL';
                 $dinclude_flag[0]   = 'INCLUDE';
@@ -4010,17 +4013,17 @@ sub read_databases{
 		$sqlh1->finish;
 
 #
-#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015; debugged Aug 10, 2016)
 #
         if($aciswin_no > 0){
             @rlist = ();
-            for($i = 0; $i <= $aciswin_no; $i++){
+            for($i = 0; $i < $aciswin_no; $i++){
                 push(@rlist, $ordr[$i]);
             }
             @sorted = sort{$a<=>$b} @rlist;
             @tlist = ();
             foreach $ent (@sorted){
-                for($i = 0; $i <= $aciswin_no; $i++){
+                for($i = 0; $i < $aciswin_no; $i++){
                     if($ent == $ordr[$i]){
                         push(@tlist, $i);
                     }
@@ -4039,12 +4042,12 @@ sub read_databases{
             @temp9 = ();
             @temp10= ();
         
-            for($i = 0; $i <= $aciswin_no; $i++){
+            for($i = 0; $i < $aciswin_no; $i++){
                 $pos = $tlist[$i];
-                if($pos == 0){
-                    last;
-                }
-                $pos--;
+                #if($pos == 0){
+                #    last;
+                #}
+                #$pos--;
         
                 push(@temp0 , $ordr[$pos]);
                 push(@temp1 , $start_row[$pos]);
@@ -13236,7 +13239,7 @@ sub lts_date_check{
 	}else{
 		@ttemp = split(/\s+/, $lts_lt_plan);
 
-       		if($ttemp[1]     =~ /Jan/i){
+       		if($ttemp[0]     =~ /Jan/i){
                		$month = '1';
 			$add = 0;
         	}elsif($ttemp[0] =~ /Feb/i){
