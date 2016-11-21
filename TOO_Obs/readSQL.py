@@ -1,14 +1,14 @@
 #!/usr/bin/env /proj/sot/ska/bin/python
 
-#############################################################################################################################
-#                                                                                                                           #
-#   readSQL.py: read data from sql database.                                                                                #
-#                                                                                                                           #
-#       author: t. isobe (tisobe@cfa.harvard.edu)                                                                           #
-#                                                                                                                           #
-#       last update: Jul 10, 2015                                                                                           #
-#                                                                                                                           #
-#############################################################################################################################
+#####################################################################################################
+#                                                                                                   #
+#   readSQL.py: read data from sql database.                                                        #
+#                                                                                                   #
+#       author: t. isobe (tisobe@cfa.harvard.edu)                                                   #
+#                                                                                                   #
+#       last update: Oct 17, 2016                                                                   #
+#                                                                                                   #
+#####################################################################################################
 
 #--- if above does  not work, use /proj/sot/ska/bin/python with Ska.DBI (below)
 #--- from Ska.DBI import *
@@ -54,8 +54,6 @@ import tooddtFunctions as tdfnc
 
 from DBI import *
 
-
-
 #----------------------------------------------------------------------------------------------------------------
 #-- readSQL: or a given sql command and database, return result in dictionary form                            ---
 #----------------------------------------------------------------------------------------------------------------
@@ -67,10 +65,15 @@ def readSQL(cmd, database):
 
     """
 
-    db_user = 'browser'
+    #db_user = 'browser'
+    #line    = pass_dir + '.targpass'
+    #server  = 'sqlxtest'
+    #line    = pass_dir + '.targpass_itest'
+
+    db_user = 'mtaops_internal_web'
     server  = 'ocatsqlsrv'
 
-    line      = pass_dir + '.targpass'
+    line      = pass_dir + '.targpass_internal'
     f         = open(line, 'r')
     db_passwd = f.readline().strip()
     f.close()

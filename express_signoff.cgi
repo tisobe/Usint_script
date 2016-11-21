@@ -19,7 +19,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #										#
 #	author: t. isobe (tisobe@cfa.harvard.edu)				#
 #										#
-#	last update: Apr 24, 2015	           				#
+#	last update: Oct 17, 2016	           				#
 #										#
 #################################################################################
 
@@ -643,12 +643,19 @@ sub input_obsid{
 
 sub read_databases{
 
-        $db_user = "browser";
+        $web = $ENV{'HTTP_REFERER'};
+        if($web =~ /icxc/){
+            $db_user   = "mtaops_internal_web";
+            $db_passwd =`cat $pass_dir/.targpass_internal`;
+        }else{
+            $db_user = "mtaops_public_web";
+            $db_passwd =`cat $pass_dir/.targpass_public`;
+        }
+
         $server  = "ocatsqlsrv";
 
-#       $db_user="browser";
-#       $server="sqlbeta";
-
+#       $db_user = "browser";
+#       $server  = "sqlbeta";
 #       $db_user = "browser";
 #       $server  = "sqlxtest";
 
@@ -1293,50 +1300,66 @@ sub read_databases{
         $proposal_vla    = $prop_infodata[7];
         $proposal_vlba   = $prop_infodata[8];
 
+        $sqlh1 = $dbh1->prepare(qq(select  
+            last  from view_pi where ocat_propid=$proposal_id));
+        $sqlh1->execute();
+        $PI_name = $sqlh1->fetchrow_array;
+        $sqlh1->finish;
+    
+        $sqlh1 = $dbh1->prepare(qq(select  
+            last  from view_coi where ocat_propid=$proposal_id));
+        $sqlh1->execute();
+        $Observer = $sqlh1->fetchrow_array;
+        $sqlh1->finish;
+    
+        if($Observer eq ""){
+            $Observer = $PI_name;
+        }
+
 #-------------------------------------------------------------
 #<<<<<<------>>>>>>  switch to axafusers <<<<<<------>>>>>>>>
 #-------------------------------------------------------------
 
-        $db = "server=$server;database=axafusers";
-        $dsn1 = "DBI:Sybase:$db";
-        $dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
-
+#        $db = "server=$server;database=axafusers";
+#        $dsn1 = "DBI:Sybase:$db";
+#        $dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
+#
 #--------------------------------
 #-----  get proposer's last name
 #--------------------------------
-
-        $sqlh1 = $dbh1->prepare(qq(select
-                last from person_short s,axafocat..prop_info p
-        where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
-        $sqlh1->execute();
-        @namedata = $sqlh1->fetchrow_array;
-        $sqlh1->finish;
-
-        $PI_name = $namedata[0];
-
+#
+#        $sqlh1 = $dbh1->prepare(qq(select
+#                last from person_short s,axafocat..prop_info p
+#        where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
+#        $sqlh1->execute();
+#        @namedata = $sqlh1->fetchrow_array;
+#        $sqlh1->finish;
+#
+#        $PI_name = $namedata[0];
+#
 #---------------------------------------------------------------------------
 #------- if there is a co-i who is observer, get them, otherwise it's the pi
 #---------------------------------------------------------------------------
-
-        $sqlh1 = $dbh1->prepare(qq(select
-                coi_contact from person_short s,axafocat..prop_info p
-        where p.ocat_propid = $proposal_id));
-        $sqlh1->execute();
-        ($observerdata) = $sqlh1->fetchrow_array;
-        $sqlh1->finish;
-
-        if ($observerdata =~/N/){
-                $Observer = $PI_name;
-        } else {
-                $sqlh1 = $dbh1->prepare(qq(select
-                        last from person_short s,axafocat..prop_info p
-                where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
-                $sqlh1->execute();
-                ($observerdata) = $sqlh1->fetchrow_array;
-                $sqlh1->finish;
-
-                $Observer=$observerdata;
-        }
+#
+#        $sqlh1 = $dbh1->prepare(qq(select
+#                coi_contact from person_short s,axafocat..prop_info p
+#        where p.ocat_propid = $proposal_id));
+#        $sqlh1->execute();
+#        ($observerdata) = $sqlh1->fetchrow_array;
+#        $sqlh1->finish;
+#
+#        if ($observerdata =~/N/){
+#                $Observer = $PI_name;
+#        } else {
+#                $sqlh1 = $dbh1->prepare(qq(select
+#                        last from person_short s,axafocat..prop_info p
+#                where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
+#                $sqlh1->execute();
+#                ($observerdata) = $sqlh1->fetchrow_array;
+#                $sqlh1->finish;
+#
+#                $Observer=$observerdata;
+#        }
 
 #-------------------------------------------------
 #---- Disconnect from the server

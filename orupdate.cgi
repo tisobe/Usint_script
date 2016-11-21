@@ -100,6 +100,9 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 # T. Isobe Apr 24, 2015
 # /soft/ascds/DS.release/ots/bin/perl ---> /usr/bin/perl (make accessible from cxc)
+#
+# T. Isobe Oct 17, 2016
+# archive access user changed from borwer to mtaops_internal/public
 #											#
 #########################################################################################
 
@@ -561,9 +564,19 @@ sub get_database_values {
 #----- to access sybase, we need to set user password and a server name
 #----------------------------------------------------------------------
 
-	$db_user   = "browser";
+#	$db_user   = "browser";
+#	$db_passwd =`cat $pass_dir/.targpass`;
+
+    $web = $ENV{'HTTP_REFERER'};
+    if($web =~ /icxc/){
+        $db_user   = "mtaops_internal_web";
+        $db_passwd =`cat $pass_dir/.targpass_internal`;
+    }else{
+        $db_user = "mtaops_public_web";
+        $db_passwd =`cat $pass_dir/.targpass_public`;
+    }
+
 	$server    = "ocatsqlsrv";
-	$db_passwd =`cat $pass_dir/.targpass`;
 	chop $db_passwd;
 
 #--------------------------------------

@@ -10,7 +10,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Apr  24, 2015							#
+#		last update: Oct  17, 2016							#
 #												#
 #################################################################################################
 
@@ -466,10 +466,19 @@ sub find_group {
 #-------  database username, password, and server
 #------------------------------------------------
 
-	$db_user = "browser";
-	$server  = "ocatsqlsrv";
+#	$db_user = "browser";
+#	$db_passwd =`cat $pass_dir/.targpass`;
 
-	$db_passwd =`cat $pass_dir/.targpass`;
+    $web = $ENV{'HTTP_REFERER'};
+    if($web =~ /icxc/){
+        $db_user   = "mtaops_internal_web";
+        $db_passwd =`cat $pass_dir/.targpass_internal`;
+    }else{
+        $db_user = "mtaops_public_web";
+        $db_passwd =`cat $pass_dir/.targpass_public`;
+    }
+
+	$server  = "ocatsqlsrv";
 	chomp $db_passwd;
 
 #--------------------------------------

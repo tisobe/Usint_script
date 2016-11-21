@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Aug 10, 2016
+#		last update: Oct 17, 2016
 #  
 ###############################################################################
 
@@ -1604,14 +1604,25 @@ sub pass_param {
 
 sub read_databases{
 
+
 #------------------------------------------------
 #-------  database username, password, and server
 #------------------------------------------------
 
-	$db_user = "browser";
-	$server  = "ocatsqlsrv";
+    $web = $ENV{'HTTP_REFERER'};
+    if($web =~ /icxc/){
+        $db_user   = "mtaops_internal_web";
+	    $db_passwd =`cat $pass_dir/.targpass_internal`;
+    }else{
+        $db_user = "mtaops_public_web";
+	    $db_passwd =`cat $pass_dir/.targpass_public`;
+    }
+	$server    = "ocatsqlsrv";
 
-	$db_passwd =`cat $pass_dir/.targpass`;
+	#$db_user   = "browser";
+    #$server    = "sqlxtest";
+	#$db_passwd =`cat $pass_dir/.targpass`;
+
 	chop $db_passwd;
 
 #--------------------------------------
@@ -2071,7 +2082,7 @@ sub read_databases{
 		}
 		$aciswin_no = $j;
 #
-#--- reorder the rank with increasing order value sequence (added Jul 14, 2015; debugged Aug 11, 2016)
+#--- reorder the rank with increasing order value sequence (added Jul 14, 2015)
 #
         if($aciswin_no > 0){
             @rlist = ();
@@ -2102,10 +2113,6 @@ sub read_databases{
         
             for($i = 0; $i < $aciswin_no; $i++){
                 $pos = $tlist[$i];
-                #if($pos == 0){
-                #    last;
-                #}
-                #$pos--;
         
                 push(@temp0 , $ordr[$pos]);
                 push(@temp1 , $start_row[$pos]);
@@ -2274,50 +2281,70 @@ sub read_databases{
 	$proposal_vla    = $prop_infodata[7];
 	$proposal_vlba   = $prop_infodata[8];
 
+#---------------------------------------------------
+#-----  get proposer's and observer's last names
+#---------------------------------------------------
+
+    $sqlh1 = $dbh1->prepare(qq(select  
+       last  from view_pi where ocat_propid=$proposal_id));
+    $sqlh1->execute();
+    $PI_name = $sqlh1->fetchrow_array;
+    $sqlh1->finish;
+ 
+    $sqlh1 = $dbh1->prepare(qq(select  
+        last  from view_coi where ocat_propid=$proposal_id));
+    $sqlh1->execute();
+    $Observer = $sqlh1->fetchrow_array;
+    $sqlh1->finish;
+
+    if($Observer eq ""){
+        $Observer = $PI_name;
+    }
+
 #-------------------------------------------------------------
 #<<<<<<------>>>>>>  switch to axafusers <<<<<<------>>>>>>>>
 #-------------------------------------------------------------
 
-	$db = "server=$server;database=axafusers";
-	$dsn1 = "DBI:Sybase:$db";
-	$dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
+#	$db = "server=$server;database=axafusers";
+#	$dsn1 = "DBI:Sybase:$db";
+#	$dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
 
 #--------------------------------
 #-----  get proposer's last name
 #--------------------------------
 
-	$sqlh1 = $dbh1->prepare(qq(select 
-		last from person_short s,axafocat..prop_info p 
-	where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
-	$sqlh1->execute();
-	@namedata = $sqlh1->fetchrow_array;
-	$sqlh1->finish;
-
-	$PI_name = $namedata[0];
+#	$sqlh1 = $dbh1->prepare(qq(select 
+#		last from person_short s,axafocat..prop_info p 
+#	where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
+#	$sqlh1->execute();
+#	@namedata = $sqlh1->fetchrow_array;
+#	$sqlh1->finish;
+#
+#	$PI_name = $namedata[0];
 
 #---------------------------------------------------------------------------
 #------- if there is a co-i who is observer, get them, otherwise it's the pi
 #---------------------------------------------------------------------------
 
-	$sqlh1 = $dbh1->prepare(qq(select 
-		coi_contact from person_short s,axafocat..prop_info p 
-	where p.ocat_propid = $proposal_id));
-	$sqlh1->execute();
-	($observerdata) = $sqlh1->fetchrow_array;
-	$sqlh1->finish;
-
-	if ($observerdata =~/N/){
-    		$Observer = $PI_name;
-	} else {
-		$sqlh1 = $dbh1->prepare(qq(select 
-			last from person_short s,axafocat..prop_info p 
-		where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
-		$sqlh1->execute();
-		($observerdata) = $sqlh1->fetchrow_array;
-		$sqlh1->finish;
-
-    		$Observer=$observerdata;
-	}
+#	$sqlh1 = $dbh1->prepare(qq(select 
+#		coi_contact from person_short s,axafocat..prop_info p 
+#	where p.ocat_propid = $proposal_id));
+#	$sqlh1->execute();
+#	($observerdata) = $sqlh1->fetchrow_array;
+#	$sqlh1->finish;
+#
+#	if ($observerdata =~/N/){
+#    		$Observer = $PI_name;
+#	} else {
+#		$sqlh1 = $dbh1->prepare(qq(select 
+#			last from person_short s,axafocat..prop_info p 
+#		where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
+#		$sqlh1->execute();
+#		($observerdata) = $sqlh1->fetchrow_array;
+#		$sqlh1->finish;
+#
+#    		$Observer=$observerdata;
+#	}
 
 #-------------------------------------------------
 #---- Disconnect from the server
@@ -4967,7 +4994,7 @@ sub prep_submit{
 #--- aciswin cases
 #-------------------
 
-	for($j = 0; $j <= $acsiwin_no; $j++){
+	for($j = 0; $j <= $aciswin_no; $j++){
 		if($include_flag[$j] eq 'INCLUDE'){$include_flag[$j] = 'I'}
 		elsif($include_flag[$j] eq 'EXCLUDE'){$include_flag[$j] = 'E'}
 	}
