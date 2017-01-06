@@ -288,7 +288,20 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 # (Aug 10, 2016)
 #
 # archive access user name(s) changed from brower to mtaops_internal/public
-# (Oct 17, 2016)
+# (Nov 21, 2016)
+#
+# mjuda email address to HRC removed
+# (Jan 3, 2017)
+#
+# mp eamil address is now mp@cfa.harvard.edu
+# check_lts_date_coming: inverval checking changed from <10 to <=10
+# (Jan 4, 2017)
+#
+# hrc si mode change only buttom added (create na na null output).
+# (Jan 4, 2017)
+# 
+# lts warning is preceeded for or list waring to mp@cfa.havard.edu
+# (Jan 6, 2017)
 #
 #-----Up to here were done by t. isobe (tisobe@cfa.harvard.edu)-----
 #
@@ -2144,23 +2157,19 @@ if($access_ok eq 'yes'){
 	}elsif($check eq 'FINALIZE'){
 
 		pass_param();
-
-
+#
+#--- if this is a late submission (less than 11 days + M to lts date), warn MP
+#
+        $mchk = check_lts_date_coming();
+        if($mchk > 0){
+            send_lt_warning_email();
+            send_lt_warning_email2();
 #
 #--- only when the observations is already on an active list, and there is actually
 #--- changes, send a warning email to MP
 #
-		if($mp_check > 0 && $cnt_modified > 0){
+		}elsif($mp_check > 0 && $cnt_modified > 0){
 			send_email_to_mp();		# sending warning email to MP
-#
-#--- if this is a late submission (less than 10 days to lts date), warn MP
-#
-		}else{
-            $mchk = check_lts_date_coming();
-            if($mchk > 0){
-                send_lt_warning_email();
-                send_lt_warning_email2();
-            }
         }
 
 #
@@ -3419,6 +3428,10 @@ sub pass_param {
 	if($z_freq =~ /\d/ || $z_freq_asec =~ /\d/){
         	$z_freq   = $z_freq_asec/3600;
 	}
+#
+#--- hrc si mode change only notification
+#
+    $hrc_si_select = param('hrc_si_select');
 }
 
 
@@ -7593,6 +7606,11 @@ print "$monitor_elem<br />";
 			print "$hrc_si_mode";
 			print '" size="8"></td></tr>';
 		}
+
+        print "<tr><td>&#160;</td><td>&#160;</td><td>&#160;</td>";
+        print "<th colspan=3>HRC SI Mode Change Only:</th>";
+        print "<td><input type='radio' name='hrc_si_select' value='no' checked>No</input>";
+        print "<input type='radio' name='hrc_si_select' value='yes'>Yes</input></td></tr>";
 	
 		print '</table>';
 	}
@@ -12381,6 +12399,10 @@ sub submit_entry{
 	print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
 	print "<input type=\"hidden\" name=\"email_address\" value=\"$email_address\">";
 	print "<input type=\"hidden\" name=\"cnt_modified\" value=\"$cnt_modified\">";
+#
+#--- passing si select only value
+#
+    print "<input type=\"hidden\" name=\"hrc_si_select\" value=$hrc_si_select>";
 
 	if($error_ind == 0 || $usint_on =~ /yes/){
 		if($wrong_si == 0){
@@ -13718,7 +13740,7 @@ sub send_email_to_mp{
 	}
 	close(IN);
 	
-	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+	$mp_email = 'mp@cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
 		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\"  $test_email");
@@ -13780,11 +13802,11 @@ sub find_usint {
         if($targname    =~ /CAL/i){
                 $usint_mail  = 'ldavid@cfa.harvard.edu';
         }elsif($grating =~ /LETG/i){
-                $usint_mail  = 'jdrake@cfa.harvard.edu bwargelin@cfa.harvard.edu';
+                $usint_mail  = 'jdrake@cfa.harvard.edu,bwargelin@cfa.harvard.edu';
         }elsif($grating =~ /HETG/i){
-                $usint_mail  = 'nss@space.mit.edu  hermanm@spce.mit.edu';
+                $usint_mail  = 'nss@space.mit.edu,hermanm@spce.mit.edu';
         }elsif($inst    =~ /HRC/i){
-                $usint_mail  = 'juda@cfa.harvard.edu vkashyap@cfa.harvard.edu';
+                $usint_mail  = 'vkashyap@cfa.harvard.edu';
         }else{
                 if($seq_nbr < 290000){
                         $usint_mail = 'swolk@cfa.harvard.edu';
@@ -13926,32 +13948,39 @@ sub oredit_sub{
 #---- general case
 #-----------------
 
+        if($hrc_si_select eq 'yes'){
+            $general_status = "NA";
+            $acis_status    = "NA";
+            $si_mode_status = "NULL";
+        } else {
+
 #------------------------------------------------------
 #---- check and update params for the verification page
 #------------------------------------------------------
 
-		if ($generaltag =~/ON/){
-			$general_status = "NA";
-		} else {
-			$general_status = "NULL";
-		}
-		if ($acistag =~/ON/){
-			$acis_status    = "NA";
-			$si_mode_status = "NA";
-		} else {
-			$acis_status    = "NULL";
-
-			if ($si_mode =~/NULL/){
-				$si_mode_status = "NA";
-			} else {
-
-				if ($sitag =~/ON/){
-					$si_mode_status = "NA";
-				} else {
-					$si_mode_status = "NULL";
-				}
-			}
-		}
+		    if ($generaltag =~/ON/){
+			    $general_status = "NA";
+		    } else {
+			    $general_status = "NULL";
+		    }
+		    if ($acistag =~/ON/){
+			    $acis_status    = "NA";
+			    $si_mode_status = "NA";
+		    } else {
+			    $acis_status    = "NULL";
+    
+			    if ($si_mode =~/NULL/){
+				    $si_mode_status = "NA";
+			    } else {
+    
+				    if ($sitag =~/ON/){
+					    $si_mode_status = "NA";
+				    } else {
+					    $si_mode_status = "NULL";
+				    }
+			    }
+		    }
+        }
 	}
 
 
@@ -14320,7 +14349,7 @@ sub send_lt_warning_email{
         $mp_contact = $msave;
     }
 
-	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+	$mp_email = 'mp@cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
 		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is Scheduled in $lts_diff days ($mp_email)\n\" $test_email");
@@ -14370,7 +14399,7 @@ sub send_lt_warning_email2{
 	print ZOUT "\n\nA You submitted changes of  ";
 	print ZOUT "OBSID: $obsid which is scheduled in 10 days.\n\n";
 	
-	print ZOUT "The email_address of MP of this observation: $mp_email\n\n";
+	print ZOUT "The email_address of MP: mp\@cfa.harvard.edu.\n\n";
 	
 	print ZOUT "Its Ocat Data Page is:\n";
 	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
@@ -14438,15 +14467,12 @@ sub check_lts_date_coming{
     }else{
         $sday = $wday -1;
     }
-    $sday /= $base; 
-    
-    $diff -= $sday;
 #
-#-- 10 day interval in fractional year
+#-- 11 day + M interval in fractional year
 #
-    $interval = 10.0 / $base;
+    $interval = (11.0 + $sday) / $base;
 
-    if($diff < $interval){
+    if($diff <= $interval){
         return 1;
     }else{
         return 0;

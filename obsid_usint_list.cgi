@@ -17,7 +17,7 @@ use CGI qw/:standard :netscape /;
 #												#
 #		author: t. isobe (tisobe@cfa.harvard.edu)					#
 #												#
-#		last update: Apr 24, 2015							#
+#		last update: Jan 04, 2017							#
 #												#
 #################################################################################################
 
@@ -366,7 +366,7 @@ if($input_no =~ /\d/){
 			$user = $name[$pos];
 			if($user =~ /Norbert/){
 				$user = 'HETG';
-			}elsif($user =~ /Juda/){
+			}elsif($user =~ /Kashyap/){
 				$user = 'HRC';
 			}elsif($user =~ /Wargelin/){
 				$user = 'LETG';
@@ -453,8 +453,39 @@ if($input_no =~ /\d/){
 		}		
 	}
 }elsif($disp > 0 && $disp < 10){
+
+
 	print "<h3>USINT responsible for approved DDT/TOO </h3>";
 	print "<h4> This is either an instrument specialist or the bare ACIS support person on duty at the time the proposal was APPROVED. </h4>";
+
+	if($disp > 1){
+		print "<h3>Contact Information</h3>";
+		print "<table border=1 style='paddinig-top:30px'>";
+		print "<tr>";
+		print "<th>Name</th><th>Office Tel</th><th>Home Tel</th><th>Cell Phone</th><th>Email</th>";
+		print "</tr><tr>";
+
+		$user = $p_name;
+		if($user =~ /Norbert/){
+			$user = 'HETG';
+		}elsif($user =~ /Kashyap/){
+			$user = 'HRC';
+		}elsif($user =~ /Wargelin/){
+			$user = 'LETG';
+		}elsif($user =~ /Larry/){
+			$user = 'CAL';
+		}
+
+		print "<td style='text-align:center'><a href='https://cxc.cfa.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
+		print "<td style='text-align:center'>$p_o_tel</td>";
+		print "<td style='text-align:center'>$p_h_tel</td>";
+		print "<td style='text-align:center'>$p_c_tel</td>";
+		print "<td style='text-align:center'><a href='mailto:$p_email'>$p_email</a></td>";
+		print "</tr>";
+		print "</table>";
+		print "<p style='font-size:80%;padding-bottom:20px'>If you like to see all observations under <em>$p_name</em>, please click the name above.</p>";
+	}
+
 
 	print '<p>Click POC name to display the contact information.</p>';
 
@@ -496,33 +527,6 @@ if($input_no =~ /\d/){
 
 	print "</table>";
 
-	if($disp > 1){
-		print "<h3>Contact Information</h3>";
-		print "<table border=1 style='paddinig-top:30px'>";
-		print "<tr>";
-		print "<th>Name</th><th>Office Tel</th><th>Home Tel</th><th>Cell Phone</th><th>Email</th>";
-		print "</tr><tr>";
-
-		$user = $p_name;
-		if($user =~ /Norbert/){
-			$user = 'HETG';
-		}elsif($user =~ /Juda/){
-			$user = 'HRC';
-		}elsif($user =~ /Wargelin/){
-			$user = 'LETG';
-		}elsif($user =~ /Larry/){
-			$user = 'CAL';
-		}
-
-		print "<td style='text-align:center'><a href='https://cxc.cfa.harvard.edu/mta/CUS/Usint/poc_obsid_list.cgi\?$user'>$p_name</a></td>";
-		print "<td style='text-align:center'>$p_o_tel</td>";
-		print "<td style='text-align:center'>$p_h_tel</td>";
-		print "<td style='text-align:center'>$p_c_tel</td>";
-		print "<td style='text-align:center'><a href='mailto:$p_email'>$p_email</a></td>";
-		print "</tr>";
-		print "</table>";
-		print "<p style='font-size:80%;padding-bottom:20px'>If you like to see all observations under <em>$p_name</em>, please click the name above.</p>";
-	}
 
 }elsif($check =~ /Scheduled/ || $disp > 5){
 
@@ -538,7 +542,7 @@ if($input_no =~ /\d/){
 			$user = $p_name;
 			if($user =~ /Norbert/){
 				$user = 'HETG';
-			}elsif($user =~ /Juda/){
+			}elsif($user =~ /Kashyap/){
 				$user = 'HRC';
 			}elsif($user =~ /Wargelin/){
 				$user = 'LETG';

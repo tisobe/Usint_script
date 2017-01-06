@@ -4,15 +4,15 @@ use DBI;
 #use DBD::Sybase;
 use CGI qw/:standard :netscape /;
 
-#################################################################################################
-#												#
+#############################################################################
+#												                            #
 #	poc_obsid_list.cgi: display obsid list for a given poc 					#
-#												#
-#		author: t. isobe (tisobe@cfa.harvard.edu)					#
-#												#
-#		last update: Oct  17, 2016							#
-#												#
-#################################################################################################
+#												                            #
+#		author: t. isobe (tisobe@cfa.harvard.edu)					        #
+#												                            #
+#		last update: Jan 05, 2017							                #
+#												                            #
+#############################################################################
 
 #
 #---- set directory pathes
@@ -96,7 +96,8 @@ while(<FH>){
 	push(@obsid_list,  $atemp[2]);
 	push(@status_list, $atemp[3]);
 	push(@person_list, $atemp[4]);
-	push(@date_list,   $atemp[5]);
+	push(@ao_list,     $atemp[5]);
+	push(@date_list,   $atemp[6]);
 	$total++;
 }
 close(FH);
@@ -111,7 +112,8 @@ while(<FH>){
 	push(@obsid_list,  $atemp[2]);
 	push(@status_list, $atemp[3]);
 	push(@person_list, $atemp[4]);
-	push(@date_list,   $atemp[5]);
+	push(@ao_list,     $atemp[5]);
+	push(@date_list,   $atemp[6]);
 	$total++;
 }
 close(FH);
@@ -218,7 +220,7 @@ if($contact eq ''){
 	$contact      = $name_temp;
 }
 
-if($contact =~ /Nancy Adams Wolk/)   {$poc = 'nraw'}
+if($contact =~ /Malgosia Sobolewska/)   {$poc = 'msobolewska'}
 elsif($contact =~ /CAL/)             {$poc = 'cal'}
 elsif($contact =~ /Jean Connelly/)   {$poc = 'jeanconn'}
 elsif($contact =~ /Dan Schwartz/)    {$poc = 'das'}
@@ -238,11 +240,14 @@ print '<h3>Please choose POC to display the list of observations</h3>';
 print '<table style="border-width:0px">';
 
 print '<tr>';
+#print '<td style="text-align:center">';
+#print '<input type="submit" name="poc" value="Nancy Adams Wolk">';
+#print '</td>';
+#print '<td style="text-align:center">';
+#print '<input type="submit" name="poc" value="Brad Spitzbart">';
+#print '</td>';
 print '<td style="text-align:center">';
-print '<input type="submit" name="poc" value="Nancy Adams Wolk">';
-print '</td>';
-print '<td style="text-align:center">';
-print '<input type="submit" name="poc" value="Brad Spitzbart">';
+print '<input type="submit" name="poc" value="Malgosia Sobolewska">';
 print '</td>';
 print '<td style="text-align:center">';
 print '<input type="submit" name="poc" value="CAL">';

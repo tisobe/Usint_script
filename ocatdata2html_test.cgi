@@ -20,7 +20,7 @@ use Fcntl qw(:flock SEEK_END); # Import LOCK_* constants
 #
 #		author: t. isobe (tisobe@cfa.harvard.edu)
 #	
-#		last update: Oct 26, 2015
+#		last update: Jan 06, 2017
 #  
 ###############################################################################
 
@@ -37,8 +37,8 @@ $blank2 = '<Blank>';
 #---- if this is usint version, set the following param to 'yes', otherwise 'no'
 #
 
-$usint_on = 'yes';			##### USINT Version
-#$usint_on = 'test_yes';			##### Test Version USINT
+#$usint_on = 'yes';			##### USINT Version
+$usint_on = 'test_yes';			##### Test Version USINT
 
 #
 #---- set a name and email address of a test person
@@ -522,13 +522,19 @@ if($access_ok eq 'yes'){
 		pass_param();
 
 #
+#--- if this is a late submission (less than 11 days + N to lts date), warn MP
+#
+        $mchk = check_lts_date_coming();
+        if($mchk > 0){
+            send_lt_warning_email();
+            send_lt_warning_email2();
+#
 #--- only when the observations is already on an active list, and there is actually
 #--- changes, send a warning email to MP
 #
-		if($mp_check > 0 && $cnt_modified > 0){
+		}elsif($mp_check > 0 && $cnt_modified > 0){
 			send_email_to_mp();		# sending warning email to MP
-		}
-
+        }
 #
 #--- if this is an ARCOPS check and approve request, add the obsid to the list
 #
@@ -1069,7 +1075,7 @@ sub pass_param {
 #
 #---- if window filter is set to Null or No, set everything to a Null setting
 #
-		$aicswin_id[0]      = '';
+		$aciswin_id[0]      = '';
 		$ordr[0]        = '';
         $chip[0]        = 'NULL';
         $dinclude_flag[0]   = 'INCLUDE';
@@ -1586,6 +1592,10 @@ sub pass_param {
 	if($z_freq =~ /\d/ || $z_freq_asec =~ /\d/){
     	$z_freq   = $z_freq_asec/3600;
 	}
+#
+#--- hrc si mode change only notification
+#
+    $hrc_si_select = param('hrc_si_select');
 }
 
 
@@ -1595,14 +1605,27 @@ sub pass_param {
 
 sub read_databases{
 
+
 #------------------------------------------------
 #-------  database username, password, and server
 #------------------------------------------------
 
-	$db_user = "browser";
-	$server  = "ocatsqlsrv";
+    $web = $ENV{'HTTP_REFERER'};
+    if($web =~ /icxc/){
+        $db_user   = "mtaops_internal_web";
+	    $db_passwd =`cat $pass_dir/.targpass_internal`;
+	    #$db_passwd =`cat $pass_dir/.targpass_itest`;
+    }else{
+        $db_user = "mtaops_public_web";
+	    $db_passwd =`cat $pass_dir/.targpass_public`;
+	    #$db_passwd =`cat $pass_dir/.targpass_ptest`;
+    }
+    $server    = "sqlxtest";
 
-	$db_passwd =`cat $pass_dir/.targpass`;
+	#$db_user   = "browser";
+	$server    = "ocatsqlsrv";
+	#$db_passwd =`cat $pass_dir/.targpass`;
+
 	chop $db_passwd;
 
 #--------------------------------------
@@ -2066,13 +2089,13 @@ sub read_databases{
 #
         if($aciswin_no > 0){
             @rlist = ();
-            for($i = 0; $i <= $aciswin_no; $i++){
+            for($i = 0; $i < $aciswin_no; $i++){
                 push(@rlist, $ordr[$i]);
             }
             @sorted = sort{$a<=>$b} @rlist;
             @tlist = ();
             foreach $ent (@sorted){
-                for($i = 0; $i <= $aciswin_no; $i++){
+                for($i = 0; $i < $aciswin_no; $i++){
                     if($ent == $ordr[$i]){
                         push(@tlist, $i);
                     }
@@ -2091,12 +2114,8 @@ sub read_databases{
             @temp9 = ();
             @temp10= ();
         
-            for($i = 0; $i <= $aciswin_no; $i++){
+            for($i = 0; $i < $aciswin_no; $i++){
                 $pos = $tlist[$i];
-                if($pos == 0){
-                    last;
-                }
-                $pos--;
         
                 push(@temp0 , $ordr[$pos]);
                 push(@temp1 , $start_row[$pos]);
@@ -2265,50 +2284,70 @@ sub read_databases{
 	$proposal_vla    = $prop_infodata[7];
 	$proposal_vlba   = $prop_infodata[8];
 
+#---------------------------------------------------
+#-----  get proposer's and observer's last names
+#---------------------------------------------------
+
+    $sqlh1 = $dbh1->prepare(qq(select  
+       last  from view_pi where ocat_propid=$proposal_id));
+    $sqlh1->execute();
+    $PI_name = $sqlh1->fetchrow_array;
+    $sqlh1->finish;
+ 
+    $sqlh1 = $dbh1->prepare(qq(select  
+        last  from view_coi where ocat_propid=$proposal_id));
+    $sqlh1->execute();
+    $Observer = $sqlh1->fetchrow_array;
+    $sqlh1->finish;
+
+    if($Observer eq ""){
+        $Observer = $PI_name;
+    }
+
 #-------------------------------------------------------------
 #<<<<<<------>>>>>>  switch to axafusers <<<<<<------>>>>>>>>
 #-------------------------------------------------------------
 
-	$db = "server=$server;database=axafusers";
-	$dsn1 = "DBI:Sybase:$db";
-	$dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
+#	$db = "server=$server;database=axafusers";
+#	$dsn1 = "DBI:Sybase:$db";
+#	$dbh1 = DBI->connect($dsn1, $db_user, $db_passwd, { PrintError => 0, RaiseError => 1});
 
 #--------------------------------
 #-----  get proposer's last name
 #--------------------------------
 
-	$sqlh1 = $dbh1->prepare(qq(select 
-		last from person_short s,axafocat..prop_info p 
-	where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
-	$sqlh1->execute();
-	@namedata = $sqlh1->fetchrow_array;
-	$sqlh1->finish;
-
-	$PI_name = $namedata[0];
+#	$sqlh1 = $dbh1->prepare(qq(select 
+#		last from person_short s,axafocat..prop_info p 
+#	where p.ocat_propid=$proposal_id and s.pers_id=p.piid));
+#	$sqlh1->execute();
+#	@namedata = $sqlh1->fetchrow_array;
+#	$sqlh1->finish;
+#
+#	$PI_name = $namedata[0];
 
 #---------------------------------------------------------------------------
 #------- if there is a co-i who is observer, get them, otherwise it's the pi
 #---------------------------------------------------------------------------
 
-	$sqlh1 = $dbh1->prepare(qq(select 
-		coi_contact from person_short s,axafocat..prop_info p 
-	where p.ocat_propid = $proposal_id));
-	$sqlh1->execute();
-	($observerdata) = $sqlh1->fetchrow_array;
-	$sqlh1->finish;
-
-	if ($observerdata =~/N/){
-    		$Observer = $PI_name;
-	} else {
-		$sqlh1 = $dbh1->prepare(qq(select 
-			last from person_short s,axafocat..prop_info p 
-		where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
-		$sqlh1->execute();
-		($observerdata) = $sqlh1->fetchrow_array;
-		$sqlh1->finish;
-
-    		$Observer=$observerdata;
-	}
+#	$sqlh1 = $dbh1->prepare(qq(select 
+#		coi_contact from person_short s,axafocat..prop_info p 
+#	where p.ocat_propid = $proposal_id));
+#	$sqlh1->execute();
+#	($observerdata) = $sqlh1->fetchrow_array;
+#	$sqlh1->finish;
+#
+#	if ($observerdata =~/N/){
+#    		$Observer = $PI_name;
+#	} else {
+#		$sqlh1 = $dbh1->prepare(qq(select 
+#			last from person_short s,axafocat..prop_info p 
+#		where p.ocat_propid = $proposal_id and p.coin_id = s.pers_id));
+#		$sqlh1->execute();
+#		($observerdata) = $sqlh1->fetchrow_array;
+#		$sqlh1->finish;
+#
+#    		$Observer=$observerdata;
+#	}
 
 #-------------------------------------------------
 #---- Disconnect from the server
@@ -3072,6 +3111,19 @@ if($mp_check > 0){
 	print "This observation is currently under review in an active OR list. ";
 	print "You must get a permission from MP to modify entries.";
 	print "</strong></h2>";
+}else{
+    $lchk = check_lts_date_coming();
+    if($lchk == 1){
+	    print "<h2><strong style='color:red'>";
+
+        if($lts_diff < 2){
+            $ldays = 'day';
+        }else{
+            $ldays = 'days';
+        }
+        print "$lts_diff $ldays  left to LTS date. You must get a permission from MP to modify entries.";
+	    print "</strong></h2>";
+    }
 }
 
 if($status !~ /scheduled/i && $status !~ /unobserved/i){
@@ -3836,7 +3888,7 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 	if($group_id){
 		print "<br />Observations in the Group: @group<br />";
 	}elsif($monitor_flag =~ /Y/i){
-		print "<br /> Observations in the Monitoring: @monitor_series_list<br />";
+		print "<br /> Remaining Observations in the Monitoring: @monitor_series_list<br />";
 	}else{
 		print "<br />";
 	}
@@ -3925,6 +3977,10 @@ if($eventfilter_lower > 0.5 || $awc_l_th == 1){
 		print '" size="8"></td></tr>';
 	}
 
+    print "<tr><td>&#160;</td><td>&#160;</td><td>&#160;</td>";
+    print "<th colspan=3>HRC SI Mode Change Only:</th>";
+    print "<td><input type='radio' name='hrc_si_select' value='no' checked>No</input>";
+    print "<input type='radio' name='hrc_si_select' value='yes'>Yes</input></td></tr>";
 	print '</table>';
 	
 	print '<hr />';
@@ -4945,7 +5001,7 @@ sub prep_submit{
 #--- aciswin cases
 #-------------------
 
-	for($j = 0; $j <= $acsiwin_no; $j++){
+	for($j = 0; $j <= $aciswin_no; $j++){
 		if($include_flag[$j] eq 'INCLUDE'){$include_flag[$j] = 'I'}
 		elsif($include_flag[$j] eq 'EXCLUDE'){$include_flag[$j] = 'E'}
 	}
@@ -7701,6 +7757,10 @@ sub submit_entry{
 	print "<input type=\"hidden\" name=\"sp_user\" value=\"$sp_user\">";
 	print "<input type=\"hidden\" name=\"email_address\" value=\"$email_address\">";
 	print "<input type=\"hidden\" name=\"cnt_modified\" value=\"$cnt_modified\">";
+#
+#--- passing si select only value
+#
+	print "<input type=\"hidden\" name=\"hrc_si_select\" value=$hrc_si_select>";
 
 	if($error_ind == 0 || $usint_on =~ /yes/){
 		if($wrong_si == 0){
@@ -8584,7 +8644,7 @@ sub lts_date_check{
 	}else{
 		@ttemp = split(/\s+/, $lts_lt_plan);
 
-       		if($ttemp[1]     =~ /Jan/i){
+       		if($ttemp[0]     =~ /Jan/i){
            		$month = '1';
 			$add = 0;
     	}elsif($ttemp[0] =~ /Feb/i){
@@ -9030,7 +9090,7 @@ sub send_email_to_mp{
 	}
 	close(IN);
 	
-	$mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+        $mp_email = 'mp@cfa.harvard.edu';
 
 	if($usint_on =~ /test/){
 		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is in Active OR List ($mp_email)\n\" $test_email");
@@ -9054,7 +9114,7 @@ sub find_usint {
     }elsif($grating =~ /HETG/i){
         $usint_mail  = 'nss@space.mit.edu  hermanm@spce.mit.edu';
     }elsif($inst    =~ /HRC/i){
-        $usint_mail  = 'juda@cfa.harvard.edu vkashyap@cfa.harvard.edu';
+        $usint_mail  = 'vkashyap@cfa.harvard.edu dpatnaude@cfa.harvard.edu';
     }else{
         if($seq_nbr < 290000){
             $usint_mail = 'swolk@cfa.harvard.edu';
@@ -9196,32 +9256,39 @@ sub oredit_sub{
 #---- general case
 #-----------------
 
+        if($hrc_si_select eq 'yes'){
+            $general_status = "NA";
+            $acis_status    = "NA";
+            $si_mode_status = "NULL";
+        } else {
+
 #------------------------------------------------------
 #---- check and update params for the verification page
 #------------------------------------------------------
 
-		if ($generaltag =~/ON/){
-			$general_status = "NA";
-		} else {
-			$general_status = "NULL";
-		}
-		if ($acistag =~/ON/){
-			$acis_status    = "NA";
-			$si_mode_status = "NA";
-		} else {
-			$acis_status    = "NULL";
-
-			if ($si_mode =~/NULL/){
-				$si_mode_status = "NA";
-			} else {
-
-				if ($sitag =~/ON/){
-					$si_mode_status = "NA";
-				} else {
-					$si_mode_status = "NULL";
-				}
-			}
-		}
+		    if ($generaltag =~/ON/){
+			    $general_status = "NA";
+		    } else {
+			    $general_status = "NULL";
+		    }
+		    if ($acistag =~/ON/){
+			    $acis_status    = "NA";
+			    $si_mode_status = "NA";
+		    } else {
+			    $acis_status    = "NULL";
+    
+			    if ($si_mode =~/NULL/){
+				    $si_mode_status = "NA";
+			    } else {
+    
+				    if ($sitag =~/ON/){
+					    $si_mode_status = "NA";
+				    } else {
+					    $si_mode_status = "NULL";
+				    }
+			    }
+		    }
+        }
 	}
 
 
@@ -9532,3 +9599,264 @@ sub find_aiming_point{
     return ($chipx, $chipy);
 }
 
+
+##################################################################################
+## send_lt_warning_email: send out a warning email to mp abou a late submission ##
+##################################################################################
+
+sub send_lt_warning_email{
+
+	$temp_file = "$temp_dir/mp_lts";
+	open(ZOUT, ">$temp_file");
+	
+	print ZOUT "\n\nA user: $submitter submitted changes of  ";
+	print ZOUT "OBSID: $obsid which is in 10 days from the closest Monday to LTS date.\n\n";
+	
+	print ZOUT "The contact email_address address is: $email_address\n\n";
+	
+	print ZOUT "Its Ocat Data Page is:\n";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
+
+	print ZOUT "If you like to see what were changed:\n";
+
+	$file_name = "$obsid".'.'."$rev";
+	print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
+
+	print ZOUT "If you have any question about this email, please contact ";
+	print ZOUT "swolk\@head.cfa.harvard.edu.","\n\n\n";
+    
+    close(ZOUT);
+	
+
+#
+#--- find out who is the mp contact person for this obsid
+#
+    $mp_contact = '';
+	open(IN, "$obs_ss/scheduled_obs_list");
+	OUTER:
+	while(<IN>){
+		chomp $_;
+		@mtemp = split(/\s+/, $_);
+        $msave = $mtemp[1];
+		if($obsid == $mtemp[0]){
+			$mp_contact = $mtemp[1];
+			last OUTER;
+		}
+	}
+	close(IN);
+#
+#--- if no mp is assigned for this obsid, use the last person listed on the list
+#
+    if($mp_contact eq ''){
+        $mp_contact = $msave;
+    }
+
+    $mp_email = 'mp@cfa.harvard.edu';
+
+	if($usint_on =~ /test/){
+		system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is Scheduled in $lts_diff days ($mp_email)\n\" $test_email");
+	}else{
+		#system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is Scheduled in $lts_diff days\n\"  $mp_email cus\@head.cfa.harvard.edu");
+	}
+
+	system("rm $temp_file");
+
+}
+
+##################################################################################
+### send_lt_warning_email2: send out a warning email to USINT  a late submission ##
+###################################################################################
+
+sub send_lt_warning_email2{
+
+#
+#--- find out who is the mp contact person for this obsid
+#
+    $mp_contact = '';
+    open(IN, "$obs_ss/scheduled_obs_list");
+    OUTER:
+    while(<IN>){
+        chomp $_;
+        @mtemp = split(/\s+/, $_);
+        $msave = $mtemp[1];
+        if($obsid == $mtemp[0]){
+            $mp_contact = $mtemp[1];
+            last OUTER;
+        }
+    }
+    close(IN);
+#
+#--- if no mp is assigned for this obsid, use the last person listed on the list
+#
+    if($mp_contact eq ''){
+        $mp_contact = $msave;
+    }
+    
+    $mp_email = "$mp_contact".'@head.cfa.harvard.edu';
+    
+    
+    $temp_file = "$temp_dir/mp_lts";
+    open(ZOUT, ">$temp_file");
+    
+    print ZOUT "\n\nA You submitted changes of  ";
+    print ZOUT "OBSID: $obsid which is scheduled in 10 days.\n\n";
+    
+    print ZOUT "The email_address of MP: mp\@cfa.harvard.edu.\n\n";
+    
+    print ZOUT "Its Ocat Data Page is:\n";
+    print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/ocatdata2html.cgi?$obsid\n\n\n";
+    
+    print ZOUT "If you like to see what were changed:\n";
+    
+    $file_name = "$obsid".'.'."$rev";
+    print ZOUT "https://cxc.cfa.harvard.edu/mta/CUS/Usint/chkupdata.cgi?$file_name\n\n\n";
+    
+    print ZOUT "If you have any question about this email, please contact ";
+    print ZOUT "swolk\@head.cfa.harvard.edu.","\n\n\n";
+    
+    close(ZOUT);
+    
+    
+    if($usint_on =~ /test/){
+        system("cat $temp_file | mailx -s\"Subject:TEST!! Change to Obsid $obsid Which Is Scheduled in $lts_diff days ($email_address)\n\" $test_email");
+    }else{
+        #system("cat $temp_file | mailx -s\"Subject: Change to Obsid $obsid Which Is Scheduled in $lts_diff days\n\"  $email_address cus\@head.cfa.harvard.edu");
+    }
+
+    system("rm $temp_file");
+
+}
+
+##################################################################################
+## check_lts_date_coming: check whether lts date is coming less than 10 days    ##
+##################################################################################
+
+sub check_lts_date_coming{
+
+    if($lts_lt_plan eq ''){
+        return 0;
+    }
+#
+#--- today's date
+#
+	($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
+	$uyear = 1900 + $year;
+#
+#--- convert today's date in fractional year
+#
+    $val = is_liea_year($uyear);
+    if($val == 1){
+        $base = 366;
+    }else{
+        $base = 365;
+    }
+
+    $tyear = $uyear + $yday / $base;
+#
+#--- convert the lts date into fractional year
+#
+    $lts = lts_date_to_fyear($lts_lt_plan);
+#
+#--- warning date: how many more day left to lts date
+#
+    $diff     = $lts - $tyear;
+    $lts_diff = int($diff * $base);
+#
+#--- setting the warning start date to the Monday before the real lts date
+#
+    if($wday == 0){
+        $sday = 6;
+    }else{
+        $sday = $wday -1;
+    }
+#
+#-- 11 day  + M interval in fractional year
+#
+    $interval = (11.0 + $sday) / $base;
+
+    if($diff <= $interval){
+        return 1;
+    }else{
+        return 0;
+    }
+
+}    
+
+##################################################################################
+## lts_date_to_fyear: converting lts date format to fractional year format     ###
+##################################################################################
+
+sub lts_date_to_fyear{
+
+    ($lts_date) = @_;
+
+    if($lts_date eq ''){
+        return "";
+    }
+
+    @atemp = split(/\s+/, $lts_date);
+    $mon   = $atemp[0];
+    $day   = $atemp[1];
+    $year  = $atemp[2];
+#
+#--- month is in the letter from; convert it into digit
+#
+    $i = 1;
+    foreach $cmon ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'){
+        if($mon eq $cmon){
+            $mon = $i;
+            last;
+        }else{
+            $i++;
+        }
+    }
+#
+#--- check whether the year is a leap year
+#
+    $val = is_liea_year($year);
+
+    if($val == 1){
+        @m_list =(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335);
+        $base = 366;
+    }else{
+        @m_list =(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334);
+        $base = 365;
+    }
+
+    $add = $m_list[$mon-1];
+
+    $fyear = $year + ($add + $day) / $base;
+
+    return $fyear;
+
+}
+
+##################################################################################
+## is_liea_year: check a given year is a leap year                             ###
+##################################################################################
+
+sub is_liea_year{
+
+    ($lyear) = @_;
+
+    $chk  = $lyear % 4;
+    $chk2 = $lyear % 100;
+    $chk3 = $lyear % 400;
+
+    $val = 0;
+    if($chk == 0){
+        $val = 1;
+        if($chk2 == 0){
+            $val = 0;
+        }
+    }
+    if($chk3 == 0){
+        $val = 1;
+    }
+    
+    return $val;
+}
+    
+    
+        
+        
