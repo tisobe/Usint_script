@@ -10,7 +10,7 @@ use CGI;
 #		originally written by						#
 # 		R. Kilgard, Jan 30/31 2000					#
 #										#
-#	last update: Apr 24, 2015						#
+#	last update: Apr 11, 2017						#
 #										#
 #										#
 #################################################################################
@@ -428,7 +428,7 @@ sub print_month_html {
     		unless ($dutysci_status =~/NA/){
 			print OUT "<tr>";
 			print OUT "\n";
-			print OUT "<td><a href=\"http://cxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
+			print OUT "<td><a href=\"https://icxc.harvard.edu/uspp/updates/$obsrev\">$obsrev</a><br />$seqnum<br />$ftime<br />$user</td>";
 			print OUT "\n";
 			print OUT "<td>$general_status</td><td>$acis_status</td><td>$si_mode_status</td><td style='color=#005C00'>$dutysci_status</td></tr>";
 			print OUT "\n";

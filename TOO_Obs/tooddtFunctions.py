@@ -6,7 +6,7 @@
 #                                                                                                                   #
 #       author: t. isobe (tisobe@cfa.harvard.edu)                                                                   #
 #                                                                                                                   #
-#       last update: Jul 10, 2015                                                                                   #
+#       last update: Jan 09, 2017                                                                                   #
 #                                                                                                                   #
 #####################################################################################################################
 
@@ -222,7 +222,7 @@ def match_usint_person(type, grating, seq, instrument, target):
         poc = 'letg'
     elif grating.lower() == 'hetg':
         poc = 'hetg'
-    elif instrument.lower() == 'hrc':
+    elif (instrument.lower() == 'hrc') or (instrument.lower() == 'hrc-i') or (instrument.lower() == 'hrc-s'):
         poc = 'hrc'
     elif seq >= 100000 and seq < 300000:
         poc = 'sjw'
@@ -237,7 +237,8 @@ def match_usint_person(type, grating, seq, instrument, target):
     elif seq >= 600000 and seq < 700000:
         poc = 'ping'
     elif seq >= 700000 and seq < 800000:
-        poc = 'brad'
+#        poc = 'brad'
+        poc = 'malgosia'
     elif seq >= 800000 and seq < 900000:
         poc = 'ping'
     elif seq >= 900000 and seq < 1000000:
